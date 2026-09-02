@@ -69,7 +69,7 @@ class AuthController extends Controller
     protected function getRedirectRouteAfterAuth(): string
     {
         return match (Auth::user()->role ?? 'pelanggan') {
-            'admin' => route('dashboard.admin'),
+            'admin' => route('admin.dashboard'),
             'karyawan' => route('dashboard.karyawan'),
             default => route('home'),
         };
