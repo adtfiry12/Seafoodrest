@@ -1,7 +1,6 @@
 @extends('template.back_admin')
 
 @section('content')
-<!-- Integrasi Alpine.js untuk sistem keranjang -->
 <div class="space-y-6 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
      x-data="posSystem({{ $menu->toJson() }})">
 
@@ -15,13 +14,11 @@
         </a>
     </div>
 
-    <!-- Form Pembungkus -->
     <form action="{{ route('admin.transaksi.store') }}" method="POST" id="form-transaksi">
         @csrf
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            <!-- KOLOM KIRI: Data Pesanan -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
                     <h3 class="font-bold text-charcoal-900 border-b border-slate-100 pb-2">Detail Pesanan</h3>
@@ -65,7 +62,6 @@
                     </div>
                 </div>
 
-                <!-- Ringkasan & Tombol Submit -->
                 <div class="bg-charcoal-900 rounded-2xl p-5 shadow-lg text-white">
                     <h3 class="font-bold border-b border-charcoal-700 pb-2 mb-4">Total Pembayaran</h3>
                     <div class="flex justify-between items-center mb-6">
@@ -82,10 +78,8 @@
                 </div>
             </div>
 
-            <!-- KOLOM KANAN: Daftar Menu & Keranjang -->
             <div class="lg:col-span-2 space-y-6">
 
-                <!-- Keranjang Aktif -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                     <h3 class="font-bold text-charcoal-900 border-b border-slate-100 pb-2 mb-4">Keranjang Pesanan</h3>
 
@@ -96,7 +90,6 @@
                     <div class="space-y-3">
                         <template x-for="(item, index) in cart" :key="item.id">
                             <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
-                                <!-- Hidden input untuk form Laravel -->
                                 <input type="hidden" :name="`items[${index}][menu_id]`" :value="item.id">
                                 <input type="hidden" :name="`items[${index}][qty]`" :value="item.qty">
 
@@ -119,7 +112,6 @@
                     </div>
                 </div>
 
-                <!-- Daftar Menu (Katalog) -->
                 <div>
                     <h3 class="font-bold text-charcoal-900 mb-3">Pilih Menu Seafood</h3>
                     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -150,7 +142,6 @@
     </form>
 </div>
 
-<!-- Script Alpine.js khusus halaman ini -->
 <script>
     document.addEventListener('alpine:init', () => {
         Alpine.data('posSystem', (menus) => ({

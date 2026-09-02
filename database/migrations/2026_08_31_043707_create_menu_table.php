@@ -19,6 +19,7 @@ return new class extends Migration
         $table->string('gambar')->nullable();
         $table->integer('harga')->default(0);
         $table->integer('stok')->default(0);
+        $table->string('slug')->unique();
         $table->boolean('is_active')->default(true);
         $table->timestamps();
         });

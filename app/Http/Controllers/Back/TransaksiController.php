@@ -69,8 +69,8 @@ class TransaksiController extends Controller
 
             $transaksi = Transaksi::create([
                 'kode_transaksi'    => $kode,
-                'pengguna_id'       => $request->pengguna_id, // Null jika pelanggan umum/guest offline
-                'karyawan_id'       => Auth::id(), // Karyawan yang input
+                'pengguna_id'       => $request->pengguna_id,
+                'karyawan_id'       => Auth::id(),
                 'tipe_pesanan'      => $request->tipe_pesanan,
                 'alamat'            => $request->alamat,
                 'metode_pembayaran' => $request->metode_pembayaran,
@@ -86,7 +86,6 @@ class TransaksiController extends Controller
             }
 
             DB::commit();
-            // REVISI: Menggunakan $transaksi->kode_transaksi
             return redirect()->route('admin.transaksi.show', $transaksi->kode_transaksi)->with('success', 'Transaksi berhasil dibuat!');
 
         } catch (\Exception $e) {
@@ -117,7 +116,6 @@ class TransaksiController extends Controller
 
         $transaksi->update($validated);
 
-        // REVISI: Menggunakan $transaksi->kode_transaksi
         return redirect()->route('admin.transaksi.show', $transaksi->kode_transaksi)->with('success', 'Status transaksi berhasil diperbarui!');
     }
 

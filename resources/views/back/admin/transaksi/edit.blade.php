@@ -14,7 +14,6 @@
     </div>
 
     <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
-        <!-- REVISI: Action form menggunakan $transaksi->kode_transaksi -->
         <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')

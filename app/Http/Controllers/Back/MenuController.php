@@ -7,12 +7,13 @@ use App\Models\Menu;
 use App\Models\Kategori;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class MenuController extends Controller
 {
     public function index()
     {
-        $menu = Menu::with('kategori')->latest()->paginate(5);
+        $menu = Menu::with('kategori')->latest()->paginate(10);
         return view('back.admin.menu.index', compact('menu'));
     }
 
@@ -24,24 +25,31 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'kategori_id' => 'required|exists:kategori,id',
+        $request->validate([
             'nama_menu'   => 'required|string|max:255',
-            'deskripsi'   => 'nullable|string',
+            'kategori_id' => 'required|exists:kategori,id',
             'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|numeric|min:0',
-            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_active'   => 'boolean'
+            'stok'        => 'required|integer|min:0',
+            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'deskripsi'   => 'nullable|string',
         ]);
 
-        if ($request->hasFile('gambar')) {
-            $path = $request->file('gambar')->store('menu_images', 'public');
-            $validated['gambar'] = $path;
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+
+        $data['slug'] = Str::slug($request->nama_menu);
+
+        $originalSlug = $data['slug'];
+        $count = 1;
+        while (Menu::where('slug', $data['slug'])->exists()) {
+            $data['slug'] = $originalSlug . '-' . $count++;
         }
 
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('menu', 'public');
+        }
 
-        Menu::create($validated);
+        Menu::create($data);
 
         return redirect()->route('admin.menu.index')->with('success', 'Menu berhasil ditambahkan!');
     }
@@ -54,38 +62,49 @@ class MenuController extends Controller
 
     public function update(Request $request, Menu $menu)
     {
-        $validated = $request->validate([
-            'kategori_id' => 'required|exists:kategori,id',
+        $request->validate([
             'nama_menu'   => 'required|string|max:255',
-            'deskripsi'   => 'nullable|string',
+            'kategori_id' => 'required|exists:kategori,id',
             'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|numeric|min:0',
-            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'is_active'   => 'boolean'
+            'stok'        => 'required|integer|min:0',
+            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'deskripsi'   => 'nullable|string',
         ]);
 
-        if ($request->hasFile('gambar')) {
-            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
-                Storage::disk('public')->delete($menu->gambar);
+        $data = $request->all();
+        $data['is_active'] = $request->has('is_active') ? 1 : 0;
+
+        if ($request->nama_menu !== $menu->nama_menu) {
+            $data['slug'] = Str::slug($request->nama_menu);
+
+            $originalSlug = $data['slug'];
+            $count = 1;
+            while (Menu::where('slug', $data['slug'])->where('id', '!=', $menu->id)->exists()) {
+                $data['slug'] = $originalSlug . '-' . $count++;
             }
-            $path = $request->file('gambar')->store('menu_images', 'public');
-            $validated['gambar'] = $path;
         }
 
-        $validated['is_active'] = $request->has('is_active') ? 1 : 0;
+        if ($request->hasFile('gambar')) {
+            if ($menu->gambar) {
+                Storage::disk('public')->delete($menu->gambar);
+            }
+            $data['gambar'] = $request->file('gambar')->store('menu', 'public');
+        }
 
-        $menu->update($validated);
+        $menu->update($data);
 
         return redirect()->route('admin.menu.index')->with('success', 'Menu berhasil diperbarui!');
     }
 
     public function destroy(Menu $menu)
     {
-        if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+        if ($menu->gambar) {
             Storage::disk('public')->delete($menu->gambar);
         }
 
+        // Hapus data dari database
         $menu->delete();
+
         return redirect()->route('admin.menu.index')->with('success', 'Menu berhasil dihapus!');
     }
 }

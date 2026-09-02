@@ -4,9 +4,7 @@
 
 <div class="space-y-6 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-    <!-- Ucapan Selamat Datang -->
     <div class="bg-charcoal-950 rounded-2xl p-6 sm:p-8 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg overflow-hidden relative">
-        <!-- Dekorasi Background -->
         <div class="absolute -right-10 -top-10 opacity-10 pointer-events-none">
             <i class="fa-solid fa-anchor text-9xl"></i>
         </div>
@@ -27,9 +25,7 @@
         </div>
     </div>
 
-    <!-- 4 Widget Statistik -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <!-- Widget Pendapatan -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
@@ -42,7 +38,6 @@
             </div>
         </div>
 
-        <!-- Widget Pesanan Baru -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
@@ -55,7 +50,6 @@
             </div>
         </div>
 
-        <!-- Widget Total Menu -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
@@ -68,7 +62,6 @@
             </div>
         </div>
 
-        <!-- Widget Pelanggan -->
         <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
@@ -82,9 +75,7 @@
         </div>
     </div>
 
-    <!-- Area Grafik & Menu Terlaris -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Grafik Penjualan (Kiri, 2 Kolom) -->
         <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-4">
                 <h3 class="font-bold text-charcoal-900">Grafik Pendapatan (7 Hari Terakhir)</h3>
@@ -94,7 +85,6 @@
             </div>
         </div>
 
-        <!-- Top Menu Terlaris (Kanan, 1 Kolom) -->
         <div class="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <h3 class="font-bold text-charcoal-900 border-b border-slate-100 pb-4 mb-4">Menu Paling Laris</h3>
             <div class="space-y-4">
@@ -124,7 +114,6 @@
         </div>
     </div>
 
-    <!-- Tabel Transaksi Terbaru -->
     <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
         <div class="p-6 border-b border-slate-100 flex justify-between items-center">
             <h3 class="font-bold text-charcoal-900">5 Transaksi Terbaru</h3>
@@ -177,12 +166,10 @@
 
 </div>
 
-<!-- Inisialisasi Chart.js -->
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const ctx = document.getElementById('salesChart').getContext('2d');
 
-        // Ambil data dari backend PHP
         const chartLabels = {!! json_encode($chartDates) !!};
         const chartData = {!! json_encode($chartTotals) !!};
 
@@ -193,7 +180,7 @@
                 datasets: [{
                     label: 'Pendapatan (Rp)',
                     data: chartData,
-                    borderColor: '#f59e0b', // Gold-500 Tailwind
+                    borderColor: '#f59e0b',
                     backgroundColor: 'rgba(245, 158, 11, 0.1)',
                     borderWidth: 3,
                     pointBackgroundColor: '#fff',
@@ -201,7 +188,7 @@
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     fill: true,
-                    tension: 0.4 // Membuat kurva melengkung halus
+                    tension: 0.4
                 }]
             },
             options: {
@@ -225,7 +212,7 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { borderDash: [4, 4], color: '#f1f5f9' }, // Garis grid putus-putus samar
+                        grid: { borderDash: [4, 4], color: '#f1f5f9' },
                         ticks: {
                             callback: function(value) {
                                 if (value >= 1000000) return 'Rp ' + (value / 1000000) + ' Jt';
@@ -235,7 +222,7 @@
                         }
                     },
                     x: {
-                        grid: { display: false } // Hilangkan garis vertikal
+                        grid: { display: false }
                     }
                 }
             }

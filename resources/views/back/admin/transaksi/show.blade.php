@@ -9,7 +9,6 @@
             <p class="text-sm text-slate-500 mt-1">Kode: <span class="font-mono font-bold text-charcoal-900">{{ $transaksi->kode_transaksi }}</span></p>
         </div>
 
-        <!-- BAGIAN INI YANG DIUPDATE: Tambah tombol Cetak & ubah param jadi kode_transaksi -->
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('admin.transaksi.cetak', $transaksi->kode_transaksi) }}" target="_blank" class="px-4 py-2 text-sm font-medium text-charcoal-900 bg-gold-500 rounded-lg hover:bg-gold-600 transition shadow-sm">
                 <i class="fa-solid fa-print mr-2"></i> Cetak Struk

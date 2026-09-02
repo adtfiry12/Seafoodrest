@@ -68,10 +68,8 @@
             <p class="text-xs text-gray-400 mt-2">Struk akan otomatis dicetak saat halaman dibuka.</p>
         </div>
 
-        <!-- Header Struk dengan LOGO -->
         <div class="text-center border-b-2 border-dashed border-gray-400 pb-3 mb-3 flex flex-col items-center">
 
-            <!-- LOGO DISINI -->
             <img src="{{ asset('image/niskala sammudra.png') }}" alt="Logo Niskala Samudra" class="logo-struk">
 
             <h1 class="text-lg font-bold uppercase tracking-wider">Niskala Samudra</h1>
@@ -150,7 +148,6 @@
         </div>
     </div>
 
-    <!-- Script Auto Print -->
     <script>
         window.onload = function() {
             window.print();

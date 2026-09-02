@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str; // WAJIB TAMBAH INI
 
 class Menu extends Model
 {
@@ -13,16 +13,25 @@ class Menu extends Model
     protected $table = 'menu';
 
     protected $fillable = [
-        'kategori_id',
-        'nama_menu',
-        'deskripsi',
-        'gambar',
-        'harga',
-        'stok',
-        'is_active',
+        'kategori_id', 'nama_menu', 'slug', 'deskripsi', 'harga', 'gambar', 'stok', 'is_active'
     ];
 
-    public function kategori(): BelongsTo
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::saving(function ($menu) {
+            if (empty($menu->slug)) {
+                $menu->slug = Str::slug($menu->nama_menu);
+            }
+        });
+    }
+
+    public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');
     }

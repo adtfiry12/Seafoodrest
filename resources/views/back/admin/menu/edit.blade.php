@@ -14,7 +14,8 @@
     </div>
 
     <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
-        <form action="{{ route('admin.menu.update', $menu->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- DIUBAH MENJADI $menu->slug -->
+        <form action="{{ route('admin.menu.update', $menu->slug) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
 

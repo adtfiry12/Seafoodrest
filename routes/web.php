@@ -8,16 +8,21 @@ use App\Http\Controllers\Back\PenggunaController;
 use App\Http\Controllers\Back\ProfileController;
 use App\Http\Controllers\Back\SlideController;
 use App\Http\Controllers\Back\TransaksiController;
+use App\Http\Controllers\Front\CheckoutController;
 use App\Http\Controllers\Front\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Pengguna & No Login
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/tentang-kami', [HomeController::class, 'tentang'])->name('tentang');
-Route::get('/menu-kami', [HomeController::class, 'menu'])->name('menu');
+Route::get('/tentang', [HomeController::class, 'tentang'])->name('tentang');
+Route::get('/menu', [HomeController::class, 'menu'])->name('menu');
+Route::get('/menu/{slug}', [HomeController::class, 'detailMenu'])->name('menu.detail');
 Route::get('/kontak', [HomeController::class, 'kontak'])->name('kontak');
-
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout/proses', [CheckoutController::class, 'proses'])->name('checkout.proses');
+Route::get('/checkout/qris/{kode_transaksi}', [CheckoutController::class, 'qris'])->name('checkout.qris');
+Route::post('/checkout/qris/{kode_transaksi}/upload', [CheckoutController::class, 'uploadBukti'])->name('checkout.qris.upload');
+Route::get('/checkout/sukses/{kode_transaksi}', [CheckoutController::class, 'sukses'])->name('checkout.sukses');
 // Guest (no login)
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -32,6 +37,10 @@ Route::middleware('auth')->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Pesanan
+    Route::get('/pesanan', [CheckoutController::class, 'pesanan'])->name('front.pesanan');
+    Route::get('/pesanan/struk/{kode_transaksi}', [CheckoutController::class, 'struk'])->name('front.struk');
 
     // profile
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');

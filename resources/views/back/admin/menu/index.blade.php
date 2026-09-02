@@ -77,10 +77,12 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right space-x-1">
-                                <a href="{{ route('admin.menu.edit', $item->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200">
+                                <!-- DIUBAH MENJADI $item->slug -->
+                                <a href="{{ route('admin.menu.edit', $item->slug) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
-                                <form action="{{ route('admin.menu.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus menu ini secara permanen?')">
+                                <!-- DIUBAH MENJADI $item->slug -->
+                                <form action="{{ route('admin.menu.destroy', $item->slug) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus menu ini secara permanen?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200">

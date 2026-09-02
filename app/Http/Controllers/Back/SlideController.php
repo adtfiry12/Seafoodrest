@@ -18,7 +18,6 @@ class SlideController extends Controller
 
     public function create()
     {
-        // Hanya ambil menu yang aktif untuk pilihan link slide
         $menu = Menu::where('is_active', 1)->get();
         return view('back.admin.slide.create', compact('menu'));
     }
@@ -30,7 +29,7 @@ class SlideController extends Controller
             'sub_judul' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
             'menu_id'   => 'nullable|exists:menu,id',
-            'gambar'    => 'required|image|mimes:jpeg,png,jpg,webp|max:2048', // Wajib saat create
+            'gambar'    => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean'
         ]);
 

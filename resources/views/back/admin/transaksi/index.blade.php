@@ -3,7 +3,6 @@
 @section('content')
 <div class="space-y-6 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-    <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div class="flex items-center gap-4">
             <div class="inline-flex items-center justify-center w-12 h-12 bg-gold-50 text-gold-600 rounded-xl shrink-0">
@@ -26,7 +25,6 @@
         </div>
     @endif
 
-    <!-- TOMBOL SORTIR/FILTER STATUS -->
     <div class="flex flex-wrap gap-2 mb-2">
         @php $currentStatus = request('status', 'Semua'); @endphp
 
@@ -52,7 +50,6 @@
         </a>
     </div>
 
-    <!-- TABEL TRANSAKSI -->
     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-600">

@@ -41,7 +41,6 @@
             </div>
 
             <div class="p-8">
-                <!-- Arahkan ke route login -->
                 <form action="{{ route('login.submit') }}" method="POST" class="space-y-6">
                     @csrf
 
@@ -80,7 +79,6 @@
                 </form>
             </div>
 
-            <!-- Bagian Link ke Register -->
             <div class="px-8 py-5 border-t border-slate-100 bg-slate-50 text-center">
                 <p class="text-sm text-slate-600">
                     Belum punya akun?
