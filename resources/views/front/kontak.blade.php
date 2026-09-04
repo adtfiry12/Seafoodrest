@@ -4,7 +4,7 @@
 
 <section class="relative h-[300px] sm:h-[400px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=1600" alt="Kontak Niskala Samudra" class="w-full h-full object-cover object-center">
+        <img src="{{ asset('image/contactmenu.webp') }}" alt="Kontak Niskala Samudra" class="w-full h-full object-cover object-center">
         <div class="absolute inset-0 bg-charcoal-950/70"></div>
     </div>
 
@@ -46,8 +46,8 @@
                                 <i class="fa-solid fa-phone-volume"></i>
                             </div>
                             <div>
-                                <h4 class="font-bold text-charcoal-900 mb-1">Telepon / Reservasi</h4>
-                                <p class="text-sm text-slate-500 leading-relaxed">+62 812-3456-7890<br>+62 898-7654-3210</p>
+                                <h4 class="font-bold text-charcoal-900 mb-1">Telepon </h4>
+                                <p class="text-sm text-slate-500 leading-relaxed">+62 851-9119-4059</p>
                             </div>
                         </div>
 
@@ -67,7 +67,7 @@
                             </div>
                             <div>
                                 <h4 class="font-bold text-charcoal-900 mb-1">Email</h4>
-                                <p class="text-sm text-slate-500 leading-relaxed">info@niskalasamudra.com<br>reservasi@niskalasamudra.com</p>
+                                <p class="text-sm text-slate-500 leading-relaxed">niskalasamudra@gmailcom</p>
                             </div>
                         </div>
                     </div>

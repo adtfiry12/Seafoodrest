@@ -15,7 +15,6 @@
         <div class="space-y-6">
             @forelse($transaksi as $trx)
                 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <!-- Header Transaksi -->
                     <div class="bg-slate-100/50 px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                             <p class="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">{{ $trx->created_at->format('d M Y, H:i') }}</p>
@@ -34,7 +33,6 @@
                         </div>
                     </div>
 
-                    <!-- Detail Transaksi -->
                     <div class="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div class="flex-1">
                             <h4 class="font-bold text-charcoal-900 mb-2">{{ $trx->tipe_pesanan }}</h4>
@@ -74,6 +72,12 @@
                 </div>
             @endforelse
         </div>
+
+        @if($transaksi->hasPages())
+            <div class="mt-8">
+                {{ $transaksi->links() }}
+            </div>
+        @endif
 
     </div>
 </section>

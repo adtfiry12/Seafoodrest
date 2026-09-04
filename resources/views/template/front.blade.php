@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="icon" href="{{ asset('image/niskala sammudra.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
@@ -28,11 +29,17 @@
     <div class="bg-charcoal-950 text-slate-300 text-xs py-2 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div class="flex gap-6">
-                <span class="flex items-center gap-2"><i class="fa-solid fa-phone text-gold-500"></i> +62 812-3456-7890</span>
-                <span class="flex items-center gap-2"><i class="fa-solid fa-envelope text-gold-500"></i> reservasi@niskalasamudra.com</span>
+                <span class="flex items-center gap-2"><i class="fa-solid fa-phone text-gold-500"></i> +62 851-9119-4059</span>
+                <span class="flex items-center gap-2"><i class="fa-solid fa-envelope text-gold-500"></i> niskalasamudra@gmail.com</span>
             </div>
             <div class="flex gap-4 items-center">
                 <span class="flex items-center gap-2"><i class="fa-solid fa-clock text-gold-500"></i> Buka Setiap Hari: 10.00 - 22.00</span>
+                <span class="h-4 w-px bg-slate-600"></span>
+                <div class="flex items-center gap-3">
+                    <a href="#" aria-label="Instagram" class="hover:text-gold-400 transition"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook" class="hover:text-gold-400 transition"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" aria-label="WhatsApp" class="hover:text-gold-400 transition"><i class="fa-brands fa-whatsapp"></i></a>
+                </div>
             </div>
         </div>
     </div>
@@ -113,7 +120,7 @@
                     <div class="mt-4 pt-4 border-t border-slate-100">
                         <p class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Akun Saya</p>
                         @if(in_array(Auth::user()->role, ['admin', 'karyawan']))
-                            <a href="{{ Auth::user()->role == 'admin' ? route('admin.dashboard') : route('dashboard.karyawan') }}" class="block px-3 py-3 text-sm text-charcoal-800 font-medium border-b border-slate-50">Dashboard Resto</a>
+                            <a href="{{ Auth::user()->role == 'admin' ? route('admin.dashboard') : route('dashboard.karyawan') }}" class="block px-3 py-3 text-sm text-charcoal-800 font-medium border-b border-slate-50">Dashboard</a>
                         @endif
                         <a href="{{ route('profile.index') }}" class="block px-3 py-3 text-sm text-charcoal-800 font-medium border-b border-slate-50">Profil</a>
                         <form method="POST" action="{{ route('logout') }}">
@@ -126,7 +133,7 @@
         </div>
     </header>
 
-    <div class="flex-grow">
+    <div class="grow">
         @yield('content')
     </div>
 
@@ -155,8 +162,8 @@
                     <h4 class="text-white font-serif font-bold mb-6 text-lg border-b-2 border-charcoal-800 pb-2 inline-block">Hubungi Kami</h4>
                     <ul class="space-y-4 text-sm font-light text-slate-400">
                         <li class="flex items-start gap-3"><i class="fa-solid fa-location-dot mt-1 text-gold-500"></i> Jl. Pantai Kartini No. 12, Jepara, Jawa Tengah</li>
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-phone text-gold-500"></i> +62 812-3456-7890</li>
-                        <li class="flex items-center gap-3"><i class="fa-solid fa-envelope text-gold-500"></i> reservasi@niskalasamudra.com</li>
+                        <li class="flex items-center gap-3"><i class="fa-solid fa-phone text-gold-500"></i> +62 851-9119-4059</li>
+                        <li class="flex items-center gap-3"><i class="fa-solid fa-envelope text-gold-500"></i> niskalasamudra@gmail.com</li>
                     </ul>
                 </div>
                 <div>

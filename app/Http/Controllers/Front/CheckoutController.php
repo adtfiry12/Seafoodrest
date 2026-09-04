@@ -19,7 +19,6 @@ class CheckoutController extends Controller
 
     public function proses(Request $request)
     {
-        // 1. Validasi Data Dasar
         $request->validate([
             'tipe_pesanan' => 'required',
             'metode_pembayaran' => 'required',
@@ -27,19 +26,16 @@ class CheckoutController extends Controller
             'total_bayar' => 'required|numeric'
         ]);
 
-        // 2. Mapping Tipe Pesanan & Metode Pembayaran ke Enum Database
-        $enumTipePesanan = 'Dine-In'; // Default
+        $enumTipePesanan = 'Dine-In';
         if ($request->tipe_pesanan == 'Delivery') {
             $enumTipePesanan = 'Delivery';
         }
 
-        // INI TAMBAHANNYA: Ubah "Kasir" jadi "Tunai" agar diterima Database
         $enumMetodePembayaran = $request->metode_pembayaran;
         if ($request->metode_pembayaran == 'Kasir') {
             $enumMetodePembayaran = 'Tunai';
         }
 
-        // 3. TRIK NINJA: Rangkai semua info ke dalam Catatan
         $infoPelanggan = "";
         if (!Auth::check()) {
             $infoPelanggan = "[GUEST] Nama: " . $request->nama . " | HP: " . $request->no_hp . "\n";
@@ -57,26 +53,21 @@ class CheckoutController extends Controller
         $catatanAsli = $request->catatan ? "Catatan Dapur: " . $request->catatan : "";
         $finalCatatan = $infoPelanggan . $infoDineIn . $catatanAsli;
 
-        // 4. Generate Kode Transaksi (Contoh: TRX-20260902-XXXX)
-        $tanggal = date('Ymd');
-        $urutan = Transaksi::whereDate('created_at', date('Y-m-d'))->count() + 1;
-        $kodeTransaksi = 'TRX-' . $tanggal . '-' . str_pad($urutan, 4, '0', STR_PAD_LEFT);
+        $kodeTransaksi = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
-        // 5. Simpan Data ke Tabel Transaksi
         $transaksi = Transaksi::create([
             'kode_transaksi' => $kodeTransaksi,
-            'pengguna_id' => Auth::id(), // Akan bernilai null jika guest
+            'pengguna_id' => Auth::id(),
             'karyawan_id' => null,
             'tipe_pesanan' => $enumTipePesanan,
             'alamat' => $request->tipe_pesanan == 'Delivery' ? $request->alamat : null,
-            'metode_pembayaran' => $enumMetodePembayaran, // Gunakan variabel mapping
+            'metode_pembayaran' => $enumMetodePembayaran,
             'status_pembayaran' => 'Belum Lunas',
             'status_pesanan' => 'Menunggu ACC',
             'total_bayar' => $request->total_bayar,
             'catatan' => trim($finalCatatan),
         ]);
 
-        // 6. Simpan Item Keranjang ke Detail Transaksi
         foreach ($request->items as $item) {
             DetailTransaksi::create([
                 'transaksi_id' => $transaksi->id,
@@ -87,7 +78,6 @@ class CheckoutController extends Controller
             ]);
         }
 
-        // 7. Percabangan Arah Halaman (Routing)
         if ($enumMetodePembayaran == 'QRIS') {
             return redirect()->route('checkout.qris', $transaksi->kode_transaksi);
         }
@@ -97,29 +87,25 @@ class CheckoutController extends Controller
 
     public function qris($kode_transaksi)
     {
-        // Cari data transaksi berdasarkan kode
         $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
         return view('front.checkout.qris', compact('transaksi'));
     }
 
     public function sukses($kode_transaksi)
     {
-        // Cari data transaksi berdasarkan kode
         $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
         return view('front.checkout.success', compact('transaksi'));
     }
 
     public function pesanan()
     {
-        $transaksi = Transaksi::where('pengguna_id', Auth::id())->latest()->get();
+        $transaksi = Transaksi::where('pengguna_id', Auth::id())->latest()->paginate(2);
         return view('front.pesanan', compact('transaksi'));
     }
 
     public function struk($kode_transaksi)
     {
         $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
-
-        // Simpan kodingan struk yang kamu kasih tadi di file: resources/views/front/struk.blade.php
         return view('front.struk', compact('transaksi'));
     }
 

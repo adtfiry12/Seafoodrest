@@ -1,6 +1,8 @@
 <?php
+
 use App\Http\Controllers\Back\AuthController;
 use App\Http\Controllers\Back\DashboardController;
+use App\Http\Controllers\Back\KaryawanOperasionalController;
 use App\Http\Controllers\Back\KategoriController;
 use App\Http\Controllers\Back\LaporanController;
 use App\Http\Controllers\Back\MenuController;
@@ -13,23 +15,28 @@ use App\Http\Controllers\Front\HomeController;
 use Illuminate\Support\Facades\Route;
 
 // Pengguna & No Login
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/tentang', [HomeController::class, 'tentang'])->name('tentang');
-Route::get('/menu', [HomeController::class, 'menu'])->name('menu');
-Route::get('/menu/{slug}', [HomeController::class, 'detailMenu'])->name('menu.detail');
-Route::get('/kontak', [HomeController::class, 'kontak'])->name('kontak');
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout/proses', [CheckoutController::class, 'proses'])->name('checkout.proses');
-Route::get('/checkout/qris/{kode_transaksi}', [CheckoutController::class, 'qris'])->name('checkout.qris');
-Route::post('/checkout/qris/{kode_transaksi}/upload', [CheckoutController::class, 'uploadBukti'])->name('checkout.qris.upload');
-Route::get('/checkout/sukses/{kode_transaksi}', [CheckoutController::class, 'sukses'])->name('checkout.sukses');
-// Guest (no login)
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::controller(HomeController::class)->group(function () {
+    Route::get('/', 'index')->name('home');
+    Route::get('/tentang', 'tentang')->name('tentang');
+    Route::get('/menu', 'menu')->name('menu');
+    Route::get('/menu/{slug}', 'detailMenu')->name('menu.detail');
+    Route::get('/kontak', 'kontak')->name('kontak');
+});
 
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.submit');
+Route::controller(CheckoutController::class)->prefix('checkout')->name('checkout.')->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::post('/proses', 'proses')->name('proses');
+    Route::get('/qris/{kode_transaksi}', 'qris')->name('qris');
+    Route::post('/qris/{kode_transaksi}/upload', 'uploadBukti')->name('qris.upload');
+    Route::get('/sukses/{kode_transaksi}', 'sukses')->name('sukses');
+});
+
+// Guest (no login)
+Route::middleware('guest')->controller(AuthController::class)->group(function () {
+    Route::get('/login', 'showLogin')->name('login');
+    Route::post('/login', 'login')->name('login.submit');
+    Route::get('/register', 'showRegister')->name('register');
+    Route::post('/register', 'register')->name('register.submit');
 });
 
 // Auth
@@ -39,29 +46,47 @@ Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Pesanan
-    Route::get('/pesanan', [CheckoutController::class, 'pesanan'])->name('front.pesanan');
-    Route::get('/pesanan/struk/{kode_transaksi}', [CheckoutController::class, 'struk'])->name('front.struk');
+    Route::controller(CheckoutController::class)->prefix('pesanan')->name('front.')->group(function () {
+        Route::get('/', 'pesanan')->name('pesanan');
+        Route::get('/struk/{kode_transaksi}', 'struk')->name('struk');
+    });
 
     // profile
-    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
-    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
+    Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::put('/', 'update')->name('update');
+        Route::put('/password', 'updatePassword')->name('password');
+    });
 
     // Karyawan
     Route::middleware('role:karyawan')->prefix('karyawan')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexkaryawan'])->name('dashboard.karyawan');
+
+        Route::controller(KaryawanOperasionalController::class)->name('karyawan.')->group(function () {
+            Route::get('/pesanan-baru', 'pesananBaru')->name('pesanan_baru');
+            Route::get('/dapur', 'dapur')->name('dapur');
+            Route::get('/delivery', 'delivery')->name('delivery');
+            Route::post('/update-status/{kode_transaksi}', 'updateStatus')->name('update_status');
+            Route::get('/stok', 'stokIndex')->name('stok');
+            Route::post('/stok/{id}', 'updateStok')->name('stok.update');
+        });
     });
 
     // Admin
-    Route::middleware('role:admin')->prefix('admin')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'indexadmin'])->name('admin.dashboard');
-        Route::resource('kategori', KategoriController::class)->names('admin.kategori');
-        Route::resource('menu', MenuController::class)->names('admin.menu');
-        Route::resource('slide', SlideController::class)->names('admin.slide');
-        Route::resource('pengguna', PenggunaController::class)->names('admin.pengguna');
-        Route::resource('transaksi', TransaksiController::class)->names('admin.transaksi');
-        Route::get('transaksi/{transaksi}/cetak', [TransaksiController::class, 'cetak'])->name('admin.transaksi.cetak');
-        Route::get('laporan', [LaporanController::class, 'index'])->name('admin.laporan.index');
+    Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'indexadmin'])->name('dashboard');
+
+        // All CRUD
+        Route::resources([
+            'kategori'  => KategoriController::class,
+            'menu'      => MenuController::class,
+            'slide'     => SlideController::class,
+            'pengguna'  => PenggunaController::class,
+            'transaksi' => TransaksiController::class,
+        ]);
+
+        Route::get('transaksi/{transaksi}/cetak', [TransaksiController::class, 'cetak'])->name('transaksi.cetak');
+        Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
     });
 
 });

@@ -2,16 +2,12 @@
 
 @section('content')
 
-<!-- ================= HERO SECTION TENTANG KAMI ================= -->
 <section class="relative h-[400px] sm:h-[500px] flex items-center justify-center overflow-hidden">
-    <!-- Background Image -->
     <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?q=80&w=1600" alt="Suasana Restoran Niskala Samudra" class="w-full h-full object-cover object-center">
-        <!-- Overlay Gelap -->
+        <img src="{{ asset('image/seafood.webp') }}" alt="Suasana Restoran Niskala Samudra" class="w-full h-full object-cover object-center">
         <div class="absolute inset-0 bg-charcoal-950/70"></div>
     </div>
 
-    <!-- Hero Text -->
     <div class="relative z-10 text-center px-4 max-w-3xl mx-auto">
         <span class="text-gold-500 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm mb-4 block">Kisah Kami</span>
         <h1 class="text-4xl sm:text-6xl font-serif text-white mb-6 leading-tight">Membawa Kekayaan Samudra ke Atas Meja Anda</h1>
@@ -21,17 +17,14 @@
     </div>
 </section>
 
-<!-- ================= SEJARAH & VISI ================= -->
 <section class="bg-white py-16 sm:py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 sm:gap-16 items-center">
 
-            <!-- Kolom Gambar -->
             <div class="relative grid grid-cols-2 gap-4 sm:gap-6">
                 <img src="https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=600" alt="Koki Memasak" class="rounded-2xl shadow-xl w-full h-[250px] sm:h-[350px] object-cover mt-8 sm:mt-12">
-                <img src="https://images.unsplash.com/photo-1599021457199-3543d3b664f3?q=80&w=600" alt="Hidangan Kepiting" class="rounded-2xl shadow-xl w-full h-[250px] sm:h-[350px] object-cover">
+                <img src="{{ asset('image/lokasi.webp') }}" alt="Hidangan Kepiting" class="rounded-2xl shadow-xl w-full h-[250px] sm:h-[350px] object-cover">
 
-                <!-- Badge Mengambang -->
                 <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-4 sm:p-6 rounded-full shadow-2xl flex items-center justify-center">
                     <div class="w-16 h-16 sm:w-20 sm:h-20 border-2 border-gold-500 rounded-full flex flex-col items-center justify-center text-charcoal-900">
                         <span class="text-xl sm:text-2xl font-serif font-bold leading-none">2014</span>
@@ -40,7 +33,6 @@
                 </div>
             </div>
 
-            <!-- Kolom Teks -->
             <div class="lg:pl-8">
                 <h2 class="text-3xl sm:text-4xl font-serif text-charcoal-900 mb-6 leading-tight">Berawal dari Dermaga Kecil di Pesisir Utara</h2>
                 <p class="text-slate-600 mb-5 leading-relaxed font-light text-sm sm:text-base">
@@ -60,7 +52,6 @@
     </div>
 </section>
 
-<!-- ================= FILOSOFI & NILAI (CORE VALUES) ================= -->
 <section class="bg-charcoal-950 py-16 sm:py-24 border-t-2 border-gold-600">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -72,7 +63,6 @@
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12 text-center text-white">
 
-            <!-- Value 1 -->
             <div class="p-6">
                 <div class="w-20 h-20 mx-auto bg-charcoal-900 border border-charcoal-800 rounded-full flex items-center justify-center mb-6 text-gold-500 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
                     <i class="fa-solid fa-fish-fins text-3xl"></i>
@@ -83,7 +73,6 @@
                 </p>
             </div>
 
-            <!-- Value 2 -->
             <div class="p-6">
                 <div class="w-20 h-20 mx-auto bg-charcoal-900 border border-charcoal-800 rounded-full flex items-center justify-center mb-6 text-gold-500 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
                     <i class="fa-solid fa-mortar-pestle text-3xl"></i>
@@ -94,7 +83,6 @@
                 </p>
             </div>
 
-            <!-- Value 3 -->
             <div class="p-6">
                 <div class="w-20 h-20 mx-auto bg-charcoal-900 border border-charcoal-800 rounded-full flex items-center justify-center mb-6 text-gold-500 shadow-[0_0_30px_rgba(245,158,11,0.1)]">
                     <i class="fa-solid fa-wine-glass text-3xl"></i>
@@ -109,7 +97,6 @@
     </div>
 </section>
 
-<!-- ================= AMBIANCE (GALERI SUASANA) ================= -->
 <section class="bg-slate-50 py-16 sm:py-24">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
@@ -147,9 +134,7 @@
     </div>
 </section>
 
-<!-- ================= CALL TO ACTION (CTA) ================= -->
 <section class="bg-charcoal-900 py-16 sm:py-20 relative overflow-hidden">
-    <!-- Dekorasi Ikon Transparan -->
     <i class="fa-solid fa-utensils absolute -right-10 -bottom-10 text-[200px] text-charcoal-800 opacity-50 transform -rotate-12"></i>
 
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">

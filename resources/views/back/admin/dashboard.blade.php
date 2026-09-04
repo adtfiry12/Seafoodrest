@@ -168,10 +168,16 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const ctx = document.getElementById('salesChart').getContext('2d');
+        const canvas = document.getElementById('salesChart');
+        if (!canvas) return;
 
-        const chartLabels = {!! json_encode($chartDates) !!};
-        const chartData = {!! json_encode($chartTotals) !!};
+        const ctx = canvas.getContext('2d');
+
+        const chartLabels = {!! json_encode($chartDates ?? []) !!};
+        const chartData = {!! json_encode($chartTotals ?? [], JSON_NUMERIC_CHECK) !!};
+
+        console.log("Tanggal:", chartLabels);
+        console.log("Total Rp:", chartData);
 
         new Chart(ctx, {
             type: 'line',

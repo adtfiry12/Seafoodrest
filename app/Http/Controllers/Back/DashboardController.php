@@ -54,6 +54,17 @@ class DashboardController extends Controller
 
     public function indexkaryawan()
     {
-        return view('back.karyawan.dashboard');
+        // Hitung semua metrik operasional realtime
+        $pesananBaru = Transaksi::where('status_pesanan', 'Menunggu ACC')->count();
+        $pesananDapur = Transaksi::where('status_pesanan', 'Dimasak')->count();
+        $pesananDelivery = Transaksi::where('status_pesanan', 'Diantar')->count();
+
+        // Cek menu yang stoknya sisa 5 atau kurang
+        $stokMenipis = Menu::where('stok', '<=', 5)->count();
+        $menuMenipis = Menu::where('stok', '<=', 5)->take(5)->get();
+
+        return view('back.karyawan.dashboard', compact(
+            'pesananBaru', 'pesananDapur', 'pesananDelivery', 'stokMenipis', 'menuMenipis'
+        ));
     }
 }

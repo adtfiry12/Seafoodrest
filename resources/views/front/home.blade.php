@@ -179,7 +179,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-charcoal-900 mb-1">Telepon / WhatsApp</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">+62 812-3456-7890<br>+62 898-7654-3210</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">+62 851-9119-4059</p>
                     </div>
                 </div>
 
@@ -189,7 +189,7 @@
                     </div>
                     <div>
                         <h4 class="font-bold text-charcoal-900 mb-1">Email</h4>
-                        <p class="text-sm text-slate-500 leading-relaxed">info@niskalasamudra.com<br>reservasi@niskalasamudra.com</p>
+                        <p class="text-sm text-slate-500 leading-relaxed">niskalasamudra@gmail.com</p>
                     </div>
                 </div>
             </div>

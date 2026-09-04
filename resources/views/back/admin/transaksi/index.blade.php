@@ -25,29 +25,41 @@
         </div>
     @endif
 
-    <div class="flex flex-wrap gap-2 mb-2">
-        @php $currentStatus = request('status', 'Semua'); @endphp
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-2">
+        <div class="flex flex-wrap gap-2">
+            @php $currentStatus = request('status', 'Semua'); @endphp
 
-        <a href="{{ route('admin.transaksi.index') }}"
-           class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Semua' ? 'bg-charcoal-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-            Semua Pesanan
-        </a>
-        <a href="{{ route('admin.transaksi.index', ['status' => 'Menunggu ACC']) }}"
-           class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Menunggu ACC' ? 'bg-red-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-            <i class="fa-solid fa-bell-concierge mr-1"></i> Menunggu ACC
-        </a>
-        <a href="{{ route('admin.transaksi.index', ['status' => 'Dimasak']) }}"
-           class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Dimasak' ? 'bg-yellow-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-            <i class="fa-solid fa-fire-burner mr-1"></i> Dimasak
-        </a>
-        <a href="{{ route('admin.transaksi.index', ['status' => 'Diantar']) }}"
-           class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Diantar' ? 'bg-blue-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-            <i class="fa-solid fa-motorcycle mr-1"></i> Diantar
-        </a>
-        <a href="{{ route('admin.transaksi.index', ['status' => 'Selesai']) }}"
-           class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Selesai' ? 'bg-emerald-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-            <i class="fa-solid fa-check-double mr-1"></i> Selesai
-        </a>
+            <a href="{{ route('admin.transaksi.index', ['search' => request('search')]) }}"
+               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Semua' ? 'bg-charcoal-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                Semua Pesanan
+            </a>
+            <a href="{{ route('admin.transaksi.index', ['status' => 'Menunggu ACC', 'search' => request('search')]) }}"
+               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Menunggu ACC' ? 'bg-red-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-bell-concierge mr-1"></i> Menunggu ACC
+            </a>
+            <a href="{{ route('admin.transaksi.index', ['status' => 'Dimasak', 'search' => request('search')]) }}"
+               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Dimasak' ? 'bg-yellow-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-fire-burner mr-1"></i> Dimasak
+            </a>
+            <a href="{{ route('admin.transaksi.index', ['status' => 'Diantar', 'search' => request('search')]) }}"
+               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Diantar' ? 'bg-blue-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-motorcycle mr-1"></i> Diantar
+            </a>
+            <a href="{{ route('admin.transaksi.index', ['status' => 'Selesai', 'search' => request('search')]) }}"
+               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Selesai' ? 'bg-emerald-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-check-double mr-1"></i> Selesai
+            </a>
+        </div>
+
+        <form action="{{ route('admin.transaksi.index') }}" method="GET" class="w-full lg:w-72 relative">
+            @if(request('status'))
+                <input type="hidden" name="status" value="{{ request('status') }}">
+            @endif
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode transaksi..." class="w-full bg-white border border-slate-200 rounded-full pl-4 pr-10 py-2 text-sm focus:ring-gold-500 focus:border-gold-500 text-charcoal-900 shadow-sm">
+            <button type="submit" class="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-gold-600 transition">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </button>
+        </form>
     </div>
 
     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
@@ -80,7 +92,6 @@
                                 <p class="text-xs text-slate-500">{{ $item->metode_pembayaran }}</p>
                             </td>
                             <td class="px-6 py-4 space-y-1.5">
-                                <!-- Status Pembayaran -->
                                 <div>
                                     @if($item->status_pembayaran == 'Lunas')
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-700">Lunas</span>
@@ -90,7 +101,6 @@
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-yellow-100 text-yellow-700">{{ $item->status_pembayaran }}</span>
                                     @endif
                                 </div>
-                                <!-- Status Pesanan -->
                                 <div>
                                     @if($item->status_pesanan == 'Selesai')
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">{{ $item->status_pesanan }}</span>
@@ -102,7 +112,6 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right space-x-1">
-                                <!-- URL diganti ke $item->kode_transaksi -->
                                 <a href="{{ route('admin.transaksi.show', $item->kode_transaksi) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200" title="Detail Invoice">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>

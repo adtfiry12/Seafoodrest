@@ -6,6 +6,7 @@
     <title>Dashboard Karyawan - Niskala Samudra</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="icon" href="{{ asset('image/niskala sammudra.png') }}" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         tailwind.config = {
@@ -26,7 +27,6 @@
                     <button @click="sidebarOpen = !sidebarOpen" class="inline-flex items-center p-2 text-sm text-gold-500 rounded-lg sm:hidden hover:bg-charcoal-800 focus:outline-none">
                         <i class="fa-solid fa-bars text-xl"></i>
                     </button>
-                    <!-- Logo ngarah ke dashboard.karyawan -->
                     <a href="{{ route('dashboard.karyawan') }}" class="flex items-center gap-1 ml-2 md:mr-24">
                         <img src="{{ asset('image/niskala sammudra.png') }}" alt="Logo Niskala Samudra" class="h-9 sm:h-12 w-auto object-contain">
                         <div class="flex flex-col justify-center">
@@ -74,19 +74,41 @@
                     </a>
                 </li>
 
+                @php
+                    $pendingACC = \App\Models\Transaksi::where('status_pesanan', 'Menunggu ACC')->count();
+                    $pendingDapur = \App\Models\Transaksi::where('status_pesanan', 'Dimasak')->count();
+                    $pendingDelivery = \App\Models\Transaksi::where('status_pesanan', 'Diantar')->count();
+                @endphp
+
                 <li class="pt-4 mt-4 space-y-2 border-t border-slate-200">
                     <p class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Tugas Operasional</p>
-                    <a href="#" class="flex items-center p-3 text-charcoal-900 rounded-lg hover:bg-slate-100 group transition">
-                        <i class="fa-solid fa-bell-concierge w-5 h-5 text-slate-400 group-hover:text-gold-600 transition"></i>
-                        <span class="ml-3 flex-1 whitespace-nowrap">Kelola Pesanan</span>
-                        <span class="inline-flex items-center justify-center w-4 h-4 p-3 ml-3 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">2</span>
+
+                    <a href="{{ route('karyawan.pesanan_baru') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('karyawan.pesanan_baru') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                        <i class="fa-solid fa-bell-concierge w-5 h-5 transition {{ request()->routeIs('karyawan.pesanan_baru') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
+                        <span class="ml-3 flex-1 whitespace-nowrap">Pesanan Baru (Kasir)</span>
+                        @if($pendingACC > 0)
+                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-3 text-[10px] font-bold text-white bg-red-500 rounded-full animate-pulse">{{ $pendingACC }}</span>
+                        @endif
                     </a>
-                    <a href="#" class="flex items-center p-3 text-charcoal-900 rounded-lg hover:bg-slate-100 group transition">
-                        <i class="fa-solid fa-motorcycle w-5 h-5 text-slate-400 group-hover:text-gold-600 transition"></i>
-                        <span class="ml-3">Pengantaran (Delivery)</span>
+
+                    <a href="{{ route('karyawan.dapur') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('karyawan.dapur') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                        <i class="fa-solid fa-fire-burner w-5 h-5 transition {{ request()->routeIs('karyawan.dapur') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
+                        <span class="ml-3 flex-1 whitespace-nowrap">Stasiun Dapur</span>
+                        @if($pendingDapur > 0)
+                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-3 text-[10px] font-bold text-charcoal-900 bg-gold-400 rounded-full">{{ $pendingDapur }}</span>
+                        @endif
                     </a>
-                    <a href="#" class="flex items-center p-3 text-charcoal-900 rounded-lg hover:bg-slate-100 group transition">
-                        <i class="fa-solid fa-boxes-packing w-5 h-5 text-slate-400 group-hover:text-gold-600 transition"></i>
+
+                    <a href="{{ route('karyawan.delivery') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('karyawan.delivery') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                        <i class="fa-solid fa-motorcycle w-5 h-5 transition {{ request()->routeIs('karyawan.delivery') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
+                        <span class="ml-3 flex-1 whitespace-nowrap">Pengantaran Delivery</span>
+                        @if($pendingDelivery > 0)
+                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-3 text-[10px] font-bold text-white bg-blue-500 rounded-full">{{ $pendingDelivery }}</span>
+                        @endif
+                    </a>
+
+                    <a href="{{ route('karyawan.stok') }}" class="flex items-center p-3 rounded-lg group transition mt-4 border-t border-slate-100 pt-4 {{ request()->routeIs('karyawan.stok') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                        <i class="fa-solid fa-boxes-packing w-5 h-5 transition {{ request()->routeIs('karyawan.stok') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3">Input Stok Masuk</span>
                     </a>
                 </li>

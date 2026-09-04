@@ -22,7 +22,11 @@ class TransaksiController extends Controller
             $query->where('status_pesanan', $request->status);
         }
 
-        $transaksi = $query->paginate(10)->withQueryString();
+        if ($request->has('search') && $request->search != '') {
+            $query->where('kode_transaksi', 'like', '%' . $request->search . '%');
+        }
+
+        $transaksi = $query->paginate(5)->withQueryString();
 
         return view('back.admin.transaksi.index', compact('transaksi'));
     }
@@ -47,7 +51,7 @@ class TransaksiController extends Controller
 
         DB::beginTransaction();
         try {
-            $kode = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(4));
+            $kode = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
 
             $total_bayar = 0;
             $detail_data = [];

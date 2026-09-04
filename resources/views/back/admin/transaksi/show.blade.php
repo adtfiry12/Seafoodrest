@@ -71,6 +71,52 @@
             </div>
         </div>
 
+        <!-- INI BAGIAN BUKTI PEMBAYARAN (MUNCUL JIKA QRIS) -->
+        @if($transaksi->metode_pembayaran == 'QRIS')
+            <div class="px-6 sm:px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                <h4 class="text-sm font-bold text-charcoal-900 uppercase tracking-wider mb-4 border-l-4 border-gold-500 pl-3">Bukti Pembayaran QRIS</h4>
+
+                @if($transaksi->bukti_pembayaran)
+                    <div class="flex flex-col sm:flex-row gap-6 items-start">
+                        <a href="{{ asset('storage/' . $transaksi->bukti_pembayaran) }}" target="_blank" class="block w-full sm:w-48 shrink-0 overflow-hidden rounded-xl border-2 border-slate-200 shadow-sm hover:opacity-80 transition group relative">
+                            <img src="{{ asset('storage/' . $transaksi->bukti_pembayaran) }}" alt="Bukti Transfer" class="w-full h-auto sm:h-64 object-cover">
+                            <div class="absolute inset-0 bg-charcoal-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fa-solid fa-magnifying-glass-plus text-white text-3xl"></i>
+                            </div>
+                        </a>
+                        <div class="flex-1 space-y-3">
+                            <p class="text-sm text-charcoal-900 font-medium">Pelanggan telah mengunggah bukti pembayaran.</p>
+                            <p class="text-xs text-slate-500 mb-4"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Klik gambar di samping untuk melihat struk lebih jelas (zoom).</p>
+
+                            <!-- Tombol Shortcut ACC Khusus Pembayaran -->
+                            @if($transaksi->status_pembayaran == 'Menunggu Konfirmasi')
+                                <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" class="mt-4 p-4 bg-white border border-slate-200 rounded-xl">
+                                    @csrf
+                                    @method('PUT')
+                                    <p class="text-xs text-slate-500 mb-2 font-bold">Aksi Cepat:</p>
+                                    <input type="hidden" name="status_pembayaran" value="Lunas">
+                                    <input type="hidden" name="status_pesanan" value="Dimasak">
+                                    <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 text-white text-sm font-bold rounded-lg hover:bg-emerald-600 shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
+                                        <i class="fa-solid fa-check-double"></i> Tandai Lunas & Masak
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
+                    </div>
+                @else
+                    <div class="p-4 bg-orange-50 text-orange-700 rounded-xl text-sm border border-orange-200 flex flex-col sm:flex-row items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 text-xl">
+                            <i class="fa-solid fa-hourglass-half animate-pulse"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold">Menunggu Upload</p>
+                            <p class="text-xs">Pelanggan belum mengunggah foto bukti pembayaran. Harap tunggu.</p>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <!-- Tabel Item -->
         <div class="overflow-x-auto p-6 sm:p-8">
             <table class="w-full text-left text-sm text-slate-600">
@@ -104,7 +150,7 @@
         @if($transaksi->catatan)
             <div class="p-6 sm:p-8 border-t border-slate-100 bg-slate-50">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Catatan Tambahan</p>
-                <p class="text-sm italic text-charcoal-900">"{{ $transaksi->catatan }}"</p>
+                <p class="text-sm italic text-charcoal-900">"{!! nl2br(e($transaksi->catatan)) !!}"</p>
             </div>
         @endif
     </div>
