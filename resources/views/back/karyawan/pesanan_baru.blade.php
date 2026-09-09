@@ -99,17 +99,17 @@
                     <!-- Tombol Aksi Kasir -->
                     <div class="grid grid-cols-2 gap-2 pt-2">
                         <!-- Tombol Batal -->
-                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST">
+                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pembatalan', 'Yakin ingin membatalkan pesanan ini?')">
                             @csrf
                             <input type="hidden" name="status_pesanan" value="Dibatalkan">
                             <input type="hidden" name="status_pembayaran" value="Batal">
-                            <button type="submit" onclick="return confirm('Yakin ingin membatalkan pesanan ini?')" class="w-full py-2.5 bg-white border border-red-200 text-red-600 text-xs font-bold rounded-xl hover:bg-red-50 transition">
+                            <button type="submit" class="w-full py-2.5 bg-white border border-red-200 text-red-600 text-xs font-bold rounded-xl hover:bg-red-50 transition">
                                 Batalkan
                             </button>
                         </form>
 
                         <!-- Tombol ACC Sesuai Kondisi -->
-                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST">
+                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi ACC Pesanan', 'Bukti pembayaran sudah valid? Teruskan pesanan ini ke dapur?')">
                             @csrf
                             <input type="hidden" name="status_pesanan" value="Dimasak">
 
@@ -123,7 +123,7 @@
                                 <a href="{{ asset('storage/' . $trx->bukti_pembayaran) }}" target="_blank" class="block w-full py-2 mb-2 bg-charcoal-900 text-white text-xs font-bold rounded-xl text-center hover:bg-charcoal-800">
                                     <i class="fa-solid fa-image mr-1"></i> Lihat Bukti
                                 </a>
-                                <button type="submit" onclick="return confirm('Bukti sudah valid? Teruskan ke Dapur?')" class="w-full py-2.5 bg-emerald-500 text-white text-xs font-bold rounded-xl hover:bg-emerald-600 transition shadow-sm">
+                                <button type="submit" class="w-full py-2.5 bg-emerald-500 text-white text-xs font-bold rounded-xl hover:bg-emerald-600 transition shadow-sm">
                                     Valid & ACC Dapur
                                 </button>
 

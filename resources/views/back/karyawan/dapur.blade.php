@@ -81,13 +81,13 @@
                 </div>
 
                 <div class="p-4 bg-slate-50 border-t border-slate-100">
-                    <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST">
+                    <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pesanan Selesai Dimasak', 'Pastikan semua pesanan sudah matang dan siap disajikan.')">
                         @csrf
 
                         <!-- Logika Cerdas: Jika Delivery diteruskan ke Kurir, Jika Makan di Tempat langsung Selesai -->
                         <input type="hidden" name="status_pesanan" value="{{ $trx->tipe_pesanan == 'Delivery' ? 'Diantar' : 'Selesai' }}">
 
-                        <button type="submit" onclick="return confirm('Pastikan semua pesanan sudah matang dan siap disajikan. Selesaikan?')" class="w-full py-3 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition shadow-sm shadow-orange-500/30 flex items-center justify-center gap-2">
+                        <button type="submit" class="w-full py-3 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition shadow-sm shadow-orange-500/30 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-bell-concierge"></i> Pesanan Selesai Dimasak
                         </button>
                     </form>

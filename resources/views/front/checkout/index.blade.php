@@ -21,7 +21,7 @@
             </a>
         </div>
 
-        <form action="{{ route('checkout.proses') }}" method="POST" x-show="cart.length > 0" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12" x-cloak>
+        <form action="{{ route('checkout.proses') }}" method="POST" @submit.prevent="handleSubmit($event)" x-show="cart.length > 0" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12" x-cloak>
             @csrf
 
             <div class="lg:col-span-7 space-y-8">
@@ -208,6 +208,28 @@
 
         </form>
     </div>
+
+    <div x-show="loginModalOpen" x-cloak class="fixed inset-0 z-50 flex min-h-screen items-center justify-center px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+        <div x-show="loginModalOpen" x-transition.opacity @click="loginModalOpen = false" class="absolute inset-0 bg-charcoal-950/70 backdrop-blur-sm"></div>
+
+        <div x-show="loginModalOpen" x-transition class="relative my-auto w-full max-w-sm overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-2xl">
+            <div class="h-1.5 bg-gold-500"></div>
+            <div class="px-6 pb-6 pt-8 text-center sm:px-8">
+                <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-200 bg-gold-50 text-gold-600 shadow-sm">
+                    <i class="fa-solid fa-lock text-2xl"></i>
+                </div>
+                <h2 id="login-modal-title" class="font-serif text-2xl font-bold text-charcoal-900">Login untuk COD</h2>
+                <p class="mt-3 text-sm leading-relaxed text-slate-500">Pembayaran COD untuk pesanan delivery memerlukan akun yang sudah login.</p>
+            </div>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-5 sm:flex-row sm:px-8">
+                <button type="button" @click="loginModalOpen = false" class="flex-1 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">Kembali</button>
+                <a href="{{ route('login') }}" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-charcoal-900 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-gold-600">
+                    Login Sekarang <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 </section>
 
 <style>
@@ -220,6 +242,8 @@
     document.addEventListener('alpine:init', () => {
         Alpine.data('checkoutPage', () => ({
             cart: [],
+            isGuest: @json(auth()->guest()),
+            loginModalOpen: false,
             tipePesanan: 'Makan di Tempat',
             opsiDineIn: 'sekarang',
             metodePembayaran: 'Kasir',
@@ -235,6 +259,15 @@
                         this.metodePembayaran = 'Kasir';
                     }
                 });
+            },
+
+            handleSubmit(event) {
+                if (this.isGuest && this.tipePesanan === 'Delivery' && this.metodePembayaran === 'COD') {
+                    this.loginModalOpen = true;
+                    return;
+                }
+
+                event.target.submit();
             },
 
             subtotal() {

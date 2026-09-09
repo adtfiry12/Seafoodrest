@@ -90,7 +90,7 @@
 
                             <!-- Tombol Shortcut ACC Khusus Pembayaran -->
                             @if($transaksi->status_pembayaran == 'Menunggu Konfirmasi')
-                                <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" class="mt-4 p-4 bg-white border border-slate-200 rounded-xl">
+                                <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pembayaran', 'Tandai pembayaran lunas dan teruskan pesanan ke dapur?')" class="mt-4 p-4 bg-white border border-slate-200 rounded-xl">
                                     @csrf
                                     @method('PUT')
                                     <p class="text-xs text-slate-500 mb-2 font-bold">Aksi Cepat:</p>

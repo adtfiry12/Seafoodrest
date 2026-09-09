@@ -61,7 +61,7 @@
                         <a href="{{ route('menu.detail', $item->slug) }}" class="flex items-center justify-center bg-slate-100 hover:bg-charcoal-900 hover:text-white text-slate-600 font-bold py-2.5 rounded-xl transition duration-300 text-[11px] uppercase tracking-wider shadow-sm">
                             Lihat Detail
                         </a>
-                        <button @auth @click="addToCart({{ $item->id }}, '{{ addslashes($item->nama_menu) }}', {{ $item->harga }}, '{{ $imageUrl }}', {{ $item->stok }})" @else onclick="window.location.href='{{ route('login') }}'" @endauth class="flex items-center justify-center bg-gold-600 hover:bg-gold-500 text-white font-bold py-2.5 rounded-xl transition duration-300 text-[11px] uppercase tracking-wider shadow-sm active:scale-95">
+                        <button @click="addToCart({{ $item->id }}, '{{ addslashes($item->nama_menu) }}', {{ $item->harga }}, '{{ $imageUrl }}', {{ $item->stok }})" class="flex items-center justify-center bg-gold-600 hover:bg-gold-500 text-white font-bold py-2.5 rounded-xl transition duration-300 text-[11px] uppercase tracking-wider shadow-sm active:scale-95">
                             <i class="fa-solid fa-cart-plus mr-1.5"></i> Keranjang
                         </button>
                     </div>

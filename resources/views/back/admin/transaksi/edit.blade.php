@@ -14,7 +14,7 @@
     </div>
 
     <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
-        <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Perubahan Status', 'Yakin ingin menyimpan perubahan status transaksi ini?')" class="space-y-6">
             @csrf
             @method('PUT')
 

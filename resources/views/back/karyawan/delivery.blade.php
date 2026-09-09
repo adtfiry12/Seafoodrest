@@ -117,7 +117,7 @@
 
                 <!-- Footer Card (Aksi) -->
                 <div class="p-4 bg-slate-50 border-t border-slate-100">
-                    <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST">
+                    <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pengantaran Selesai', 'Pastikan pesanan sudah diserahkan kepada pelanggan.')">
                         @csrf
 
                         <input type="hidden" name="status_pesanan" value="Selesai">
@@ -131,7 +131,7 @@
                             </div>
                         @endif
 
-                        <button type="submit" onclick="return confirm('Pesanan sudah diserahkan ke pelanggan?')" class="w-full py-3 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition shadow-sm shadow-blue-600/30 flex items-center justify-center gap-2">
+                        <button type="submit" class="w-full py-3 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition shadow-sm shadow-blue-600/30 flex items-center justify-center gap-2">
                             <i class="fa-solid fa-flag-checkered"></i> Selesaikan Pengantaran
                         </button>
                     </form>

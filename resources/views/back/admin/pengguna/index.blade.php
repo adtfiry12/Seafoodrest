@@ -73,7 +73,7 @@
                                 <a href="{{ route('admin.pengguna.edit', $item->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
-                                <form action="{{ route('admin.pengguna.destroy', $item->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Hapus pengguna ini secara permanen?')">
+                                <form action="{{ route('admin.pengguna.destroy', $item->id) }}" method="POST" class="inline-block" @submit.prevent="openDeleteModal($event, 'Hapus pengguna ini secara permanen?')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200">

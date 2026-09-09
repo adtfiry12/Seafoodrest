@@ -51,7 +51,7 @@
                 </div>
 
                 @if($menu->stok > 0)
-                    <button @auth @click="addToCart({{ $menu->id }}, '{{ addslashes($menu->nama_menu) }}', {{ $menu->harga }}, '{{ $imageUrl }}', {{ $menu->stok }})" @else onclick="window.location.href='{{ route('login') }}'" @endauth class="w-full sm:w-auto px-10 py-4 bg-charcoal-900 hover:bg-gold-600 text-white font-bold rounded-xl transition duration-300 text-sm uppercase tracking-wider shadow-lg active:scale-95 flex items-center justify-center gap-3">
+                    <button @click="addToCart({{ $menu->id }}, '{{ addslashes($menu->nama_menu) }}', {{ $menu->harga }}, '{{ $imageUrl }}', {{ $menu->stok }})" class="w-full sm:w-auto px-10 py-4 bg-charcoal-900 hover:bg-gold-600 text-white font-bold rounded-xl transition duration-300 text-sm uppercase tracking-wider shadow-lg active:scale-95 flex items-center justify-center gap-3">
                         <i class="fa-solid fa-cart-plus text-lg"></i> Tambahkan ke Keranjang
                     </button>
                 @else

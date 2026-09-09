@@ -62,16 +62,18 @@
                     <a href="{{ route('tentang') }}" class="transition {{ request()->routeIs('tentang') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Tentang Kami</a>
                     <a href="{{ route('menu') }}" class="transition {{ request()->routeIs('menu') || request()->routeIs('menu.detail') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Menu</a>
                     <a href="{{ route('kontak') }}" class="transition {{ request()->routeIs('kontak') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Kontak</a>
-                    <a href="{{ route('front.pesanan') }}" class="transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Pesanan</a>
+                    @auth
+                        <a href="{{ route('front.pesanan') }}" class="transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">PESANAN</a>
+                    @else
+                        <button type="button" @click="loginHistoryModalOpen = true" class="transition text-charcoal-800 hover:text-gold-600">PESANAN</button>
+                    @endauth
                 </nav>
 
                 <div class="flex items-center gap-3 sm:gap-5">
-                    @auth
-                        <button @click.prevent="isCartOpen = true" class="relative text-charcoal-800 hover:text-gold-600 transition focus:outline-none">
-                            <i class="fa-solid fa-cart-shopping text-lg sm:text-xl"></i>
-                            <span x-show="cartTotalItems() > 0" x-text="cartTotalItems()" x-cloak class="absolute -top-2 -right-2 bg-gold-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-bounce"></span>
-                        </button>
-                    @endauth
+                    <button @click.prevent="isCartOpen = true" aria-label="Buka keranjang" class="relative text-charcoal-800 hover:text-gold-600 transition focus:outline-none">
+                        <i class="fa-solid fa-cart-shopping text-lg sm:text-xl"></i>
+                        <span x-show="cartTotalItems() > 0" x-text="cartTotalItems()" x-cloak class="absolute -top-2 -right-2 bg-gold-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full animate-bounce"></span>
+                    </button>
                     <div class="h-6 w-px bg-slate-300 mx-1 hidden md:block"></div>
                     @guest
                         <a href="{{ route('login') }}" class="hidden md:flex text-charcoal-800 hover:text-gold-600 font-semibold text-sm transition uppercase tracking-wider items-center gap-2">
@@ -112,7 +114,11 @@
                 <a href="{{ route('tentang') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('tentang') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Tentang Kami</a>
                 <a href="{{ route('menu') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('menu') || request()->routeIs('menu.detail') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Menu</a>
                 <a href="{{ route('kontak') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('kontak') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Kontak</a>
-                <a href="{{ route('front.pesanan') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Pesanan</a>
+                @auth
+                    <a href="{{ route('front.pesanan') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">PESANAN</a>
+                @else
+                    <button type="button" @click="loginHistoryModalOpen = true; mobileMenuOpen = false" class="block w-full px-3 py-3 text-left text-sm uppercase tracking-wider border-b border-slate-50 transition text-charcoal-800 hover:text-gold-600">PESANAN</button>
+                @endauth
 
                 @guest
                     <a href="{{ route('login') }}" class="block px-3 py-3 mt-4 text-sm font-bold text-white bg-charcoal-900 text-center rounded hover:bg-gold-600 uppercase tracking-wider transition">Login / Masuk</a>
@@ -131,7 +137,30 @@
                 @endguest
             </div>
         </div>
+
     </header>
+
+    <div x-show="loginHistoryModalOpen" x-cloak class="fixed inset-0 z-[60] flex min-h-screen items-center justify-center px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="login-history-modal-title">
+        <div x-show="loginHistoryModalOpen" x-transition.opacity @click="loginHistoryModalOpen = false" class="absolute inset-0 bg-charcoal-950/70 backdrop-blur-sm"></div>
+
+        <div x-show="loginHistoryModalOpen" x-transition class="relative my-auto w-full max-w-sm overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-2xl">
+            <div class="h-1.5 bg-gold-500"></div>
+            <div class="px-6 pb-6 pt-8 text-center sm:px-8">
+                <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-200 bg-gold-50 text-gold-600 shadow-sm">
+                    <i class="fa-solid fa-receipt text-2xl"></i>
+                </div>
+                <h2 id="login-history-modal-title" class="font-serif text-2xl font-bold text-charcoal-900">Riwayat Pesanan</h2>
+                <p class="mt-3 text-sm leading-relaxed text-slate-500">Login untuk melihat status dan riwayat pesanan Anda dengan mudah.</p>
+            </div>
+
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50/70 px-6 py-5 sm:flex-row sm:px-8">
+                <button type="button" @click="loginHistoryModalOpen = false" class="flex-1 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">Kembali</button>
+                <a href="{{ route('login') }}" class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-charcoal-900 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-gold-600">
+                    Login Sekarang <i class="fa-solid fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <div class="grow">
         @yield('content')
@@ -260,6 +289,7 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('cartSystem', () => ({
                 isCartOpen: false,
+                loginHistoryModalOpen: false,
                 cart: JSON.parse(localStorage.getItem('niskala_cart') || '[]'),
                 init() { this.$watch('cart', val => { localStorage.setItem('niskala_cart', JSON.stringify(val)); }); },
                 addToCart(id, nama, harga, image, maxStok) {

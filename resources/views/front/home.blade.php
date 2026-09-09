@@ -130,7 +130,7 @@
 
                         @php $imageUrl = $item->gambar ? asset('storage/' . $item->gambar) : 'https://ui-avatars.com/api/?name=Menu&background=f1f5f9&color=94a3b8'; @endphp
 
-                        <button @auth @click="addToCart({{ $item->id }}, '{{ addslashes($item->nama_menu) }}', {{ $item->harga }}, '{{ $imageUrl }}', {{ $item->stok }})" @else onclick="window.location.href='{{ route('login') }}'" @endauth class="flex items-center justify-center bg-gold-600 hover:bg-gold-500 text-white font-bold py-2.5 rounded-xl transition duration-300 text-[11px] uppercase tracking-wider shadow-sm active:scale-95">
+                        <button @click="addToCart({{ $item->id }}, '{{ addslashes($item->nama_menu) }}', {{ $item->harga }}, '{{ $imageUrl }}', {{ $item->stok }})" class="flex items-center justify-center bg-gold-600 hover:bg-gold-500 text-white font-bold py-2.5 rounded-xl transition duration-300 text-[11px] uppercase tracking-wider shadow-sm active:scale-95">
                             <i class="fa-solid fa-cart-plus mr-1"></i> Pesan
                         </button>
                     </div>

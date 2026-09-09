@@ -19,7 +19,7 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased" x-data="{ sidebarOpen: false }">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased" x-data="{ sidebarOpen: false, deleteModalOpen: false, deleteForm: null, deleteMessage: '', actionModalOpen: false, actionForm: null, actionTitle: '', actionMessage: '', openDeleteModal(event, message) { this.deleteForm = event.currentTarget; this.deleteMessage = message; this.deleteModalOpen = true; }, openActionModal(event, title, message) { this.actionForm = event.currentTarget; this.actionTitle = title; this.actionMessage = message; this.actionModalOpen = true; } }">
 
     <nav class="fixed top-0 z-50 w-full bg-charcoal-950 border-b border-charcoal-800 shadow-sm">
         <div class="px-3 py-3 lg:px-5 lg:pl-3">
@@ -143,5 +143,52 @@
     <div class="p-4 sm:ml-64 pt-24">
         @yield('content')
     </div>
+
+    <div x-show="deleteModalOpen" x-cloak class="fixed inset-0 z-[60] flex min-h-screen items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+        <div x-show="deleteModalOpen" x-transition class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div class="flex items-start gap-4 border-b border-slate-100 px-6 py-5">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600">
+                    <i class="fa-solid fa-trash-can"></i>
+                </div>
+                <div>
+                    <h2 id="delete-modal-title" class="text-lg font-bold text-charcoal-900">Konfirmasi Penghapusan</h2>
+                    <p class="mt-1 text-sm text-slate-500">Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+                <button type="button" @click="deleteModalOpen = false" class="ml-auto text-slate-400 transition hover:text-slate-700" aria-label="Tutup modal">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="px-6 py-5">
+                <p class="text-sm leading-relaxed text-slate-600" x-text="deleteMessage"></p>
+            </div>
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
+                <button type="button" @click="deleteModalOpen = false" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">
+                    Batal
+                </button>
+                <button type="button" @click="deleteForm.submit()" class="rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-600/20">
+                    Hapus Data
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="actionModalOpen" x-cloak class="fixed inset-0 z-[60] flex min-h-screen items-center justify-center bg-slate-900/40 px-4 py-6 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="action-modal-title">
+        <div x-show="actionModalOpen" x-transition class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div class="flex items-start gap-4 border-b border-slate-100 px-6 py-5">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-50 text-gold-600"><i class="fa-solid fa-circle-question"></i></div>
+                <div>
+                    <h2 id="action-modal-title" class="text-lg font-bold text-charcoal-900" x-text="actionTitle"></h2>
+                    <p class="mt-1 text-sm text-slate-500">Periksa kembali sebelum melanjutkan.</p>
+                </div>
+                <button type="button" @click="actionModalOpen = false" class="ml-auto text-slate-400 transition hover:text-slate-700" aria-label="Tutup modal"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="px-6 py-5"><p class="text-sm leading-relaxed text-slate-600" x-text="actionMessage"></p></div>
+            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
+                <button type="button" @click="actionModalOpen = false" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Batal</button>
+                <button type="button" @click="actionForm.submit()" class="rounded-lg bg-charcoal-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-charcoal-800 focus:outline-none focus:ring-4 focus:ring-charcoal-900/20">Lanjutkan</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
