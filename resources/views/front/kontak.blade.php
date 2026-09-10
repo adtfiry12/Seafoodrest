@@ -2,145 +2,75 @@
 
 @section('content')
 
-<section class="relative h-[300px] sm:h-[400px] flex items-center justify-center overflow-hidden">
+<section class="relative overflow-hidden bg-charcoal-950 py-14 sm:py-20">
     <div class="absolute inset-0">
-        <img src="{{ asset('image/contactmenu.webp') }}" alt="Kontak Niskala Samudra" class="w-full h-full object-cover object-center">
-        <div class="absolute inset-0 bg-charcoal-950/70"></div>
+        <img src="{{ asset('image/contactmenu.webp') }}" alt="Suasana restoran Niskala Samudra" class="h-full w-full object-cover opacity-35">
+        <div class="absolute inset-0 bg-charcoal-950/75"></div>
     </div>
-
-    <div class="relative z-10 text-center px-4 max-w-3xl mx-auto">
-        <span class="text-gold-500 font-bold uppercase tracking-[0.3em] text-xs sm:text-sm mb-4 block">Reservasi & Bantuan</span>
-        <h1 class="text-4xl sm:text-5xl font-serif text-white mb-4 leading-tight">Hubungi Kami</h1>
-        <p class="text-slate-300 text-sm sm:text-base font-light leading-relaxed">
-            Kami siap menyambut dan melayani Anda. Jangan ragu untuk menghubungi kami terkait reservasi, acara spesial, maupun saran.
-        </p>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl">
+            <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-gold-500">Reservasi dan bantuan</p>
+            <h1 class="font-serif text-4xl leading-tight text-white sm:text-6xl">Mari terhubung dengan kami.</h1>
+            <p class="mt-5 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">Tanyakan menu, reservasi meja, acara keluarga, atau kebutuhan katering. Tim kami siap membantu.</p>
+        </div>
     </div>
 </section>
 
-<section class="bg-slate-50 py-16 sm:py-24">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="bg-white py-12 sm:py-16">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:gap-12 xl:gap-16">
+            <div>
+                <p class="text-xs font-bold uppercase tracking-[0.2em] text-gold-600">Temukan kami</p>
+                <h2 class="mt-3 font-serif text-3xl leading-tight text-charcoal-900 sm:text-4xl">Semua informasi yang Anda perlukan.</h2>
+                <p class="mt-4 text-sm leading-relaxed text-slate-600 sm:text-base">Datang dan nikmati hidangan seafood segar di kawasan Pantai Kartini, Jepara.</p>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-
-            <div class="lg:col-span-7 space-y-10">
-
-                <div>
-                    <h2 class="text-2xl sm:text-3xl font-serif text-charcoal-900 mb-6">Informasi Kontak</h2>
-                    <p class="text-slate-600 font-light text-sm sm:text-base leading-relaxed mb-8">
-                        Berlokasi di kawasan pesisir Jepara yang indah, Niskala Samudra menawarkan pemandangan laut yang menenangkan sambil Anda menikmati hidangan laut terbaik kami.
-                    </p>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4">
-                            <div class="w-12 h-12 bg-charcoal-950 text-gold-500 rounded-xl flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-location-dot"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-charcoal-900 mb-1">Alamat Restoran</h4>
-                                <p class="text-sm text-slate-500 leading-relaxed">Jl. Pantai Kartini No. 12,<br>Jepara, Jawa Tengah 59417</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4">
-                            <div class="w-12 h-12 bg-charcoal-950 text-gold-500 rounded-xl flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-phone-volume"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-charcoal-900 mb-1">Telepon </h4>
-                                <p class="text-sm text-slate-500 leading-relaxed">+62 851-9119-4059</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4">
-                            <div class="w-12 h-12 bg-charcoal-950 text-gold-500 rounded-xl flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-clock"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-charcoal-900 mb-1">Jam Operasional</h4>
-                                <p class="text-sm text-slate-500 leading-relaxed">Senin - Jumat: 10:00 - 22:00<br>Sabtu - Minggu: 09:00 - 23:00</p>
-                            </div>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4">
-                            <div class="w-12 h-12 bg-charcoal-950 text-gold-500 rounded-xl flex items-center justify-center text-xl shrink-0">
-                                <i class="fa-solid fa-envelope-open-text"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-bold text-charcoal-900 mb-1">Email</h4>
-                                <p class="text-sm text-slate-500 leading-relaxed">niskalasamudra@gmailcom</p>
-                            </div>
-                        </div>
+                <div class="mt-8 divide-y divide-slate-200 border-y border-slate-200">
+                    <a href="https://www.google.com/maps/search/?api=1&query=Pantai+Kartini+Jepara" target="_blank" rel="noopener" class="flex gap-4 py-5 transition hover:text-gold-600">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-50 text-gold-600"><i class="fa-solid fa-location-dot"></i></span>
+                        <span><strong class="block text-sm text-charcoal-900">Alamat restoran</strong><span class="mt-1 block text-sm leading-relaxed text-slate-500">Jl. Pantai Kartini No. 12, Jepara, Jawa Tengah 59417</span></span>
+                    </a>
+                    <a href="tel:+6285191194059" class="flex gap-4 py-5 transition hover:text-gold-600">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-50 text-gold-600"><i class="fa-solid fa-phone"></i></span>
+                        <span><strong class="block text-sm text-charcoal-900">Telepon dan WhatsApp</strong><span class="mt-1 block text-sm text-slate-500">+62 851-9119-4059</span></span>
+                    </a>
+                    <div class="flex gap-4 py-5">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-50 text-gold-600"><i class="fa-solid fa-clock"></i></span>
+                        <span><strong class="block text-sm text-charcoal-900">Jam operasional</strong><span class="mt-1 block text-sm leading-relaxed text-slate-500">Senin - Jumat 10.00 - 22.00<br>Sabtu - Minggu 09.00 - 23.00</span></span>
                     </div>
+                    <a href="mailto:niskalasamudra@gmail.com" class="flex gap-4 py-5 transition hover:text-gold-600">
+                        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold-50 text-gold-600"><i class="fa-solid fa-envelope"></i></span>
+                        <span><strong class="block text-sm text-charcoal-900">Email</strong><span class="mt-1 block text-sm text-slate-500">niskalasamudra@gmail.com</span></span>
+                    </a>
                 </div>
 
-                <div class="rounded-2xl overflow-hidden border border-slate-200 shadow-sm h-[300px] sm:h-[400px] relative bg-slate-200">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.368817348981!2d110.65590921477123!3d-6.577953295243169!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e711ef85ec01783%3A0xc3f8e56149150ff9!2sPantai%20Kartini%20Jepara!5e0!3m2!1sid!2sid!4v1698305000000!5m2!1sid!2sid" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </div>
-
+                <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="mt-8 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-charcoal-900 px-5 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-gold-600 sm:w-auto"><i class="fa-brands fa-whatsapp text-lg text-gold-400"></i> Chat WhatsApp</a>
             </div>
 
-            <div class="lg:col-span-5">
-                <div class="bg-charcoal-950 p-8 sm:p-10 rounded-3xl shadow-2xl relative overflow-hidden h-full flex flex-col justify-center">
-
-                    <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
-                        <i class="fa-solid fa-envelope-open text-9xl text-white"></i>
-                    </div>
-
-                    <div class="relative z-10">
-                        <h3 class="text-2xl font-serif text-white mb-2">Kirim Pesan</h3>
-                        <p class="text-slate-400 text-sm font-light mb-8 leading-relaxed">
-                            Punya pertanyaan seputar katering, paket rombongan, atau reservasi tempat VIP? Tulis pesan Anda pada formulir di bawah ini.
-                        </p>
-
-                        <form action="#" class="space-y-5">
-
-                            <div>
-                                <label class="block text-xs font-bold text-gold-500 uppercase tracking-wider mb-2">Nama Lengkap</label>
-                                <input type="text" placeholder="John Doe" class="w-full bg-charcoal-900 border border-charcoal-800 text-white rounded-xl px-4 py-3 sm:py-3.5 text-sm focus:ring-gold-500 focus:border-gold-500 transition-colors placeholder-slate-600">
-                            </div>
-
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                                <div>
-                                    <label class="block text-xs font-bold text-gold-500 uppercase tracking-wider mb-2">Email</label>
-                                    <input type="email" placeholder="john@example.com" class="w-full bg-charcoal-900 border border-charcoal-800 text-white rounded-xl px-4 py-3 sm:py-3.5 text-sm focus:ring-gold-500 focus:border-gold-500 transition-colors placeholder-slate-600">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gold-500 uppercase tracking-wider mb-2">No. WhatsApp</label>
-                                    <input type="text" placeholder="0812-xxxx-xxxx" class="w-full bg-charcoal-900 border border-charcoal-800 text-white rounded-xl px-4 py-3 sm:py-3.5 text-sm focus:ring-gold-500 focus:border-gold-500 transition-colors placeholder-slate-600">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gold-500 uppercase tracking-wider mb-2">Keperluan</label>
-                                <select class="w-full bg-charcoal-900 border border-charcoal-800 text-slate-300 rounded-xl px-4 py-3 sm:py-3.5 text-sm focus:ring-gold-500 focus:border-gold-500 transition-colors">
-                                    <option value="">-- Pilih Keperluan --</option>
-                                    <option value="Reservasi Meja">Reservasi Meja</option>
-                                    <option value="Paket Rombongan/Acara">Paket Rombongan / Acara</option>
-                                    <option value="Kritik & Saran">Kritik & Saran</option>
-                                    <option value="Lainnya">Lainnya</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-bold text-gold-500 uppercase tracking-wider mb-2">Pesan Anda</label>
-                                <textarea rows="4" placeholder="Tulis rincian pesan atau permintaan khusus Anda..." class="w-full bg-charcoal-900 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 transition-colors placeholder-slate-600"></textarea>
-                            </div>
-
-                            <div class="pt-2">
-                                <button type="button" class="w-full px-8 py-3.5 bg-gold-600 text-white text-sm font-bold uppercase tracking-wider rounded-xl hover:bg-gold-500 transition-all shadow-lg shadow-gold-500/20 active:scale-95 flex items-center justify-center gap-3">
-                                    Kirim Pesan <i class="fa-solid fa-paper-plane"></i>
-                                </button>
-                                <p class="text-center text-[11px] text-slate-500 mt-4">
-                                    Kami akan merespons pesan Anda maksimal dalam 1x24 jam kerja.
-                                </p>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
+            <div class="h-96 overflow-hidden rounded-2xl border border-slate-200 shadow-sm sm:h-120 lg:h-160 xl:h-180">
+                <iframe src="https://www.google.com/maps?q=Pantai+Kartini+Jepara&output=embed" class="block h-full w-full" style="border:0;" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Lokasi Niskala Samudra di Pantai Kartini Jepara"></iframe>
             </div>
-
         </div>
+    </div>
+</section>
+
+<section class="bg-slate-50 py-12 sm:py-16">
+    <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="mb-8 text-center">
+            <p class="text-xs font-bold uppercase tracking-[0.2em] text-gold-600">Pesan langsung</p>
+            <h2 class="mt-3 font-serif text-3xl text-charcoal-900 sm:text-4xl">Ada yang ingin ditanyakan?</h2>
+            <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-500">Isi formulir singkat ini dan kami akan meneruskannya ke WhatsApp restoran.</p>
+        </div>
+
+        <form x-data @submit.prevent="window.open('https://wa.me/6285191194059?text=' + encodeURIComponent('Nama: ' + $refs.nama.value + '\nEmail: ' + $refs.email.value + '\nWhatsApp: ' + $refs.phone.value + '\nKeperluan: ' + $refs.subject.value + '\nPesan: ' + $refs.message.value), '_blank')" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                <div><label for="contact-name" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Nama lengkap</label><input id="contact-name" x-ref="nama" type="text" required placeholder="Nama Anda" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-charcoal-900 outline-none transition focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"></div>
+                <div><label for="contact-phone" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">No. WhatsApp</label><input id="contact-phone" x-ref="phone" type="text" required placeholder="0812-xxxx-xxxx" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-charcoal-900 outline-none transition focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"></div>
+                <div><label for="contact-email" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Email</label><input id="contact-email" x-ref="email" type="email" required placeholder="nama@email.com" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-charcoal-900 outline-none transition focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"></div>
+                <div><label for="contact-subject" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Keperluan</label><select id="contact-subject" x-ref="subject" required class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-charcoal-900 outline-none transition focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"><option value="">Pilih keperluan</option><option value="Reservasi meja">Reservasi meja</option><option value="Paket acara">Paket acara</option><option value="Kritik dan saran">Kritik dan saran</option><option value="Lainnya">Lainnya</option></select></div>
+                <div class="sm:col-span-2"><label for="contact-message" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-500">Pesan</label><textarea id="contact-message" x-ref="message" rows="5" required placeholder="Tulis pertanyaan atau kebutuhan Anda..." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-charcoal-900 outline-none transition focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"></textarea></div>
+            </div>
+            <button type="submit" class="mt-6 inline-flex w-full items-center justify-center gap-3 rounded-xl bg-gold-600 px-6 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg shadow-gold-600/20 transition hover:bg-gold-500">Kirim ke WhatsApp <i class="fa-brands fa-whatsapp text-lg"></i></button>
+        </form>
     </div>
 </section>
 

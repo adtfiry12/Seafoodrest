@@ -20,7 +20,7 @@
 
             <div class="rounded-3xl overflow-hidden shadow-2xl border border-slate-100">
                 @php $imageUrl = $menu->gambar ? asset('storage/' . $menu->gambar) : 'https://ui-avatars.com/api/?name=Menu&background=f1f5f9&color=94a3b8'; @endphp
-                <img src="{{ $imageUrl }}" alt="{{ $menu->nama_menu }}" class="w-full h-auto object-cover max-h-[500px]">
+                <img src="{{ $imageUrl }}" alt="{{ $menu->nama_menu }}" class="w-full h-auto object-cover max-h-125">
             </div>
 
             <div class="flex flex-col h-full">
@@ -51,7 +51,7 @@
                 </div>
 
                 @if($menu->stok > 0)
-                    <button @click="addToCart({{ $menu->id }}, '{{ addslashes($menu->nama_menu) }}', {{ $menu->harga }}, '{{ $imageUrl }}', {{ $menu->stok }})" class="w-full sm:w-auto px-10 py-4 bg-charcoal-900 hover:bg-gold-600 text-white font-bold rounded-xl transition duration-300 text-sm uppercase tracking-wider shadow-lg active:scale-95 flex items-center justify-center gap-3">
+                    <button @click="addToCart({{ $menu->id }}, @js($menu->nama_menu), {{ $menu->harga }}, @js($imageUrl), {{ $menu->stok }})" class="w-full sm:w-auto px-10 py-4 bg-charcoal-900 hover:bg-gold-600 text-white font-bold rounded-xl transition duration-300 text-sm uppercase tracking-wider shadow-lg active:scale-95 flex items-center justify-center gap-3">
                         <i class="fa-solid fa-cart-plus text-lg"></i> Tambahkan ke Keranjang
                     </button>
                 @else

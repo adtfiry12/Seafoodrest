@@ -130,7 +130,7 @@
 
                         @php $imageUrl = $item->gambar ? asset('storage/' . $item->gambar) : 'https://ui-avatars.com/api/?name=Menu&background=f1f5f9&color=94a3b8'; @endphp
 
-                        <button @click="addToCart({{ $item->id }}, '{{ addslashes($item->nama_menu) }}', {{ $item->harga }}, '{{ $imageUrl }}', {{ $item->stok }})" class="flex items-center justify-center bg-gold-600 hover:bg-gold-500 text-white font-bold py-2.5 rounded-xl transition duration-300 text-[11px] uppercase tracking-wider shadow-sm active:scale-95">
+                        <button @click="addToCart({{ $item->id }}, @js($item->nama_menu), {{ $item->harga }}, @js($imageUrl), {{ $item->stok }})" class="flex items-center justify-center bg-gold-600 hover:bg-gold-500 text-white font-bold py-2.5 rounded-xl transition duration-300 text-[11px] uppercase tracking-wider shadow-sm active:scale-95">
                             <i class="fa-solid fa-cart-plus mr-1"></i> Pesan
                         </button>
                     </div>
@@ -202,22 +202,22 @@
                     <h3 class="text-2xl font-serif text-white mb-2">Kirim Pesan / Pertanyaan</h3>
                     <p class="text-slate-400 text-sm mb-6">Punya pertanyaan seputar katering atau reservasi tempat? Jangan ragu hubungi kami!</p>
 
-                    <form action="#" class="space-y-4">
+                    <form x-data @submit.prevent="window.open('https://wa.me/6285191194059?text=' + encodeURIComponent('Nama: ' + $refs.nama.value + '\nEmail: ' + $refs.email.value + '\nSubjek: ' + $refs.subject.value + '\nPesan: ' + $refs.message.value), '_blank')" class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <input type="text" placeholder="Nama Lengkap Anda" class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500">
+                                <input x-ref="nama" type="text" required placeholder="Nama Lengkap Anda" class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500">
                             </div>
                             <div>
-                                <input type="email" placeholder="Alamat Email" class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500">
+                                <input x-ref="email" type="email" required placeholder="Alamat Email" class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500">
                             </div>
                         </div>
                         <div>
-                            <input type="text" placeholder="Subjek Pesan" class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500">
+                            <input x-ref="subject" type="text" required placeholder="Subjek Pesan" class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500">
                         </div>
                         <div>
-                            <textarea rows="4" placeholder="Tulis pesan Anda di sini..." class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500"></textarea>
+                            <textarea x-ref="message" rows="4" required placeholder="Tulis pesan Anda di sini..." class="w-full bg-charcoal-900/50 border border-charcoal-800 text-white rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500 placeholder-slate-500"></textarea>
                         </div>
-                        <button type="button" class="w-full sm:w-auto px-8 py-3 bg-gold-600 text-white text-sm font-bold uppercase tracking-wider rounded-xl hover:bg-gold-500 transition shadow-lg shadow-gold-500/30">
+                        <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-gold-600 text-white text-sm font-bold uppercase tracking-wider rounded-xl hover:bg-gold-500 transition shadow-lg shadow-gold-500/30">
                             Kirim Pesan Sekarang <i class="fa-solid fa-paper-plane ml-2"></i>
                         </button>
                     </form>

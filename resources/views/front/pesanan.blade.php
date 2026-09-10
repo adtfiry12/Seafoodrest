@@ -2,15 +2,22 @@
 
 @section('content')
 
-<div class="bg-charcoal-950 py-12 border-b-4 border-gold-600">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h1 class="text-3xl sm:text-4xl font-serif text-white mb-3">Pesanan Saya</h1>
-        <p class="text-slate-400 text-sm font-light">Pantau status pesanan dan riwayat transaksi Anda.</p>
+<section class="relative overflow-hidden bg-charcoal-950 py-14 sm:py-20 border-b-4 border-gold-600">
+    <div class="absolute inset-0">
+        <img src="{{ asset('image/seafood.webp') }}" alt="Pesanan seafood Niskala Samudra" class="h-full w-full object-cover opacity-30">
+        <div class="absolute inset-0 bg-charcoal-950/75"></div>
     </div>
-</div>
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl">
+            <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-gold-500">Niskala Samudra</p>
+            <h1 class="font-serif text-4xl leading-tight text-white sm:text-6xl">Pesanan saya</h1>
+            <p class="mt-5 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">Pantau status pesanan, pembayaran, dan riwayat transaksi Anda.</p>
+        </div>
+    </div>
+</section>
 
-<section class="bg-slate-50 py-12 min-h-[60vh]">
-    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+<section class="min-h-[60vh] bg-slate-50 py-10 sm:py-14">
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 
         <div class="space-y-6">
             @forelse($transaksi as $trx)
