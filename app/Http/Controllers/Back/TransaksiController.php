@@ -3,14 +3,16 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
-use App\Models\Transaksi;
 use App\Models\DetailTransaksi;
 use App\Models\Menu;
 use App\Models\Pengguna;
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class TransaksiController extends Controller
 {
@@ -23,7 +25,7 @@ class TransaksiController extends Controller
         }
 
         if ($request->has('search') && $request->search != '') {
-            $query->where('kode_transaksi', 'like', '%' . $request->search . '%');
+            $query->where('kode_transaksi', 'like', '%'.$request->search.'%');
         }
 
         $transaksi = $query->paginate(5)->withQueryString();
@@ -42,16 +44,16 @@ class TransaksiController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'tipe_pesanan'      => 'required|in:Dine-In,Takeaway,Delivery',
+            'tipe_pesanan' => 'required|in:Dine-In,Takeaway,Delivery',
             'metode_pembayaran' => 'required|in:Tunai,QRIS,COD',
-            'items'             => 'required|array|min:1',
-            'items.*.menu_id'   => 'required|exists:menu,id',
-            'items.*.qty'       => 'required|integer|min:1',
+            'items' => 'required|array|min:1',
+            'items.*.menu_id' => 'required|exists:menu,id',
+            'items.*.qty' => 'required|integer|min:1',
         ]);
 
         DB::beginTransaction();
         try {
-            $kode = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+            $kode = 'INV-'.date('Ymd').'-'.strtoupper(Str::random(5));
 
             $total_bayar = 0;
             $detail_data = [];
@@ -62,26 +64,26 @@ class TransaksiController extends Controller
                 $total_bayar += $subtotal;
 
                 $detail_data[] = [
-                    'menu_id'      => $menu->id,
-                    'qty'          => $item['qty'],
+                    'menu_id' => $menu->id,
+                    'qty' => $item['qty'],
                     'harga_satuan' => $menu->harga,
-                    'subtotal'     => $subtotal,
+                    'subtotal' => $subtotal,
                 ];
 
                 $menu->decrement('stok', $item['qty']);
             }
 
             $transaksi = Transaksi::create([
-                'kode_transaksi'    => $kode,
-                'pengguna_id'       => $request->pengguna_id,
-                'karyawan_id'       => Auth::id(),
-                'tipe_pesanan'      => $request->tipe_pesanan,
-                'alamat'            => $request->alamat,
+                'kode_transaksi' => $kode,
+                'pengguna_id' => $request->pengguna_id,
+                'karyawan_id' => Auth::id(),
+                'tipe_pesanan' => $request->tipe_pesanan,
+                'alamat' => $request->alamat,
                 'metode_pembayaran' => $request->metode_pembayaran,
                 'status_pembayaran' => $request->metode_pembayaran == 'Tunai' ? 'Lunas' : 'Belum Lunas',
-                'status_pesanan'    => 'Menunggu ACC',
-                'total_bayar'       => $total_bayar,
-                'catatan'           => $request->catatan,
+                'status_pesanan' => 'Menunggu ACC',
+                'total_bayar' => $total_bayar,
+                'catatan' => $request->catatan,
             ]);
 
             foreach ($detail_data as $detail) {
@@ -90,17 +92,20 @@ class TransaksiController extends Controller
             }
 
             DB::commit();
+
             return redirect()->route('admin.transaksi.show', $transaksi->kode_transaksi)->with('success', 'Transaksi berhasil dibuat!');
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+
+            return back()->with('error', 'Terjadi kesalahan sistem: '.$e->getMessage());
         }
     }
 
     public function show(Transaksi $transaksi)
     {
         $transaksi->load(['pelanggan', 'karyawan', 'detail.menu']);
+
         return view('back.admin.transaksi.show', compact('transaksi'));
     }
 
@@ -113,7 +118,7 @@ class TransaksiController extends Controller
     {
         $validated = $request->validate([
             'status_pembayaran' => 'required|in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal',
-            'status_pesanan'    => 'required|in:Menunggu ACC,Dimasak,Diantar,Selesai,Dibatalkan',
+            'status_pesanan' => 'required|in:Menunggu ACC,Dimasak,Diantar,Selesai,Dibatalkan',
         ]);
 
         $validated['karyawan_id'] = Auth::id();
@@ -127,18 +132,32 @@ class TransaksiController extends Controller
     {
         foreach ($transaksi->detail as $item) {
             $menu = Menu::find($item->menu_id);
-            if($menu) {
+            if ($menu) {
                 $menu->increment('stok', $item->qty);
             }
         }
 
         $transaksi->delete();
+
         return redirect()->route('admin.transaksi.index')->with('success', 'Transaksi dibatalkan dan dihapus.');
     }
 
     public function cetak(Transaksi $transaksi)
     {
         $transaksi->load(['pelanggan', 'karyawan', 'detail.menu']);
+
         return view('back.admin.transaksi.cetak', compact('transaksi'));
+    }
+
+    public function buktiPembayaran(Transaksi $transaksi): BinaryFileResponse
+    {
+        abort_unless($transaksi->bukti_pembayaran && Storage::disk('local')->exists($transaksi->bukti_pembayaran), 404);
+
+        $path = Storage::disk('local')->path($transaksi->bukti_pembayaran);
+
+        return response()->file($path, [
+            'Content-Type' => Storage::disk('local')->mimeType($transaksi->bukti_pembayaran),
+            'Content-Disposition' => 'inline; filename="bukti-pembayaran-'.$transaksi->kode_transaksi.'"',
+        ]);
     }
 }

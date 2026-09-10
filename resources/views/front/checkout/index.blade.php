@@ -167,7 +167,6 @@
                             <div class="flex gap-4 items-start">
                                 <input type="hidden" :name="`items[${index}][menu_id]`" :value="item.id">
                                 <input type="hidden" :name="`items[${index}][qty]`" :value="item.qty">
-                                <input type="hidden" :name="`items[${index}][harga]`" :value="item.harga">
 
                                 <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-charcoal-800">
                                     <img :src="item.image" class="w-full h-full object-cover">
@@ -196,7 +195,6 @@
                             <span>Total Bayar</span>
                             <span class="text-gold-500" x-text="'Rp ' + formatRibuan(totalAkhir())"></span>
                         </div>
-                        <input type="hidden" name="total_bayar" :value="totalAkhir()">
                     </div>
 
                     <button type="submit" class="w-full mt-8 px-8 py-4 bg-gold-600 text-white font-bold rounded-xl hover:bg-gold-500 transition uppercase tracking-wider text-sm shadow-lg shadow-gold-600/20 flex justify-center items-center gap-3">

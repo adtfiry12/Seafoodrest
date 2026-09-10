@@ -78,8 +78,8 @@
 
                 @if($transaksi->bukti_pembayaran)
                     <div class="flex flex-col sm:flex-row gap-6 items-start">
-                        <a href="{{ asset('storage/' . $transaksi->bukti_pembayaran) }}" target="_blank" class="block w-full sm:w-48 shrink-0 overflow-hidden rounded-xl border-2 border-slate-200 shadow-sm hover:opacity-80 transition group relative">
-                            <img src="{{ asset('storage/' . $transaksi->bukti_pembayaran) }}" alt="Bukti Transfer" class="w-full h-auto sm:h-64 object-cover">
+                        <a href="{{ route('transaksi.bukti', $transaksi) }}" target="_blank" class="block w-full sm:w-48 shrink-0 overflow-hidden rounded-xl border-2 border-slate-200 shadow-sm hover:opacity-80 transition group relative">
+                            <img src="{{ route('transaksi.bukti', $transaksi) }}" alt="Bukti Transfer" class="w-full h-auto sm:h-64 object-cover">
                             <div class="absolute inset-0 bg-charcoal-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                 <i class="fa-solid fa-magnifying-glass-plus text-white text-3xl"></i>
                             </div>

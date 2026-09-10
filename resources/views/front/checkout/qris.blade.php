@@ -60,7 +60,7 @@
                         <i class="fa-solid fa-cloud-arrow-up text-gold-500"></i> Upload Bukti Pembayaran
                     </h3>
 
-                    <form action="{{ route('checkout.qris.upload', $transaksi->kode_transaksi) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                    <form action="{{ URL::temporarySignedRoute('checkout.qris.upload', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         <div>
                             <input type="file" name="bukti_pembayaran" required accept="image/jpeg,image/png,image/jpg" class="block w-full text-sm text-slate-400 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-gold-600 file:text-white hover:file:bg-gold-500 transition cursor-pointer bg-charcoal-900 rounded-xl border border-charcoal-800 focus:outline-none">

@@ -26,15 +26,19 @@ Route::controller(HomeController::class)->group(function () {
 Route::controller(CheckoutController::class)->prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/proses', 'proses')->name('proses');
-    Route::get('/qris/{kode_transaksi}', 'qris')->name('qris');
-    Route::post('/qris/{kode_transaksi}/upload', 'uploadBukti')->name('qris.upload');
-    Route::get('/sukses/{kode_transaksi}', 'sukses')->name('sukses');
+    Route::get('/qris/{kode_transaksi}', 'qris')->middleware('signed')->name('qris');
+    Route::post('/qris/{kode_transaksi}/upload', 'uploadBukti')->middleware('signed')->name('qris.upload');
+    Route::get('/sukses/{kode_transaksi}', 'sukses')->middleware('signed')->name('sukses');
 });
+
+Route::get('/pesanan/struk/{kode_transaksi}', [CheckoutController::class, 'struk'])
+    ->middleware('signed')
+    ->name('front.struk');
 
 // Guest (no login)
 Route::middleware('guest')->controller(AuthController::class)->group(function () {
     Route::get('/login', 'showLogin')->name('login');
-    Route::post('/login', 'login')->name('login.submit');
+    Route::post('/login', 'login')->middleware('throttle:login')->name('login.submit');
     Route::get('/register', 'showRegister')->name('register');
     Route::post('/register', 'register')->name('register.submit');
 });
@@ -48,8 +52,11 @@ Route::middleware('auth')->group(function () {
     // Pesanan
     Route::controller(CheckoutController::class)->prefix('pesanan')->name('front.')->group(function () {
         Route::get('/', 'pesanan')->name('pesanan');
-        Route::get('/struk/{kode_transaksi}', 'struk')->name('struk');
     });
+
+    Route::get('/transaksi/{transaksi}/bukti-pembayaran', [TransaksiController::class, 'buktiPembayaran'])
+        ->middleware('role:admin,karyawan')
+        ->name('transaksi.bukti');
 
     // profile
     Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
@@ -78,10 +85,10 @@ Route::middleware('auth')->group(function () {
 
         // All CRUD
         Route::resources([
-            'kategori'  => KategoriController::class,
-            'menu'      => MenuController::class,
-            'slide'     => SlideController::class,
-            'pengguna'  => PenggunaController::class,
+            'kategori' => KategoriController::class,
+            'menu' => MenuController::class,
+            'slide' => SlideController::class,
+            'pengguna' => PenggunaController::class,
             'transaksi' => TransaksiController::class,
         ]);
 

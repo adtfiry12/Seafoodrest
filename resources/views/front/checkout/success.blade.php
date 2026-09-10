@@ -34,7 +34,7 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('front.struk', $transaksi->kode_transaksi) }}" target="_blank" class="px-8 py-3 bg-white text-charcoal-900 font-bold rounded-xl border border-charcoal-900 hover:bg-slate-50 transition uppercase tracking-wider text-sm shadow-md flex items-center justify-center gap-2">
+                <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" target="_blank" class="px-8 py-3 bg-white text-charcoal-900 font-bold rounded-xl border border-charcoal-900 hover:bg-slate-50 transition uppercase tracking-wider text-sm shadow-md flex items-center justify-center gap-2">
                     <i class="fa-solid fa-print"></i> Cetak Struk
                 </a>
                 <a href="{{ route('menu') }}" class="px-8 py-3 bg-charcoal-900 text-white font-bold rounded-xl hover:bg-gold-600 transition uppercase tracking-wider text-sm shadow-md flex items-center justify-center gap-2">

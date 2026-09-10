@@ -25,10 +25,8 @@ class AuthController extends Controller
     public function login(Request $request): RedirectResponse
     {
         $credentials = $request->validate([
-            'email' => ['required', 'email', 'exists:pengguna,email'],
+            'email' => ['required', 'email'],
             'password' => ['required', 'string'],
-        ], [
-            'email.exists' => 'Email belum terdaftar.',
         ]);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {

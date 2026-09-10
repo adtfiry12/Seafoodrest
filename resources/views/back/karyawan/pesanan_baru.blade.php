@@ -120,7 +120,7 @@
 
                             @elseif($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran == 'Menunggu Konfirmasi')
                                 <input type="hidden" name="status_pembayaran" value="Lunas">
-                                <a href="{{ asset('storage/' . $trx->bukti_pembayaran) }}" target="_blank" class="block w-full py-2 mb-2 bg-charcoal-900 text-white text-xs font-bold rounded-xl text-center hover:bg-charcoal-800">
+                                <a href="{{ route('transaksi.bukti', $trx) }}" target="_blank" class="block w-full py-2 mb-2 bg-charcoal-900 text-white text-xs font-bold rounded-xl text-center hover:bg-charcoal-800">
                                     <i class="fa-solid fa-image mr-1"></i> Lihat Bukti
                                 </a>
                                 <button type="submit" class="w-full py-2.5 bg-emerald-500 text-white text-xs font-bold rounded-xl hover:bg-emerald-600 transition shadow-sm">

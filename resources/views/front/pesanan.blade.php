@@ -51,11 +51,11 @@
                             <p class="text-xl font-bold text-gold-600 mb-4">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</p>
 
                             <div class="flex flex-wrap gap-2">
-                                <a href="{{ route('front.struk', $trx->kode_transaksi) }}" target="_blank" class="px-4 py-2 bg-slate-100 text-charcoal-900 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-200 transition">
+                                <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" target="_blank" class="px-4 py-2 bg-slate-100 text-charcoal-900 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-200 transition">
                                     <i class="fa-solid fa-receipt mr-1"></i> Lihat Struk
                                 </a>
                                 @if($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran != 'Lunas')
-                                    <a href="{{ route('checkout.qris', $trx->kode_transaksi) }}" class="px-4 py-2 bg-gold-600 text-white text-xs font-bold rounded-lg hover:bg-gold-500 transition shadow-sm shadow-gold-500/30">
+                                    <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" class="px-4 py-2 bg-gold-600 text-white text-xs font-bold rounded-lg hover:bg-gold-500 transition shadow-sm shadow-gold-500/30">
                                         Bayar QRIS
                                     </a>
                                 @endif
