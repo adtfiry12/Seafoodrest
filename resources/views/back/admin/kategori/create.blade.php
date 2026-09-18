@@ -32,22 +32,6 @@
                 @enderror
             </div>
 
-            <div>
-                <label for="slug" class="block text-sm font-semibold text-charcoal-900 mb-2">Slug (Opsional)</label>
-                <input type="text" name="slug" id="slug"
-                    value="{{ old('slug') }}"
-                    placeholder="kepiting-dan-lobster"
-                    class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full px-4 py-3 lg:py-3.5 transition-all duration-200 hover:bg-white">
-                <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-info"></i> Kosongkan jika ingin dibuat otomatis mengikuti nama kategori.
-                </p>
-                @error('slug')
-                    <p class="flex items-center gap-1 text-xs text-red-500 mt-2 font-medium">
-                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-                    </p>
-                @enderror
-            </div>
-
             <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-8">
                 <a href="{{ route('admin.kategori.index') }}"
                    class="w-full sm:w-auto px-5 py-2.5 text-sm font-medium text-center text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 hover:text-charcoal-900 transition-colors focus:ring-4 focus:ring-slate-100">

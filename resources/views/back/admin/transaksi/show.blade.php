@@ -46,9 +46,9 @@
         <div class="p-6 sm:p-8 border-b border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Pelanggan</p>
-                <p class="font-bold text-charcoal-900">{{ $transaksi->pelanggan->nama ?? 'Pelanggan Umum (Guest)' }}</p>
-                @if($transaksi->pelanggan)
-                    <p class="text-sm text-slate-600">{{ $transaksi->pelanggan->no_hp }}</p>
+                <p class="font-bold text-charcoal-900">{{ $transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan ?? 'Pelanggan Umum (Guest)' }}</p>
+                @if($transaksi->pelanggan?->no_hp || $transaksi->no_hp_pelanggan)
+                    <p class="text-sm text-slate-600">{{ $transaksi->pelanggan->no_hp ?? $transaksi->no_hp_pelanggan }}</p>
                 @endif
                 <p class="text-sm font-medium mt-2"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">{{ $transaksi->tipe_pesanan }}</span></p>
 
@@ -131,7 +131,7 @@
                 <tbody class="divide-y divide-slate-100">
                     @foreach($transaksi->detail as $dt)
                         <tr>
-                            <td class="py-4 font-medium">{{ $dt->menu->nama_menu ?? 'Menu Terhapus' }}</td>
+                            <td class="py-4 font-medium">{{ $dt->menu->nama_menu ?? $dt->nama_menu }}</td>
                             <td class="py-4 text-center">Rp {{ number_format($dt->harga_satuan, 0, ',', '.') }}</td>
                             <td class="py-4 text-center font-bold">{{ $dt->qty }}</td>
                             <td class="py-4 text-right font-bold text-charcoal-900">Rp {{ number_format($dt->subtotal, 0, ',', '.') }}</td>
@@ -139,6 +139,16 @@
                     @endforeach
                 </tbody>
                 <tfoot>
+                    <tr>
+                        <td colspan="3" class="py-2 text-right text-slate-500">Subtotal</td>
+                        <td class="py-2 text-right font-medium">Rp {{ number_format($transaksi->subtotal_bayar, 0, ',', '.') }}</td>
+                    </tr>
+                    @if($transaksi->ongkos_kirim > 0)
+                        <tr>
+                            <td colspan="3" class="py-2 text-right text-slate-500">Ongkos Kirim</td>
+                            <td class="py-2 text-right font-medium">Rp {{ number_format($transaksi->ongkos_kirim, 0, ',', '.') }}</td>
+                        </tr>
+                    @endif
                     <tr>
                         <td colspan="3" class="py-4 text-right font-bold text-slate-500 uppercase tracking-wider text-xs">Total Pembayaran</td>
                         <td class="py-4 text-right font-bold text-gold-600 text-xl">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</td>

@@ -34,6 +34,16 @@
                     </div>
 
                     <div>
+                        <label for="nama_pelanggan" class="block text-sm font-semibold text-charcoal-900 mb-2">Nama Pemesan</label>
+                        <input type="text" name="nama_pelanggan" id="nama_pelanggan" placeholder="Nama pelanggan umum" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
+                    </div>
+
+                    <div>
+                        <label for="no_hp_pelanggan" class="block text-sm font-semibold text-charcoal-900 mb-2">No. HP Pemesan</label>
+                        <input type="text" name="no_hp_pelanggan" id="no_hp_pelanggan" placeholder="Nomor WhatsApp pelanggan" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
+                    </div>
+
+                    <div>
                         <label class="block text-sm font-semibold text-charcoal-900 mb-2">Tipe Pesanan <span class="text-red-500">*</span></label>
                         <select name="tipe_pesanan" required x-model="tipePesanan" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
                             <option value="Dine-In">Dine-In (Makan di Tempat)</option>

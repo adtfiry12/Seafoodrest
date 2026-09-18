@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class CheckoutController extends Controller
 {
@@ -29,6 +30,10 @@ class CheckoutController extends Controller
             'no_hp' => ['required', 'string', 'max:20'],
             'alamat' => ['required_if:tipe_pesanan,Delivery', 'nullable', 'string', 'max:1000'],
             'catatan' => ['nullable', 'string', 'max:1000'],
+            'opsi_dinein' => ['required_if:tipe_pesanan,Makan di Tempat', 'in:sekarang,reservasi'],
+            'nomor_meja' => ['nullable', 'string', 'max:50'],
+            'jam_kedatangan' => ['nullable', 'date_format:H:i'],
+            'jumlah_orang' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
 
         if (! Auth::check()) {
@@ -37,20 +42,23 @@ class CheckoutController extends Controller
 
         $validated = $request->validate($rules);
 
-        if ($request->input('tipe_pesanan') === 'Delivery' && $request->input('metode_pembayaran') === 'COD' && ! Auth::check()) {
+        if ($validated['tipe_pesanan'] === 'Delivery' && $validated['metode_pembayaran'] === 'Kasir') {
+            throw ValidationException::withMessages(['metode_pembayaran' => 'Pesanan delivery tidak dapat dibayar di kasir.']);
+        }
+
+        if ($validated['tipe_pesanan'] === 'Makan di Tempat' && $validated['metode_pembayaran'] === 'COD') {
+            throw ValidationException::withMessages(['metode_pembayaran' => 'COD hanya tersedia untuk pesanan delivery.']);
+        }
+
+        if ($validated['tipe_pesanan'] === 'Delivery' && $validated['metode_pembayaran'] === 'COD' && ! Auth::check()) {
             abort(403, 'Login diperlukan untuk pembayaran COD.');
         }
 
-        $enumTipePesanan = $request->input('tipe_pesanan') === 'Delivery' ? 'Delivery' : 'Dine-In';
-        $enumMetodePembayaran = $request->input('metode_pembayaran') === 'Kasir' ? 'Tunai' : $request->input('metode_pembayaran');
-
-        $infoPelanggan = '';
-        if (! Auth::check()) {
-            $infoPelanggan = "[GUEST] Nama: {$validated['nama']} | HP: {$validated['no_hp']}\n";
-        }
+        $enumTipePesanan = $validated['tipe_pesanan'] === 'Delivery' ? 'Delivery' : 'Dine-In';
+        $enumMetodePembayaran = $validated['metode_pembayaran'] === 'Kasir' ? 'Tunai' : $validated['metode_pembayaran'];
 
         $infoDineIn = '';
-        if ($request->input('tipe_pesanan') === 'Makan di Tempat') {
+        if ($validated['tipe_pesanan'] === 'Makan di Tempat') {
             if ($request->input('opsi_dinein') === 'sekarang') {
                 $infoDineIn = '[LOKASI] Nomor Meja: '.($request->input('nomor_meja') ?: 'Belum diisi')."\n";
             } else {
@@ -59,10 +67,11 @@ class CheckoutController extends Controller
         }
 
         $catatanAsli = $request->filled('catatan') ? "Catatan Dapur: {$validated['catatan']}" : '';
-        $finalCatatan = $infoPelanggan.$infoDineIn.$catatanAsli;
+        $finalCatatan = $infoDineIn.$catatanAsli;
         $kodeTransaksi = 'TRX-'.date('Ymd').'-'.strtoupper(Str::random(5));
+        $namaPelanggan = Auth::user()?->nama ?? ($validated['nama'] ?? null);
 
-        $transaksi = DB::transaction(function () use ($validated, $enumTipePesanan, $enumMetodePembayaran, $kodeTransaksi, $finalCatatan) {
+        $transaksi = DB::transaction(function () use ($validated, $enumTipePesanan, $enumMetodePembayaran, $kodeTransaksi, $finalCatatan, $namaPelanggan) {
             $menuIds = collect($validated['items'])->pluck('menu_id')->sort()->values();
             $menus = Menu::whereIn('id', $menuIds)
                 ->where('is_active', true)
@@ -70,6 +79,7 @@ class CheckoutController extends Controller
                 ->get()
                 ->keyBy('id');
             $totalBayar = 0;
+            $ongkosKirim = $enumTipePesanan === 'Delivery' ? 15000 : 0;
             $details = [];
 
             foreach ($validated['items'] as $item) {
@@ -78,30 +88,33 @@ class CheckoutController extends Controller
 
                 $subtotal = $menu->harga * $item['qty'];
                 $totalBayar += $subtotal;
-                $details[] = [$menu->id, $item['qty'], $menu->harga, $subtotal];
+                $details[] = [$menu->id, $menu->nama_menu, $item['qty'], $menu->harga, $subtotal];
                 $menu->decrement('stok', $item['qty']);
             }
 
-            if ($enumTipePesanan === 'Delivery') {
-                $totalBayar += 15000;
-            }
+            $totalBayar += $ongkosKirim;
 
             $transaksi = Transaksi::create([
                 'kode_transaksi' => $kodeTransaksi,
                 'pengguna_id' => Auth::id(),
                 'karyawan_id' => null,
+                'nama_pelanggan' => $namaPelanggan,
+                'no_hp_pelanggan' => $validated['no_hp'],
                 'tipe_pesanan' => $enumTipePesanan,
                 'alamat' => $enumTipePesanan === 'Delivery' ? $validated['alamat'] : null,
                 'metode_pembayaran' => $enumMetodePembayaran,
                 'status_pembayaran' => 'Belum Lunas',
                 'status_pesanan' => 'Menunggu ACC',
+                'subtotal_bayar' => $totalBayar - $ongkosKirim,
+                'ongkos_kirim' => $ongkosKirim,
                 'total_bayar' => $totalBayar,
                 'catatan' => trim($finalCatatan),
             ]);
 
-            foreach ($details as [$menuId, $qty, $harga, $subtotal]) {
+            foreach ($details as [$menuId, $namaMenu, $qty, $harga, $subtotal]) {
                 $transaksi->detail()->create([
                     'menu_id' => $menuId,
+                    'nama_menu' => $namaMenu,
                     'qty' => $qty,
                     'harga_satuan' => $harga,
                     'subtotal' => $subtotal,
@@ -120,28 +133,43 @@ class CheckoutController extends Controller
 
     public function qris($kode_transaksi)
     {
-        $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
+        $transaksi = Transaksi::with('detail.menu')->where('kode_transaksi', $kode_transaksi)->firstOrFail();
 
         return view('front.checkout.qris', compact('transaksi'));
     }
 
     public function sukses($kode_transaksi)
     {
-        $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
+        $transaksi = Transaksi::with('detail.menu')->where('kode_transaksi', $kode_transaksi)->firstOrFail();
 
         return view('front.checkout.success', compact('transaksi'));
     }
 
     public function pesanan()
     {
-        $transaksi = Transaksi::where('pengguna_id', Auth::id())->latest()->paginate(2);
+        $transaksi = Transaksi::with('detail')
+            ->where('pengguna_id', Auth::id())
+            ->latest()
+            ->paginate(6);
 
         return view('front.pesanan', compact('transaksi'));
     }
 
+    public function detailPesanan(string $kode_transaksi)
+    {
+        $transaksi = Transaksi::with(['pelanggan', 'detail.menu'])
+            ->where('pengguna_id', Auth::id())
+            ->where('kode_transaksi', $kode_transaksi)
+            ->firstOrFail();
+
+        return view('front.pesanan-detail', compact('transaksi'));
+    }
+
     public function struk($kode_transaksi)
     {
-        $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
+        $transaksi = Transaksi::with(['pelanggan', 'karyawan', 'detail.menu'])
+            ->where('kode_transaksi', $kode_transaksi)
+            ->firstOrFail();
 
         return view('front.struk', compact('transaksi'));
     }
@@ -153,6 +181,8 @@ class CheckoutController extends Controller
         ]);
 
         $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
+
+        abort_if($transaksi->metode_pembayaran !== 'QRIS' || in_array($transaksi->status_pembayaran, ['Lunas', 'Batal'], true), 422, 'Bukti pembayaran tidak dapat diunggah untuk transaksi ini.');
 
         if ($request->hasFile('bukti_pembayaran')) {
             $path = $request->file('bukti_pembayaran')->store('bukti_bayar', 'local');

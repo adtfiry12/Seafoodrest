@@ -4,8 +4,8 @@
 
 <section class="relative overflow-hidden bg-charcoal-950 py-14 sm:py-20 border-b-4 border-gold-600">
     <div class="absolute inset-0">
-        <img src="{{ asset('image/seafood.webp') }}" alt="Pesanan seafood Niskala Samudra" class="h-full w-full object-cover opacity-30">
-        <div class="absolute inset-0 bg-charcoal-950/75"></div>
+        <img src="{{ asset('image/seafood.webp') }}" alt="Pesanan seafood Niskala Samudra" class="h-full w-full object-cover opacity-75">
+        <div class="absolute inset-0 bg-charcoal-950/45"></div>
     </div>
     <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="max-w-2xl">
@@ -40,31 +40,20 @@
                         </div>
                     </div>
 
-                    <div class="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-charcoal-900 mb-2">{{ $trx->tipe_pesanan }}</h4>
-                            <p class="text-sm text-slate-500 mb-1">
-                                <span class="font-semibold text-slate-700">Metode:</span> {{ $trx->metode_pembayaran }}
-                                <span class="mx-2 text-slate-300">|</span>
-                                <span class="font-semibold text-slate-700">Status Bayar:</span>
-                                <span class="{{ $trx->status_pembayaran == 'Lunas' ? 'text-emerald-600 font-bold' : 'text-red-500 font-bold' }}">
-                                    {{ $trx->status_pembayaran }}
-                                </span>
-                            </p>
+                    <div class="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="grid grid-cols-2 sm:flex sm:items-center gap-x-6 gap-y-3 text-sm">
+                            <div><p class="text-xs text-slate-400">Tipe Pesanan</p><p class="mt-1 font-bold text-charcoal-900">{{ $trx->tipe_pesanan }}</p></div>
+                            <div><p class="text-xs text-slate-400">Isi Pesanan</p><p class="mt-1 font-bold text-charcoal-900">{{ $trx->detail->sum('qty') }} Porsi</p></div>
+                            <div><p class="text-xs text-slate-400">Pembayaran</p><p class="mt-1 font-bold {{ $trx->status_pembayaran === 'Lunas' ? 'text-emerald-600' : 'text-red-500' }}">{{ $trx->status_pembayaran }}</p></div>
                         </div>
 
-                        <div class="text-left md:text-right w-full md:w-auto border-t md:border-t-0 md:border-l border-slate-100 pt-4 md:pt-0 md:pl-6">
-                            <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-1">Total Belanja</p>
-                            <p class="text-xl font-bold text-gold-600 mb-4">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</p>
-
-                            <div class="flex flex-wrap gap-2">
-                                <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" target="_blank" class="px-4 py-2 bg-slate-100 text-charcoal-900 text-xs font-bold rounded-lg border border-slate-200 hover:bg-slate-200 transition">
-                                    <i class="fa-solid fa-receipt mr-1"></i> Lihat Struk
-                                </a>
+                        <div class="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 border-slate-100 pt-4 sm:pt-0">
+                            <p class="text-lg font-bold text-gold-600">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</p>
+                            <div class="flex gap-2">
+                                <a href="{{ route('front.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-9 h-9 bg-charcoal-900 text-white rounded-lg hover:bg-gold-600 transition"><i class="fa-solid fa-eye"></i></a>
+                                <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" target="_blank" title="Lihat struk" aria-label="Lihat struk" class="inline-flex items-center justify-center w-9 h-9 bg-slate-100 text-slate-600 rounded-lg border border-slate-200 hover:bg-slate-200 transition"><i class="fa-solid fa-receipt"></i></a>
                                 @if($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran != 'Lunas')
-                                    <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" class="px-4 py-2 bg-gold-600 text-white text-xs font-bold rounded-lg hover:bg-gold-500 transition shadow-sm shadow-gold-500/30">
-                                        Bayar QRIS
-                                    </a>
+                                    <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" title="Bayar dengan QRIS" aria-label="Bayar dengan QRIS" class="inline-flex items-center justify-center w-9 h-9 bg-gold-600 text-white rounded-lg hover:bg-gold-500 transition"><i class="fa-solid fa-wallet"></i></a>
                                 @endif
                             </div>
                         </div>

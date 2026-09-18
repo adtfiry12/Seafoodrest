@@ -77,6 +77,9 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right space-x-1">
+                                <a href="{{ route('admin.slide.show', $item->id) }}" title="Lihat detail banner" aria-label="Lihat detail banner" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
                                 <a href="{{ route('admin.slide.edit', $item->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
@@ -104,7 +107,9 @@
         </div>
         @if($slide->hasPages())
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/50">
-                {{ $slide->links() }}
+                <div class="max-w-full overflow-x-auto pb-1">
+                    {{ $slide->links() }}
+                </div>
             </div>
         @endif
     </div>

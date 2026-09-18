@@ -18,6 +18,12 @@
                 <p class="text-xs text-gold-700 font-bold uppercase tracking-wider mb-2">Total Tagihan</p>
                 <h2 class="text-4xl font-bold text-charcoal-900">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</h2>
                 <p class="text-sm text-slate-500 mt-2 font-mono">Kode Pesanan: <strong>{{ $transaksi->kode_transaksi }}</strong></p>
+                <div class="mt-4 flex justify-center gap-5 text-xs text-slate-500">
+                    <span>Subtotal: <strong class="text-charcoal-900">Rp {{ number_format($transaksi->subtotal_bayar, 0, ',', '.') }}</strong></span>
+                    @if($transaksi->ongkos_kirim > 0)
+                        <span>Ongkir: <strong class="text-charcoal-900">Rp {{ number_format($transaksi->ongkos_kirim, 0, ',', '.') }}</strong></span>
+                    @endif
+                </div>
             </div>
 
             <div class="p-6 sm:p-8 space-y-8">
@@ -31,9 +37,9 @@
                 </div>
 
                 <div class="relative flex py-2 items-center">
-                    <div class="flex-grow border-t border-slate-200"></div>
-                    <span class="flex-shrink-0 mx-4 text-slate-400 text-xs font-bold uppercase tracking-wider">Atau Transfer Bank</span>
-                    <div class="flex-grow border-t border-slate-200"></div>
+                    <div class="grow border-t border-slate-200"></div>
+                    <span class="shrink-0 mx-4 text-slate-400 text-xs font-bold uppercase tracking-wider">Atau Transfer Bank</span>
+                    <div class="grow border-t border-slate-200"></div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">

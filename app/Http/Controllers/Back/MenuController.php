@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
-use App\Models\Menu;
 use App\Models\Kategori;
+use App\Models\Menu;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -14,24 +15,33 @@ class MenuController extends Controller
     public function index()
     {
         $menu = Menu::with('kategori')->latest()->paginate(10);
+
         return view('back.admin.menu.index', compact('menu'));
+    }
+
+    public function show(Menu $menu): View
+    {
+        $menu->load('kategori');
+
+        return view('back.admin.menu.show', compact('menu'));
     }
 
     public function create()
     {
         $kategori = Kategori::all();
+
         return view('back.admin.menu.create', compact('kategori'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nama_menu'   => 'required|string|max:255',
+            'nama_menu' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategori,id',
-            'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|integer|min:0',
-            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'deskripsi'   => 'nullable|string',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'deskripsi' => 'nullable|string',
         ]);
 
         $data = $request->all();
@@ -42,7 +52,7 @@ class MenuController extends Controller
         $originalSlug = $data['slug'];
         $count = 1;
         while (Menu::where('slug', $data['slug'])->exists()) {
-            $data['slug'] = $originalSlug . '-' . $count++;
+            $data['slug'] = $originalSlug.'-'.$count++;
         }
 
         if ($request->hasFile('gambar')) {
@@ -57,18 +67,19 @@ class MenuController extends Controller
     public function edit(Menu $menu)
     {
         $kategori = Kategori::all();
+
         return view('back.admin.menu.edit', compact('menu', 'kategori'));
     }
 
     public function update(Request $request, Menu $menu)
     {
         $request->validate([
-            'nama_menu'   => 'required|string|max:255',
+            'nama_menu' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategori,id',
-            'harga'       => 'required|numeric|min:0',
-            'stok'        => 'required|integer|min:0',
-            'gambar'      => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-            'deskripsi'   => 'nullable|string',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'deskripsi' => 'nullable|string',
         ]);
 
         $data = $request->all();
@@ -80,7 +91,7 @@ class MenuController extends Controller
             $originalSlug = $data['slug'];
             $count = 1;
             while (Menu::where('slug', $data['slug'])->where('id', '!=', $menu->id)->exists()) {
-                $data['slug'] = $originalSlug . '-' . $count++;
+                $data['slug'] = $originalSlug.'-'.$count++;
             }
         }
 

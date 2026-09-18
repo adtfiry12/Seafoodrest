@@ -4,8 +4,8 @@
 
 <section class="relative overflow-hidden bg-charcoal-950 py-14 sm:py-20">
     <div class="absolute inset-0">
-        <img src="{{ asset('image/contactmenu.webp') }}" alt="Suasana restoran Niskala Samudra" class="h-full w-full object-cover opacity-35">
-        <div class="absolute inset-0 bg-charcoal-950/75"></div>
+        <img src="{{ asset('image/contactmenu.webp') }}" alt="Suasana restoran Niskala Samudra" class="h-full w-full object-cover opacity-75">
+        <div class="absolute inset-0 bg-charcoal-950/45"></div>
     </div>
     <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="max-w-2xl">

@@ -88,7 +88,7 @@
                 <span>Tipe: {{ strtoupper($transaksi->tipe_pesanan) }}</span>
             </div>
             <div class="mt-1">
-                <span>Plgn: {{ $transaksi->pelanggan->nama ?? 'Umum' }}</span>
+                <span>Plgn: {{ $transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan ?? 'Umum' }}</span>
             </div>
         </div>
 
@@ -106,7 +106,7 @@
                     @foreach($transaksi->detail as $dt)
                         <tr>
                             <td class="py-1 align-top pr-1">
-                                {{ $dt->menu->nama_menu ?? 'Menu Terhapus' }} <br>
+                                {{ $dt->menu->nama_menu ?? $dt->nama_menu }} <br>
                                 <span class="text-[10px]">@ {{ number_format($dt->harga_satuan, 0, ',', '.') }}</span>
                             </td>
                             <td class="py-1 align-top text-center">{{ $dt->qty }}</td>
@@ -119,6 +119,16 @@
 
         <!-- Total Pembayaran -->
         <div class="text-xs space-y-1 mb-4">
+            <div class="flex justify-between">
+                <span>Subtotal</span>
+                <span>Rp {{ number_format($transaksi->subtotal_bayar, 0, ',', '.') }}</span>
+            </div>
+            @if($transaksi->ongkos_kirim > 0)
+                <div class="flex justify-between">
+                    <span>Ongkos kirim</span>
+                    <span>Rp {{ number_format($transaksi->ongkos_kirim, 0, ',', '.') }}</span>
+                </div>
+            @endif
             <div class="flex justify-between font-bold text-sm">
                 <span>TOTAL</span>
                 <span>Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</span>

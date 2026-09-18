@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengguna;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -12,7 +13,13 @@ class PenggunaController extends Controller
     public function index()
     {
         $pengguna = Pengguna::latest()->paginate(5);
+
         return view('back.admin.pengguna.index', compact('pengguna'));
+    }
+
+    public function show(Pengguna $pengguna): View
+    {
+        return view('back.admin.pengguna.show', compact('pengguna'));
     }
 
     public function create()
@@ -23,15 +30,15 @@ class PenggunaController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama'          => 'required|string|max:255',
-            'email'         => 'required|string|email|max:255|unique:pengguna,email',
-            'password'      => 'required|string|min:8',
-            'role'          => 'required|in:admin,karyawan,pelanggan',
-            'no_hp'         => 'nullable|string|max:20',
+            'nama' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:pengguna,email',
+            'password' => 'required|string|min:8',
+            'role' => 'required|in:admin,karyawan,pelanggan',
+            'no_hp' => 'nullable|string|max:20',
             'jenis_kelamin' => 'nullable|in:L,P',
             'tanggal_lahir' => 'nullable|date',
-            'alamat'        => 'nullable|string',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'alamat' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if ($request->hasFile('foto')) {
@@ -51,15 +58,15 @@ class PenggunaController extends Controller
     public function update(Request $request, Pengguna $pengguna)
     {
         $validated = $request->validate([
-            'nama'          => 'required|string|max:255',
-            'email'         => 'required|string|email|max:255|unique:pengguna,email,' . $pengguna->id,
-            'password'      => 'nullable|string|min:8',
-            'role'          => 'required|in:admin,karyawan,pelanggan',
-            'no_hp'         => 'nullable|string|max:20',
+            'nama' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:pengguna,email,'.$pengguna->id,
+            'password' => 'nullable|string|min:8',
+            'role' => 'required|in:admin,karyawan,pelanggan',
+            'no_hp' => 'nullable|string|max:20',
             'jenis_kelamin' => 'nullable|in:L,P',
             'tanggal_lahir' => 'nullable|date',
-            'alamat'        => 'nullable|string',
-            'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'alamat' => 'nullable|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         if (empty($validated['password'])) {
@@ -85,6 +92,7 @@ class PenggunaController extends Controller
         }
 
         $pengguna->delete();
+
         return redirect()->route('admin.pengguna.index')->with('success', 'Pengguna berhasil dihapus!');
     }
 }

@@ -77,11 +77,12 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right space-x-1">
-                                <!-- DIUBAH MENJADI $item->slug -->
+                                <a href="{{ route('admin.menu.show', $item->slug) }}" title="Lihat detail menu" aria-label="Lihat detail menu" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
                                 <a href="{{ route('admin.menu.edit', $item->slug) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
-                                <!-- DIUBAH MENJADI $item->slug -->
                                 <form action="{{ route('admin.menu.destroy', $item->slug) }}" method="POST" class="inline-block" @submit.prevent="openDeleteModal($event, 'Hapus menu ini secara permanen?')">
                                     @csrf
                                     @method('DELETE')
@@ -106,7 +107,9 @@
         </div>
         @if($menu->hasPages())
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/50">
-                {{ $menu->links() }}
+                <div class="max-w-full overflow-x-auto pb-1">
+                    {{ $menu->links() }}
+                </div>
             </div>
         @endif
     </div>

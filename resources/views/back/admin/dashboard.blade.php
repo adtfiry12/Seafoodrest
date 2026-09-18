@@ -135,7 +135,7 @@
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4 font-mono font-bold text-charcoal-900">{{ $trx->kode_transaksi }}</td>
                             <td class="px-6 py-4">
-                                {{ $trx->pelanggan->nama ?? 'Guest' }}
+                                {{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}
                                 <div class="text-xs text-slate-400">{{ $trx->tipe_pesanan }}</div>
                             </td>
                             <td class="px-6 py-4 font-bold text-gold-600">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</td>
@@ -149,8 +149,8 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" class="inline-flex items-center px-3 py-1.5 bg-slate-100 text-slate-600 hover:bg-gold-50 hover:text-gold-600 rounded-lg text-xs font-bold transition">
-                                    Detail
+                                <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" title="Lihat detail transaksi" aria-label="Lihat detail transaksi" class="inline-flex items-center justify-center w-9 h-9 bg-slate-100 text-slate-500 hover:bg-gold-50 hover:text-gold-600 rounded-lg transition-colors">
+                                    <i class="fa-solid fa-eye"></i>
                                 </a>
                             </td>
                         </tr>

@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('detail_transaksi', function (Blueprint $table) {
             $table->id();
-        $table->foreignId('transaksi_id')->constrained('transaksi')->onDelete('cascade');
-        $table->foreignId('menu_id')->constrained('menu')->onDelete('cascade');
-        $table->integer('qty')->default(1);
-        $table->integer('harga_satuan')->default(0);
-        $table->integer('subtotal')->default(0);
-        $table->timestamps();
+            $table->foreignId('transaksi_id')->constrained('transaksi')->cascadeOnDelete();
+            $table->foreignId('menu_id')->nullable()->constrained('menu')->nullOnDelete();
+            $table->string('nama_menu');
+            $table->unsignedInteger('qty')->default(1);
+            $table->unsignedInteger('harga_satuan')->default(0);
+            $table->unsignedInteger('subtotal')->default(0);
+            $table->timestamps();
         });
     }
 

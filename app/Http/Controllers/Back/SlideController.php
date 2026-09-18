@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
-use App\Models\Slide;
 use App\Models\Menu;
+use App\Models\Slide;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,24 +14,33 @@ class SlideController extends Controller
     public function index()
     {
         $slide = Slide::with('menu')->latest()->paginate(5);
+
         return view('back.admin.slide.index', compact('slide'));
+    }
+
+    public function show(Slide $slide): View
+    {
+        $slide->load('menu');
+
+        return view('back.admin.slide.show', compact('slide'));
     }
 
     public function create()
     {
         $menu = Menu::where('is_active', 1)->get();
+
         return view('back.admin.slide.create', compact('menu'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'judul'     => 'required|string|max:255',
+            'judul' => 'required|string|max:255',
             'sub_judul' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
-            'menu_id'   => 'nullable|exists:menu,id',
-            'gambar'    => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_active' => 'boolean'
+            'menu_id' => 'nullable|exists:menu,id',
+            'gambar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('gambar')) {
@@ -48,18 +58,19 @@ class SlideController extends Controller
     public function edit(Slide $slide)
     {
         $menu = Menu::where('is_active', 1)->get();
+
         return view('back.admin.slide.edit', compact('slide', 'menu'));
     }
 
     public function update(Request $request, Slide $slide)
     {
         $validated = $request->validate([
-            'judul'     => 'required|string|max:255',
+            'judul' => 'required|string|max:255',
             'sub_judul' => 'nullable|string|max:255',
             'deskripsi' => 'nullable|string',
-            'menu_id'   => 'nullable|exists:menu,id',
-            'gambar'    => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
-            'is_active' => 'boolean'
+            'menu_id' => 'nullable|exists:menu,id',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'is_active' => 'boolean',
         ]);
 
         if ($request->hasFile('gambar')) {
@@ -84,6 +95,7 @@ class SlideController extends Controller
         }
 
         $slide->delete();
+
         return redirect()->route('admin.slide.index')->with('success', 'Slide banner berhasil dihapus!');
     }
 }

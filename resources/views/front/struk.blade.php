@@ -83,7 +83,7 @@
                 <span>Tipe: {{ strtoupper($transaksi->tipe_pesanan) }}</span>
             </div>
             <div class="mt-1">
-                <span>Plgn: {{ $transaksi->pengguna->nama ?? 'Umum (Guest)' }}</span>
+                <span>Plgn: {{ $transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan ?? 'Umum (Guest)' }}</span>
             </div>
         </div>
 
@@ -97,10 +97,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($transaksi->detailTransaksi ?? $transaksi->detail as $dt)
+                    @foreach($transaksi->detail as $dt)
                         <tr>
                             <td class="py-1 align-top pr-1">
-                                {{ $dt->menu->nama_menu ?? 'Menu Terhapus' }} <br>
+                                {{ $dt->menu->nama_menu ?? $dt->nama_menu }} <br>
                                 <span class="text-[10px]">@ {{ number_format($dt->harga_satuan, 0, ',', '.') }}</span>
                             </td>
                             <td class="py-1 align-top text-center">{{ $dt->qty }}</td>
@@ -120,6 +120,12 @@
                 <span>Metode</span>
                 <span>{{ $transaksi->metode_pembayaran }}</span>
             </div>
+            @if($transaksi->ongkos_kirim > 0)
+                <div class="flex justify-between">
+                    <span>Ongkos kirim</span>
+                    <span>Rp {{ number_format($transaksi->ongkos_kirim, 0, ',', '.') }}</span>
+                </div>
+            @endif
             <div class="flex justify-between">
                 <span>Status</span>
                 <span class="{{ $transaksi->status_pembayaran == 'Lunas' ? '' : 'font-bold' }}">

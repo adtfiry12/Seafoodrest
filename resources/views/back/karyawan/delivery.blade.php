@@ -44,7 +44,7 @@
             <div class="bg-white border-2 border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col transition hover:shadow-md relative">
 
                 <!-- Garis Biru Tanda Delivery -->
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-blue-400 to-blue-600"></div>
 
                 <!-- Header Card -->
                 <div class="p-4 border-b border-slate-100 flex justify-between items-start bg-slate-50/50">
@@ -61,57 +61,16 @@
                     </div>
                 </div>
 
-                <!-- Body Card (Info Alamat & Kontak) -->
-                <div class="p-5 flex-1 bg-white space-y-4">
-
-                    <!-- Info Pemesan & Kontak -->
-                    <div>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Penerima</p>
-                        <p class="font-bold text-charcoal-900 text-lg">{{ $trx->pelanggan->nama ?? 'Guest' }}</p>
-
-                        @if($trx->pelanggan && $trx->pelanggan->no_hp)
-                            <!-- Tombol WhatsApp Pintar -->
-                            @php
-                                // Ubah 08 jadi 628 untuk link WA
-                                $no_wa = $trx->pelanggan->no_hp;
-                                if(substr($no_wa, 0, 1) == '0') {
-                                    $no_wa = '62' . substr($no_wa, 1);
-                                }
-                            @endphp
-                            <a href="https://wa.me/{{ $no_wa }}" target="_blank" class="inline-flex items-center gap-1 text-sm text-emerald-600 hover:text-emerald-700 font-medium mt-1 transition">
-                                <i class="fa-brands fa-whatsapp text-lg"></i> {{ $trx->pelanggan->no_hp }}
-                            </a>
-                        @else
-                            <p class="text-sm text-slate-500"><i class="fa-solid fa-phone"></i> Tidak ada nomor HP</p>
-                        @endif
+                <div class="p-5 flex-1 bg-white space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div><p class="text-xs font-bold uppercase tracking-wider text-slate-400">Penerima</p><p class="font-bold text-charcoal-900 truncate">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</p></div>
+                        <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition"><i class="fa-solid fa-eye"></i></a>
                     </div>
-
-                    <!-- Alamat Tujuan -->
-                    <div class="p-3 bg-blue-50 border border-blue-100 rounded-xl">
-                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wider mb-1"><i class="fa-solid fa-location-dot"></i> Alamat Pengantaran</p>
-                        <p class="text-sm text-charcoal-900 leading-relaxed font-medium">
-                            {{ $trx->alamat ?? 'Alamat tidak dicantumkan (Hubungi Pelanggan)' }}
-                        </p>
-                        @if($trx->catatan)
-                            <hr class="my-2 border-blue-200">
-                            <p class="text-xs text-blue-800 italic">"{{ $trx->catatan }}"</p>
-                        @endif
+                    <div class="rounded-xl bg-blue-50 border border-blue-100 px-3 py-3">
+                        <p class="text-xs font-bold text-blue-600 uppercase tracking-wider"><i class="fa-solid fa-location-dot mr-1"></i> Tujuan</p>
+                        <p class="mt-1 truncate text-sm font-medium text-charcoal-900">{{ $trx->alamat ?? 'Alamat tidak dicantumkan' }}</p>
                     </div>
-
-                    <!-- Ringkasan Order (Dropdown AlpineJS) -->
-                    <div x-data="{ open: false }" class="border border-slate-200 rounded-xl overflow-hidden">
-                        <button @click="open = !open" class="w-full px-3 py-2 bg-slate-50 text-left text-xs font-bold text-slate-600 flex justify-between items-center hover:bg-slate-100 transition">
-                            <span><i class="fa-solid fa-box-open mr-1"></i> Lihat Isi Pesanan ({{ $trx->detail->count() }} Item)</span>
-                            <i class="fa-solid fa-chevron-down transition-transform" :class="open ? 'rotate-180' : ''"></i>
-                        </button>
-                        <div x-show="open" x-collapse x-cloak class="px-3 py-2 bg-white text-sm space-y-1">
-                            @foreach($trx->detail as $dt)
-                                <div class="flex justify-between border-b border-slate-100 last:border-0 pb-1 last:pb-0">
-                                    <span class="text-slate-600">{{ $dt->qty }}x {{ $dt->menu->nama_menu ?? 'Terhapus' }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
+                    <div class="flex items-center justify-between text-xs text-slate-500"><span>{{ $trx->detail->sum('qty') }} Porsi</span><span>{{ $trx->status_pembayaran }}</span></div>
 
                 </div>
 

@@ -60,23 +60,14 @@
                     </div>
                 </div>
 
-                <!-- Card Body (Info Pelanggan & Catatan) -->
-                <div class="p-4 flex-1">
-                    <p class="text-sm font-bold text-charcoal-900 mb-1"><i class="fa-solid fa-user text-slate-400 mr-1"></i> {{ $trx->pelanggan->nama ?? 'Guest' }}</p>
-
-                    @if($trx->catatan)
-                        <div class="mt-3 p-3 bg-yellow-50/50 border border-yellow-100 rounded-xl text-xs text-charcoal-800">
-                            {!! nl2br(e($trx->catatan)) !!}
-                        </div>
-                    @endif
-
-                    <!-- List Menu Singkat -->
-                    <div class="mt-4 pt-4 border-t border-slate-100 border-dashed space-y-2">
-                        @foreach($trx->detail as $dt)
-                            <div class="flex justify-between text-sm">
-                                <span class="text-slate-600"><span class="font-bold text-charcoal-900">{{ $dt->qty }}x</span> {{ $dt->menu->nama_menu ?? 'Menu Terhapus' }}</span>
-                            </div>
-                        @endforeach
+                <div class="p-4 flex-1 space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <p class="text-sm font-bold text-charcoal-900 truncate"><i class="fa-solid fa-user text-slate-400 mr-1"></i> {{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</p>
+                        <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition"><i class="fa-solid fa-eye"></i></a>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-xs">
+                        <div class="rounded-lg bg-slate-50 px-3 py-2"><p class="text-slate-400">Item</p><p class="mt-1 font-bold text-charcoal-900">{{ $trx->detail->sum('qty') }} Porsi</p></div>
+                        <div class="rounded-lg bg-slate-50 px-3 py-2"><p class="text-slate-400">Pembayaran</p><p class="mt-1 font-bold text-charcoal-900">{{ $trx->status_pembayaran }}</p></div>
                     </div>
                 </div>
 

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
-use App\Models\DetailTransaksi;
 use App\Models\Menu;
 use App\Models\Pengguna;
 use App\Models\Transaksi;
@@ -12,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class TransaksiController extends Controller
@@ -43,28 +43,38 @@ class TransaksiController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'pengguna_id' => ['nullable', 'exists:pengguna,id'],
+            'nama_pelanggan' => ['nullable', 'string', 'max:255'],
+            'no_hp_pelanggan' => ['nullable', 'string', 'max:20'],
             'tipe_pesanan' => 'required|in:Dine-In,Takeaway,Delivery',
             'metode_pembayaran' => 'required|in:Tunai,QRIS,COD',
             'items' => 'required|array|min:1',
-            'items.*.menu_id' => 'required|exists:menu,id',
+            'items.*.menu_id' => 'required|distinct|exists:menu,id',
             'items.*.qty' => 'required|integer|min:1',
+            'alamat' => ['nullable', 'string', 'max:1000'],
+            'catatan' => ['nullable', 'string', 'max:1000'],
         ]);
 
-        DB::beginTransaction();
-        try {
+        $transaksi = DB::transaction(function () use ($validated) {
             $kode = 'INV-'.date('Ymd').'-'.strtoupper(Str::random(5));
+            $subtotalBayar = 0;
+            $detailData = [];
+            $menuIds = collect($validated['items'])->pluck('menu_id');
+            $menus = Menu::whereIn('id', $menuIds)->where('is_active', true)->lockForUpdate()->get()->keyBy('id');
 
-            $total_bayar = 0;
-            $detail_data = [];
+            foreach ($validated['items'] as $item) {
+                $menu = $menus->get($item['menu_id']);
+                if (! $menu || $menu->stok < $item['qty']) {
+                    throw ValidationException::withMessages(['items' => 'Stok menu tidak mencukupi atau menu tidak aktif.']);
+                }
 
-            foreach ($request->items as $item) {
-                $menu = Menu::find($item['menu_id']);
                 $subtotal = $menu->harga * $item['qty'];
-                $total_bayar += $subtotal;
+                $subtotalBayar += $subtotal;
 
-                $detail_data[] = [
+                $detailData[] = [
                     'menu_id' => $menu->id,
+                    'nama_menu' => $menu->nama_menu,
                     'qty' => $item['qty'],
                     'harga_satuan' => $menu->harga,
                     'subtotal' => $subtotal,
@@ -73,33 +83,37 @@ class TransaksiController extends Controller
                 $menu->decrement('stok', $item['qty']);
             }
 
+            $namaPelanggan = $validated['nama_pelanggan'] ?? null;
+            $pelanggan = ! empty($validated['pengguna_id']) ? Pengguna::find($validated['pengguna_id']) : null;
+            $namaPelanggan ??= $pelanggan?->nama;
+            $statusPembayaran = $validated['metode_pembayaran'] === 'Tunai' ? 'Lunas' : 'Belum Lunas';
+
             $transaksi = Transaksi::create([
                 'kode_transaksi' => $kode,
-                'pengguna_id' => $request->pengguna_id,
+                'pengguna_id' => $validated['pengguna_id'] ?? null,
                 'karyawan_id' => Auth::id(),
-                'tipe_pesanan' => $request->tipe_pesanan,
-                'alamat' => $request->alamat,
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'status_pembayaran' => $request->metode_pembayaran == 'Tunai' ? 'Lunas' : 'Belum Lunas',
+                'nama_pelanggan' => $namaPelanggan,
+                'no_hp_pelanggan' => $validated['no_hp_pelanggan'] ?? $pelanggan?->no_hp,
+                'tipe_pesanan' => $validated['tipe_pesanan'],
+                'alamat' => $validated['alamat'] ?? null,
+                'metode_pembayaran' => $validated['metode_pembayaran'],
+                'status_pembayaran' => $statusPembayaran,
+                'dibayar_pada' => $statusPembayaran === 'Lunas' ? now() : null,
                 'status_pesanan' => 'Menunggu ACC',
-                'total_bayar' => $total_bayar,
-                'catatan' => $request->catatan,
+                'subtotal_bayar' => $subtotalBayar,
+                'ongkos_kirim' => 0,
+                'total_bayar' => $subtotalBayar,
+                'catatan' => $validated['catatan'] ?? null,
             ]);
 
-            foreach ($detail_data as $detail) {
-                $detail['transaksi_id'] = $transaksi->id;
-                DetailTransaksi::create($detail);
+            foreach ($detailData as $detail) {
+                $transaksi->detail()->create($detail);
             }
 
-            DB::commit();
+            return $transaksi;
+        });
 
-            return redirect()->route('admin.transaksi.show', $transaksi->kode_transaksi)->with('success', 'Transaksi berhasil dibuat!');
-
-        } catch (\Exception $e) {
-            DB::rollback();
-
-            return back()->with('error', 'Terjadi kesalahan sistem: '.$e->getMessage());
-        }
+        return redirect()->route('admin.transaksi.show', $transaksi->kode_transaksi)->with('success', 'Transaksi berhasil dibuat!');
     }
 
     public function show(Transaksi $transaksi)
@@ -121,23 +135,40 @@ class TransaksiController extends Controller
             'status_pesanan' => 'required|in:Menunggu ACC,Dimasak,Diantar,Selesai,Dibatalkan',
         ]);
 
-        $validated['karyawan_id'] = Auth::id();
+        if ($validated['status_pesanan'] === 'Dimasak' && $transaksi->metode_pembayaran === 'QRIS' && $validated['status_pembayaran'] !== 'Lunas') {
+            throw ValidationException::withMessages(['status_pembayaran' => 'Pembayaran QRIS harus lunas sebelum pesanan dimasak.']);
+        }
 
-        $transaksi->update($validated);
+        if ($validated['status_pesanan'] === 'Selesai' && $transaksi->metode_pembayaran === 'COD' && $validated['status_pembayaran'] !== 'Lunas') {
+            throw ValidationException::withMessages(['status_pembayaran' => 'Pembayaran COD harus lunas sebelum pesanan selesai.']);
+        }
+
+        $statusPembayaran = $validated['status_pesanan'] === 'Dibatalkan'
+            ? 'Batal'
+            : $validated['status_pembayaran'];
+
+        DB::transaction(function () use ($validated, $statusPembayaran, $transaksi) {
+            $transaksi->update([
+                ...$validated,
+                'status_pembayaran' => $statusPembayaran,
+                'karyawan_id' => Auth::id(),
+                'dibayar_pada' => $statusPembayaran === 'Lunas' ? ($transaksi->dibayar_pada ?? now()) : null,
+            ]);
+
+            if ($validated['status_pesanan'] === 'Dibatalkan') {
+                $transaksi->restoreStockIfNeeded();
+            }
+        });
 
         return redirect()->route('admin.transaksi.show', $transaksi->kode_transaksi)->with('success', 'Status transaksi berhasil diperbarui!');
     }
 
     public function destroy(Transaksi $transaksi)
     {
-        foreach ($transaksi->detail as $item) {
-            $menu = Menu::find($item->menu_id);
-            if ($menu) {
-                $menu->increment('stok', $item->qty);
-            }
-        }
-
-        $transaksi->delete();
+        DB::transaction(function () use ($transaksi) {
+            $transaksi->restoreStockIfNeeded();
+            $transaksi->delete();
+        });
 
         return redirect()->route('admin.transaksi.index')->with('success', 'Transaksi dibatalkan dan dihapus.');
     }
@@ -156,7 +187,7 @@ class TransaksiController extends Controller
         $path = Storage::disk('local')->path($transaksi->bukti_pembayaran);
 
         return response()->file($path, [
-            'Content-Type' => Storage::disk('local')->mimeType($transaksi->bukti_pembayaran),
+            'Content-Type' => mime_content_type($path) ?: 'application/octet-stream',
             'Content-Disposition' => 'inline; filename="bukti-pembayaran-'.$transaksi->kode_transaksi.'"',
         ]);
     }

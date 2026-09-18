@@ -4,8 +4,8 @@
 
 <section class="relative overflow-hidden bg-charcoal-950 py-14 sm:py-20 border-b-4 border-gold-600">
     <div class="absolute inset-0">
-        <img src="{{ asset('image/seafood.webp') }}" alt="Hidangan seafood Niskala Samudra" class="h-full w-full object-cover opacity-30">
-        <div class="absolute inset-0 bg-charcoal-950/75"></div>
+        <img src="{{ asset('image/seafood.webp') }}" alt="Hidangan seafood Niskala Samudra" class="h-full w-full object-cover opacity-75">
+        <div class="absolute inset-0 bg-charcoal-950/45"></div>
     </div>
     <div class="absolute -right-16 -top-20 text-[14rem] leading-none text-white/3 pointer-events-none">
         <i class="fa-solid fa-fish"></i>

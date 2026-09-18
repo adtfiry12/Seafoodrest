@@ -51,7 +51,7 @@
             <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden flex flex-col transition hover:shadow-md" x-data="{ stokSekarang: {{ $menu->stok }} }">
 
                 <!-- Gambar Menu -->
-                <div class="h-40 w-full bg-slate-100 relative group overflow-hidden">
+                <div class="h-28 w-full bg-slate-100 relative group overflow-hidden">
                     @if($menu->gambar)
                         <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}" class="w-full h-full object-cover transition duration-300 group-hover:scale-110">
                     @else
@@ -67,9 +67,17 @@
                 </div>
 
                 <!-- Info Menu -->
-                <div class="p-4 flex-1">
-                    <p class="text-[10px] font-bold text-gold-600 uppercase tracking-wider mb-1">{{ $menu->kategori->nama_kategori ?? 'Tanpa Kategori' }}</p>
-                    <h3 class="font-bold text-charcoal-900 leading-tight mb-2">{{ $menu->nama_menu }}</h3>
+                <div class="p-3 flex-1">
+                    <div class="flex items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-bold text-gold-600 uppercase tracking-wider mb-1 truncate">{{ $menu->kategori->nama_kategori ?? 'Tanpa Kategori' }}</p>
+                            <h3 class="font-bold text-sm text-charcoal-900 leading-tight truncate" title="{{ $menu->nama_menu }}">{{ $menu->nama_menu }}</h3>
+                            <p class="text-xs text-slate-500 mt-1">Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
+                        </div>
+                        <a href="{{ route('karyawan.stok.detail', $menu->slug) }}" title="Lihat detail menu dan pesanan" aria-label="Lihat detail menu dan pesanan" class="inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition">
+                            <i class="fa-solid fa-eye text-sm"></i>
+                        </a>
+                    </div>
                 </div>
 
                 <!-- Form Update Stok -->
@@ -92,7 +100,7 @@
                             </div>
 
                             <!-- Tombol Simpan -->
-                            <button type="submit" class="px-4 py-2 bg-charcoal-900 text-white text-sm font-bold rounded-lg hover:bg-gold-600 transition shadow-sm active:scale-95 flex-shrink-0">
+                            <button type="submit" class="px-4 py-2 bg-charcoal-900 text-white text-sm font-bold rounded-lg hover:bg-gold-600 transition shadow-sm active:scale-95 shrink-0">
                                 <i class="fa-solid fa-check"></i>
                             </button>
                         </div>

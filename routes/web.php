@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     // Pesanan
     Route::controller(CheckoutController::class)->prefix('pesanan')->name('front.')->group(function () {
         Route::get('/', 'pesanan')->name('pesanan');
+        Route::get('/{kode_transaksi}', 'detailPesanan')->name('pesanan.detail');
     });
 
     Route::get('/transaksi/{transaksi}/bukti-pembayaran', [TransaksiController::class, 'buktiPembayaran'])
@@ -73,8 +74,10 @@ Route::middleware('auth')->group(function () {
             Route::get('/pesanan-baru', 'pesananBaru')->name('pesanan_baru');
             Route::get('/dapur', 'dapur')->name('dapur');
             Route::get('/delivery', 'delivery')->name('delivery');
+            Route::get('/pesanan/{kode_transaksi}', 'detailPesanan')->name('pesanan.detail');
             Route::post('/update-status/{kode_transaksi}', 'updateStatus')->name('update_status');
             Route::get('/stok', 'stokIndex')->name('stok');
+            Route::get('/stok/menu/{menu}', 'detailMenu')->name('stok.detail');
             Route::post('/stok/{id}', 'updateStok')->name('stok.update');
         });
     });

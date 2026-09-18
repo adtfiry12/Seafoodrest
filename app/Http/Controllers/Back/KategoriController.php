@@ -14,6 +14,7 @@ class KategoriController extends Controller
     public function index(): View
     {
         $kategori = Kategori::withCount('menu')->latest()->paginate(5);
+
         return view('back.admin.kategori.index', compact('kategori'));
     }
 
@@ -24,12 +25,14 @@ class KategoriController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'nama_kategori' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:kategori,slug',
+        $request->merge([
+            'slug' => Str::slug((string) $request->input('nama_kategori')),
         ]);
 
-        $validated['slug'] = $validated['slug'] ? Str::slug($validated['slug']) : Str::slug($validated['nama_kategori']);
+        $validated = $request->validate([
+            'nama_kategori' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:kategori,slug',
+        ]);
 
         Kategori::create($validated);
 
@@ -38,7 +41,8 @@ class KategoriController extends Controller
 
     public function show(Kategori $kategori): View
     {
-        $kategori->load('menu');
+        $kategori->load(['menu' => fn ($query) => $query->latest()]);
+
         return view('back.admin.kategori.show', compact('kategori'));
     }
 
@@ -49,12 +53,14 @@ class KategoriController extends Controller
 
     public function update(Request $request, Kategori $kategori): RedirectResponse
     {
-        $validated = $request->validate([
-            'nama_kategori' => 'required|string|max:255',
-            'slug' => 'nullable|string|max:255|unique:kategori,slug,' . $kategori->id,
+        $request->merge([
+            'slug' => Str::slug((string) $request->input('nama_kategori')),
         ]);
 
-        $validated['slug'] = $validated['slug'] ? Str::slug($validated['slug']) : Str::slug($validated['nama_kategori']);
+        $validated = $request->validate([
+            'nama_kategori' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:kategori,slug,'.$kategori->id,
+        ]);
 
         $kategori->update($validated);
 

@@ -32,7 +32,6 @@
                     <tr>
                         <th class="px-6 py-4 lg:py-5">No</th>
                         <th class="px-6 py-4 lg:py-5">Nama Kategori</th>
-                        <th class="px-6 py-4 lg:py-5">Slug</th>
                         <th class="px-6 py-4 lg:py-5">Total Menu</th>
                         <th class="px-6 py-4 lg:py-5 text-right">Aksi</th>
                     </tr>
@@ -42,17 +41,19 @@
                         <tr class="hover:bg-slate-50/80 transition-colors duration-150">
                             <td class="px-6 py-4 font-medium text-slate-900">{{ $kategori->firstItem() + $index }}</td>
                             <td class="px-6 py-4 font-semibold text-charcoal-900">{{ $item->nama_kategori }}</td>
-                            <td class="px-6 py-4 text-slate-400 font-mono text-xs">{{ $item->slug }}</td>
                             <td class="px-6 py-4">
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-slate-100 text-slate-600 border border-slate-200">
                                     {{ $item->menu_count }} Item
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right space-x-1">
-                                <a href="{{ route('admin.kategori.edit', $item->id) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200">
+                                <a href="{{ route('admin.kategori.show', $item->slug) }}" title="Lihat detail kategori" aria-label="Lihat detail kategori" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a href="{{ route('admin.kategori.edit', $item->slug) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </a>
-                                <form action="{{ route('admin.kategori.destroy', $item->id) }}" method="POST" class="inline-block" @submit.prevent="openDeleteModal($event, 'Hapus kategori ini? Seluruh menu terkait juga akan terhapus!')">
+                                <form action="{{ route('admin.kategori.destroy', $item->slug) }}" method="POST" class="inline-block" @submit.prevent="openDeleteModal($event, 'Hapus kategori ini? Seluruh menu terkait juga akan terhapus!')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200">
@@ -63,7 +64,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-12 text-center">
+                            <td colspan="4" class="px-6 py-12 text-center">
                                 <div class="flex flex-col items-center justify-center text-slate-400 space-y-3">
                                     <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
                                     <p class="text-base font-medium">Belum ada data kategori.</p>
@@ -76,7 +77,9 @@
         </div>
         @if($kategori->hasPages())
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/50">
-                {{ $kategori->links() }}
+                <div class="max-w-full overflow-x-auto pb-1">
+                    {{ $kategori->links() }}
+                </div>
             </div>
         @endif
     </div>

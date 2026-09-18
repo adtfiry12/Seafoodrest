@@ -82,7 +82,7 @@
                                 <p class="text-xs text-slate-500">{{ $item->created_at->format('d M Y, H:i') }}</p>
                             </td>
                             <td class="px-6 py-4">
-                                <p class="font-semibold text-charcoal-900">{{ $item->pelanggan ? $item->pelanggan->nama : 'Pelanggan Umum' }}</p>
+                                <p class="font-semibold text-charcoal-900">{{ $item->pelanggan->nama ?? $item->nama_pelanggan ?? 'Pelanggan Umum' }}</p>
                                 <span class="inline-flex items-center gap-1 mt-1 text-xs font-medium text-slate-500">
                                     <i class="fa-solid fa-bell-concierge"></i> {{ $item->tipe_pesanan }}
                                 </span>
@@ -142,7 +142,9 @@
         </div>
         @if($transaksi->hasPages())
             <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/50">
-                {{ $transaksi->links() }}
+                <div class="max-w-full overflow-x-auto pb-1">
+                    {{ $transaksi->links() }}
+                </div>
             </div>
         @endif
     </div>

@@ -83,6 +83,13 @@
                 </tbody>
             </table>
         </div>
+        @if($laporan->hasPages())
+            <div class="border-t border-slate-200 bg-slate-50/50 px-6 py-4">
+                <div class="max-w-full overflow-x-auto pb-1">
+                    {{ $laporan->links() }}
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 @endsection

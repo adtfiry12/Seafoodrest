@@ -23,6 +23,10 @@
                         <p class="font-bold text-gold-600">Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</p>
                     </div>
                     <div>
+                        <p class="text-slate-400 font-bold uppercase text-[10px] tracking-wider mb-1">Status Pembayaran</p>
+                        <p class="font-medium text-charcoal-900">{{ $transaksi->status_pembayaran }}</p>
+                    </div>
+                    <div>
                         <p class="text-slate-400 font-bold uppercase text-[10px] tracking-wider mb-1">Tipe Pesanan</p>
                         <p class="font-medium text-charcoal-900">{{ $transaksi->tipe_pesanan }}</p>
                     </div>

@@ -14,7 +14,7 @@
     </div>
 
     <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
-        <form action="{{ route('admin.kategori.update', $kategori->id) }}" method="POST" class="space-y-6">
+        <form action="{{ route('admin.kategori.update', $kategori->slug) }}" method="POST" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -27,22 +27,6 @@
                     placeholder="Contoh: Kepiting & Lobster"
                     class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full px-4 py-3 lg:py-3.5 transition-all duration-200 hover:bg-white">
                 @error('nama_kategori')
-                    <p class="flex items-center gap-1 text-xs text-red-500 mt-2 font-medium">
-                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
-                    </p>
-                @enderror
-            </div>
-
-            <div>
-                <label for="slug" class="block text-sm font-semibold text-charcoal-900 mb-2">Slug (Opsional)</label>
-                <input type="text" name="slug" id="slug"
-                    value="{{ old('slug', $kategori->slug) }}"
-                    placeholder="kepiting-dan-lobster"
-                    class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full px-4 py-3 lg:py-3.5 transition-all duration-200 hover:bg-white">
-                <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
-                    <i class="fa-solid fa-circle-info"></i> Kosongkan jika ingin dibuat otomatis mengikuti nama kategori.
-                </p>
-                @error('slug')
                     <p class="flex items-center gap-1 text-xs text-red-500 mt-2 font-medium">
                         <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
                     </p>

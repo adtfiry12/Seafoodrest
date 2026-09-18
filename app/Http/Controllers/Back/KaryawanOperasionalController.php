@@ -8,6 +8,8 @@ use App\Models\Menu;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class KaryawanOperasionalController extends Controller
 {
@@ -53,6 +55,15 @@ class KaryawanOperasionalController extends Controller
         return view('back.karyawan.delivery', compact('transaksi'));
     }
 
+    public function detailPesanan(string $kode_transaksi): View
+    {
+        $transaksi = Transaksi::with(['pelanggan', 'detail.menu'])
+            ->where('kode_transaksi', $kode_transaksi)
+            ->firstOrFail();
+
+        return view('back.karyawan.pesanan-detail', compact('transaksi'));
+    }
+
     public function updateStatus(Request $request, $kode_transaksi)
     {
         $validated = $request->validate([
@@ -82,11 +93,20 @@ class KaryawanOperasionalController extends Controller
             abort_unless($nextPaymentStatus === 'Lunas', 422, 'Pembayaran harus lunas sebelum pesanan selesai.');
         }
 
-        $transaksi->update([
-            'status_pesanan' => $nextStatus,
-            'status_pembayaran' => $nextStatus === 'Dibatalkan' ? 'Batal' : $nextPaymentStatus,
-            'karyawan_id' => Auth::id(),
-        ]);
+        DB::transaction(function () use ($transaksi, $nextStatus, $nextPaymentStatus) {
+            $statusPembayaran = $nextStatus === 'Dibatalkan' ? 'Batal' : $nextPaymentStatus;
+
+            $transaksi->update([
+                'status_pesanan' => $nextStatus,
+                'status_pembayaran' => $statusPembayaran,
+                'dibayar_pada' => $statusPembayaran === 'Lunas' ? ($transaksi->dibayar_pada ?? now()) : null,
+                'karyawan_id' => Auth::id(),
+            ]);
+
+            if ($nextStatus === 'Dibatalkan') {
+                $transaksi->restoreStockIfNeeded();
+            }
+        });
 
         return back()->with('success', 'Status pesanan '.$kode_transaksi.' berhasil diperbarui!');
     }
@@ -107,6 +127,22 @@ class KaryawanOperasionalController extends Controller
         $kategoris = Kategori::all();
 
         return view('back.karyawan.stok', compact('menus', 'kategoris'));
+    }
+
+    public function detailMenu(Menu $menu): View
+    {
+        $menu->load('kategori');
+
+        $transaksi = Transaksi::with('pelanggan')
+            ->whereHas('detail', fn ($query) => $query->where('menu_id', $menu->id))
+            ->latest()
+            ->paginate(8);
+
+        $transaksi->getCollection()->load([
+            'detail' => fn ($query) => $query->where('menu_id', $menu->id),
+        ]);
+
+        return view('back.karyawan.menu-detail', compact('menu', 'transaksi'));
     }
 
     public function updateStok(Request $request, $id)

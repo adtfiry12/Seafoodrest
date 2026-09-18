@@ -41,7 +41,7 @@
         @forelse($transaksi as $trx)
             <div class="bg-yellow-50/30 border-2 border-orange-200 rounded-2xl shadow-sm overflow-hidden flex flex-col transition hover:shadow-md relative">
 
-                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-red-500"></div>
+                <div class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-orange-400 to-red-500"></div>
 
                 <div class="p-4 border-b border-orange-200/50 flex justify-between items-start bg-white">
                     <div>
@@ -57,27 +57,15 @@
                     </div>
                 </div>
 
-                <div class="p-4 flex-1 bg-white">
+                <div class="p-4 flex-1 bg-white space-y-3">
+                    <div class="flex items-center justify-between gap-3">
+                        <div><p class="text-xs text-slate-400">Pelanggan</p><p class="font-bold text-charcoal-900 truncate">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</p></div>
+                        <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition"><i class="fa-solid fa-eye"></i></a>
+                    </div>
+                    <div class="flex items-center justify-between rounded-xl bg-orange-50 px-3 py-3 text-sm"><span class="text-orange-700"><i class="fa-solid fa-utensils mr-1"></i> Total menu</span><strong class="text-orange-800">{{ $trx->detail->sum('qty') }} Porsi</strong></div>
                     @if($trx->catatan)
-                        <div class="mb-4 p-3 bg-red-50 border border-red-100 rounded-xl text-sm font-bold text-red-700">
-                            <i class="fa-solid fa-triangle-exclamation mr-1"></i> CATATAN: <br>
-                            <span class="font-normal text-red-600">{!! nl2br(e($trx->catatan)) !!}</span>
-                        </div>
+                        <p class="truncate text-xs font-semibold text-red-600"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Ada catatan dapur</p>
                     @endif
-
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 border-b border-slate-100 pb-2">Daftar Menu Dimasak</p>
-                    <ul class="space-y-3">
-                        @foreach($trx->detail as $dt)
-                            <li class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded bg-charcoal-900 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
-                                    {{ $dt->qty }}
-                                </div>
-                                <div class="flex-1 pt-1">
-                                    <p class="font-bold text-charcoal-900 text-base leading-tight">{{ $dt->menu->nama_menu ?? 'Menu Terhapus' }}</p>
-                                </div>
-                            </li>
-                        @endforeach
-                    </ul>
                 </div>
 
                 <div class="p-4 bg-slate-50 border-t border-slate-100">

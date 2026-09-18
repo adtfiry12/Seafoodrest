@@ -44,12 +44,31 @@
 
                 <div>
                     <label for="menu_id" class="block text-sm font-semibold text-charcoal-900 mb-2">Tautkan ke Menu (Opsional)</label>
-                    <select name="menu_id" id="menu_id" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full px-4 py-3 transition-all duration-200 hover:bg-white">
-                        <option value="">-- Tidak Ditautkan --</option>
-                        @foreach($menu as $item)
-                            <option value="{{ $item->id }}" {{ old('menu_id', $slide->menu_id) == $item->id ? 'selected' : '' }}>{{ $item->nama_menu }}</option>
-                        @endforeach
-                    </select>
+                    <div x-data="searchableRelationSelect(@js($menu->map(fn ($item) => ['id' => $item->id, 'label' => $item->nama_menu])->values()), @js((string) old('menu_id', $slide->menu_id)))" @click.outside="open = false" class="relative">
+                        <input type="hidden" name="menu_id" :value="selected">
+                        <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20">
+                            <span x-text="selectedLabel() || '-- Tidak Ditautkan --'" :class="selected ? 'text-charcoal-900' : 'text-slate-400'"></span>
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+                        </button>
+                        <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-30 mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                            <div class="border-b border-slate-100 p-2">
+                                <div class="relative">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+                                    <input type="search" x-model="search" placeholder="Cari menu..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-charcoal-900 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
+                                </div>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto p-1">
+                                <button type="button" @click="clearSelection()" class="w-full rounded-lg px-3 py-2.5 text-left text-sm text-slate-500 hover:bg-slate-50">-- Tidak Ditautkan --</button>
+                                <button type="button" x-show="filteredOptions().length === 0" class="w-full px-3 py-3 text-left text-sm text-slate-400" disabled>Tidak ada menu ditemukan.</button>
+                                <template x-for="option in filteredOptions()" :key="option.id">
+                                    <button type="button" @click="select(option)" class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm text-charcoal-900 hover:bg-gold-50 hover:text-gold-700">
+                                        <span x-text="option.label"></span>
+                                        <i x-show="selected == String(option.id)" class="fa-solid fa-check text-gold-600"></i>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
                     @error('menu_id') <p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p> @enderror
                 </div>
 
@@ -74,4 +93,37 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('searchableRelationSelect', (options, initialValue = '') => ({
+            open: false,
+            search: '',
+            selected: String(initialValue || ''),
+            options,
+
+            filteredOptions() {
+                const query = this.search.toLowerCase().trim();
+
+                return this.options.filter((option) => option.label.toLowerCase().includes(query));
+            },
+
+            selectedLabel() {
+                return this.options.find((option) => String(option.id) === this.selected)?.label || '';
+            },
+
+            select(option) {
+                this.selected = String(option.id);
+                this.open = false;
+                this.search = '';
+            },
+
+            clearSelection() {
+                this.selected = '';
+                this.open = false;
+                this.search = '';
+            },
+        }));
+    });
+</script>
 @endsection
