@@ -14,8 +14,8 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        if (!Auth::check()) {
-            return redirect()->route('login');
+        if (! Auth::check()) {
+            abort(404);
         }
 
         $userRole = Auth::user()->role;
@@ -29,9 +29,9 @@ class RoleMiddleware
         }
 
         if ($userRole === 'karyawan') {
-            return redirect('/karyawan/dashboard')->with('error', 'No access to this page.');
+            abort(404);
         }
 
-        return redirect('/')->with('error', 'No access to this page.');
+        abort(404);
     }
 }

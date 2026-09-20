@@ -124,6 +124,8 @@ class CheckoutController extends Controller
             return $transaksi;
         });
 
+        session()->put('checkout_transaction_code', $transaksi->kode_transaksi);
+
         if ($enumMetodePembayaran == 'QRIS') {
             return redirect()->to(URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]));
         }
@@ -133,14 +135,16 @@ class CheckoutController extends Controller
 
     public function qris($kode_transaksi)
     {
-        $transaksi = Transaksi::with('detail.menu')->where('kode_transaksi', $kode_transaksi)->firstOrFail();
+        $transaksi = $this->accessibleTransaction($kode_transaksi);
+        $transaksi->load('detail.menu');
 
         return view('front.checkout.qris', compact('transaksi'));
     }
 
     public function sukses($kode_transaksi)
     {
-        $transaksi = Transaksi::with('detail.menu')->where('kode_transaksi', $kode_transaksi)->firstOrFail();
+        $transaksi = $this->accessibleTransaction($kode_transaksi);
+        $transaksi->load('detail.menu');
 
         return view('front.checkout.success', compact('transaksi'));
     }
@@ -167,9 +171,8 @@ class CheckoutController extends Controller
 
     public function struk($kode_transaksi)
     {
-        $transaksi = Transaksi::with(['pelanggan', 'karyawan', 'detail.menu'])
-            ->where('kode_transaksi', $kode_transaksi)
-            ->firstOrFail();
+        $transaksi = $this->accessibleTransaction($kode_transaksi);
+        $transaksi->load(['pelanggan', 'karyawan', 'detail.menu']);
 
         return view('front.struk', compact('transaksi'));
     }
@@ -180,9 +183,9 @@ class CheckoutController extends Controller
             'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:5120',
         ]);
 
-        $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
+        $transaksi = $this->accessibleTransaction($kode_transaksi);
 
-        abort_if($transaksi->metode_pembayaran !== 'QRIS' || in_array($transaksi->status_pembayaran, ['Lunas', 'Batal'], true), 422, 'Bukti pembayaran tidak dapat diunggah untuk transaksi ini.');
+        abort_if($transaksi->metode_pembayaran !== 'QRIS' || $transaksi->status_pembayaran !== 'Belum Lunas', 422, 'Bukti pembayaran hanya dapat diunggah satu kali untuk transaksi yang belum dibayar.');
 
         if ($request->hasFile('bukti_pembayaran')) {
             $path = $request->file('bukti_pembayaran')->store('bukti_bayar', 'local');
@@ -194,5 +197,18 @@ class CheckoutController extends Controller
         }
 
         return redirect()->to(URL::temporarySignedRoute('checkout.sukses', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]));
+    }
+
+    private function accessibleTransaction(string $kode_transaksi): Transaksi
+    {
+        $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
+        $user = Auth::user();
+        $isStaff = $user && in_array($user->role, ['admin', 'karyawan'], true);
+        $isOwner = $user && (int) $transaksi->pengguna_id === (int) $user->id;
+        $isGuestCheckout = session('checkout_transaction_code') === $transaksi->kode_transaksi;
+
+        abort_unless($isStaff || $isOwner || $isGuestCheckout, 404);
+
+        return $transaksi;
     }
 }
