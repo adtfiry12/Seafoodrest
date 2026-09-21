@@ -2,14 +2,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap");
 @import "tailwindcss";
 
-/* Sumber pencarian class Tailwind (wajib di Laravel) */
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../../resources/**/*.blade.php';
 @source '../../resources/**/*.js';
 
 @theme {
-    /* Konfigurasi Warna Niskala Samudra */
     --color-charcoal-800: #27272a;
     --color-charcoal-900: #18181b;
     --color-charcoal-950: #09090b;
@@ -19,12 +17,10 @@
     --color-gold-600: #d97706;
     --color-gold-700: #b45309;
 
-    /* Konfigurasi Font Niskala Samudra */
     --font-serif: "Playfair Display", serif;
     --font-sans: "Inter", sans-serif;
 }
 
-/* Utilities tambahan dari tag <style> kamu */
 [x-cloak] {
     display: none !important;
 }
