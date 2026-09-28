@@ -9,15 +9,15 @@
             <p class="text-sm text-slate-500 mt-1">Kode: <span class="font-mono font-bold text-charcoal-900">{{ $transaksi->kode_transaksi }}</span></p>
         </div>
 
-        <div class="flex flex-wrap gap-2">
-            <a href="{{ route('admin.transaksi.cetak', $transaksi->kode_transaksi) }}" target="_blank" class="px-4 py-2 text-sm font-medium text-charcoal-900 bg-gold-500 rounded-lg hover:bg-gold-600 transition shadow-sm">
+        <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
+            <a href="{{ route('admin.transaksi.cetak', $transaksi->kode_transaksi) }}" target="_blank" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-charcoal-900 bg-gold-500 rounded-lg hover:bg-gold-600 transition shadow-sm">
                 <i class="fa-solid fa-print mr-2"></i> Cetak Struk
             </a>
 
-            <a href="{{ route('admin.transaksi.edit', $transaksi->kode_transaksi) }}" class="px-4 py-2 text-sm font-medium text-white bg-charcoal-900 rounded-lg hover:bg-charcoal-800 transition">
+            <a href="{{ route('admin.transaksi.edit', $transaksi->kode_transaksi) }}" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-white bg-charcoal-900 rounded-lg hover:bg-charcoal-800 transition">
                 Update Status
             </a>
-            <a href="{{ route('admin.transaksi.index') }}" class="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
+            <a href="{{ route('admin.transaksi.index') }}" class="w-full sm:w-auto text-center px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition">
                 Kembali
             </a>
         </div>

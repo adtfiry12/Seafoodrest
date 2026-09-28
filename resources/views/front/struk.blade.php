@@ -67,8 +67,8 @@
             <img src="{{ asset('image/niskala sammudra.png') }}" alt="Logo Niskala Samudra" class="logo-struk">
 
             <h1 class="text-lg font-bold uppercase tracking-wider">Niskala Samudra</h1>
-            <p class="text-xs mt-1">Jl. Pantai Indah No. 99, Jepara</p>
-            <p class="text-xs">Telp: 0812-3456-7890</p>
+            <p class="text-xs mt-1">Jl. Pantai Kartini No. 12, Jepara</p>
+            <p class="text-xs">Telp/WA: +62 851-9119-4059</p>
         </div>
 
         <div class="text-xs mb-3">

@@ -99,16 +99,16 @@
 
                     <div class="space-y-3">
                         <template x-for="(item, index) in cart" :key="item.id">
-                            <div class="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl gap-2.5 sm:gap-3">
                                 <input type="hidden" :name="`items[${index}][menu_id]`" :value="item.id">
                                 <input type="hidden" :name="`items[${index}][qty]`" :value="item.qty">
 
-                                <div class="flex-1">
-                                    <p class="font-bold text-charcoal-900 text-sm" x-text="item.nama"></p>
-                                    <p class="text-xs text-gold-600 font-medium" x-text="formatRupiah(item.harga)"></p>
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-bold text-charcoal-900 text-sm truncate" x-text="item.nama"></p>
+                                    <p class="text-xs text-gold-600 font-medium" x-text="formatRupiah(item.harga) + ' / porsi'"></p>
                                 </div>
 
-                                <div class="flex items-center gap-3">
+                                <div class="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 border-slate-200/60 pt-2 sm:pt-0">
                                     <div class="flex items-center bg-white border border-slate-200 rounded-lg">
                                         <button type="button" @click="kurangiQty(index)" class="px-2.5 py-1 text-slate-500 hover:text-red-500"><i class="fa-solid fa-minus text-xs"></i></button>
                                         <span class="px-2 text-sm font-bold text-charcoal-900" x-text="item.qty"></span>

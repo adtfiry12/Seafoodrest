@@ -12,8 +12,17 @@ class HomeController extends Controller
 {
     public function index()
     {
-        $slides = Slide::with('menu')->latest()->take(3)->get();
-        $menus = Menu::where('is_active', 1)->inRandomOrder()->take(4)->get();
+        $slides = Slide::with('menu.kategori')
+            ->where('is_active', 1)
+            ->latest()
+            ->take(5)
+            ->get();
+        $menus = Menu::with('kategori')
+            ->where('is_active', 1)
+            ->inRandomOrder()
+            ->take(4)
+            ->get();
+
         return view('front.home', compact('slides', 'menus'));
     }
 

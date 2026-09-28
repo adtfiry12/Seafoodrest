@@ -25,7 +25,7 @@
                 <div class="flex items-center gap-3">
                     <a href="#" aria-label="Instagram" class="hover:text-gold-400 transition"><i class="fa-brands fa-instagram"></i></a>
                     <a href="#" aria-label="Facebook" class="hover:text-gold-400 transition"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" aria-label="WhatsApp" class="hover:text-gold-400 transition"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" aria-label="WhatsApp" class="hover:text-gold-400 transition"><i class="fa-brands fa-whatsapp"></i></a>
                 </div>
             </div>
         </div>
@@ -95,7 +95,7 @@
             </div>
         </div>
 
-        <div x-show="mobileMenuOpen" x-collapse x-cloak class="md:hidden bg-white border-t border-slate-100 shadow-xl absolute w-full left-0 top-full">
+        <div x-show="mobileMenuOpen" x-collapse x-cloak class="md:hidden bg-white border-t border-slate-100 shadow-xl absolute w-full left-0 top-full max-h-[calc(100vh-4.5rem)] overflow-y-auto">
             <div class="px-4 pt-2 pb-6 space-y-1">
                 <a href="{{ route('home') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('home') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Beranda</a>
                 <a href="{{ route('tentang') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('tentang') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Tentang Kami</a>
@@ -126,6 +126,30 @@
         </div>
 
     </header>
+
+    @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-transition class="bg-emerald-600 text-white px-4 py-3 shadow-md relative z-30">
+            <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+                <div class="flex items-center gap-2.5 text-sm font-medium">
+                    <i class="fa-solid fa-circle-check text-base"></i>
+                    <span>{{ session('success') }}</span>
+                </div>
+                <button @click="show = false" class="text-white hover:text-emerald-100 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div x-data="{ show: true }" x-show="show" x-transition class="bg-red-600 text-white px-4 py-3 shadow-md relative z-30">
+            <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+                <div class="flex items-center gap-2.5 text-sm font-medium">
+                    <i class="fa-solid fa-circle-exclamation text-base"></i>
+                    <span>{{ session('error') }}</span>
+                </div>
+                <button @click="show = false" class="text-white hover:text-red-100 p-1"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+        </div>
+    @endif
 
     <div x-show="loginHistoryModalOpen" x-cloak class="fixed inset-0 z-[60] flex min-h-screen items-center justify-center px-4 py-6" role="dialog" aria-modal="true" aria-labelledby="login-history-modal-title">
         <div x-show="loginHistoryModalOpen" x-transition.opacity @click="loginHistoryModalOpen = false" class="absolute inset-0 bg-charcoal-950/70 backdrop-blur-sm"></div>
@@ -194,9 +218,9 @@
                 <p>&copy; {{ date('Y') }} Niskala Samudra. Seluruh Hak Cipta Dilindungi.</p>
                 <p>Didesain secara eksklusif oleh <span class="text-gold-500 font-bold">Aditya Mukti Firmansyah</span> (SMK Wikrama 1 Jepara).</p>
                 <div class="flex space-x-5">
-                    <a href="#" class="hover:text-gold-400 transition text-lg"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="#" class="hover:text-gold-400 transition text-lg"><i class="fa-brands fa-facebook"></i></a>
-                    <a href="#" class="hover:text-gold-400 transition text-lg"><i class="fa-brands fa-whatsapp"></i></a>
+                    <a href="#" aria-label="Instagram" class="hover:text-gold-400 transition text-lg"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" aria-label="Facebook" class="hover:text-gold-400 transition text-lg"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" aria-label="WhatsApp" class="hover:text-gold-400 transition text-lg"><i class="fa-brands fa-whatsapp"></i></a>
                 </div>
             </div>
         </div>
@@ -206,7 +230,7 @@
         <div x-show="isCartOpen" x-transition.opacity class="fixed inset-0 bg-charcoal-900/75 backdrop-blur-sm transition-opacity"></div>
         <div class="fixed inset-0 overflow-hidden">
             <div class="absolute inset-0 overflow-hidden">
-                <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                <div class="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-4 sm:pl-10">
                     <div x-show="isCartOpen" x-transition:enter="transform transition ease-in-out duration-500" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0" x-transition:leave="transform transition ease-in-out duration-500" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full" class="pointer-events-auto w-screen max-w-md" @click.away="isCartOpen = false">
                         <div class="flex h-full flex-col bg-white shadow-xl">
                             <div class="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
@@ -280,15 +304,30 @@
                 cart: JSON.parse(localStorage.getItem('niskala_cart') || '[]'),
                 init() { this.$watch('cart', val => { localStorage.setItem('niskala_cart', JSON.stringify(val)); }); },
                 addToCart(id, nama, harga, image, maxStok) {
+                    if (maxStok <= 0) {
+                        alert('Maaf, stok hidangan ini sedang habis.');
+                        return;
+                    }
                     let index = this.cart.findIndex(item => item.id === id);
                     if (index !== -1) {
-                        if(this.cart[index].qty < maxStok) { this.cart[index].qty++; this.isCartOpen = true; }
-                        else { alert('Stok menu ini tidak mencukupi!'); }
+                        if(this.cart[index].qty < maxStok) {
+                            this.cart[index].qty++;
+                            this.isCartOpen = true;
+                        } else {
+                            alert('Stok menu ini sudah mencapai batas maksimal yang tersedia (' + maxStok + ' porsi).');
+                        }
                     } else {
-                        this.cart.push({ id, nama, harga, image, qty: 1, maxStok }); this.isCartOpen = true;
+                        this.cart.push({ id, nama, harga, image, qty: 1, maxStok });
+                        this.isCartOpen = true;
                     }
                 },
-                tambahQty(index) { if(this.cart[index].qty < this.cart[index].maxStok) this.cart[index].qty++; },
+                tambahQty(index) {
+                    if(this.cart[index].qty < this.cart[index].maxStok) {
+                        this.cart[index].qty++;
+                    } else {
+                        alert('Stok menu ini sudah mencapai batas maksimal yang tersedia (' + this.cart[index].maxStok + ' porsi).');
+                    }
+                },
                 kurangiQty(index) { if (this.cart[index].qty > 1) this.cart[index].qty--; else this.hapusItem(index); },
                 hapusItem(index) { this.cart.splice(index, 1); },
                 cartTotalItems() { return this.cart.reduce((total, item) => total + item.qty, 0); },

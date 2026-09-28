@@ -118,22 +118,13 @@
 
             </ul>
 
-            <div class="mt-6 mb-2 pt-4 border-t border-slate-100">
-                <a href="{{ route('home') }}" target="_blank" class="group relative block overflow-hidden rounded-2xl bg-charcoal-950 p-4 text-white shadow-md transition-all duration-300 hover:shadow-xl hover:shadow-charcoal-950/20 border border-charcoal-800 hover:border-gold-500/50">
-                    <div class="absolute -right-3 -bottom-3 w-14 h-14 bg-gold-500/10 rounded-full blur-lg group-hover:bg-gold-500/25 transition-all duration-300"></div>
-                    <div class="relative z-10">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gold-400">
-                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                Toko Online
-                            </span>
-                            <div class="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-gold-400 group-hover:bg-white/20 transition">
-                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                            </div>
-                        </div>
-                        <p class="text-xs font-serif font-bold text-white group-hover:text-gold-300 transition">Lihat Website Publik</p>
-                        <p class="text-[11px] text-slate-400 mt-0.5">Buka katalog pelanggan</p>
-                    </div>
+            <div class="mt-4 pt-3 border-t border-slate-200">
+                <a href="{{ route('home') }}" target="_blank" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-600 bg-slate-50 border border-slate-200 hover:bg-gold-50 hover:text-gold-700 hover:border-gold-300 transition-all duration-200">
+                    <span class="flex items-center gap-2.5">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-gold-600"></i>
+                        <span>Lihat Website</span>
+                    </span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
                 </a>
             </div>
         </div>
@@ -141,7 +132,7 @@
 
     <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 z-30 bg-charcoal-900/50 sm:hidden"></div>
 
-    <div class="p-4 sm:ml-64 pt-24">
+    <div class="sm:ml-64 pt-16 sm:pt-20 pb-10">
         @yield('content')
     </div>
 

@@ -8,7 +8,7 @@
             <h1 class="mt-1 text-xl sm:text-2xl font-serif font-bold text-charcoal-900">{{ $transaksi->kode_transaksi }}</h1>
             <p class="mt-1 text-sm text-slate-500">{{ $transaksi->created_at->format('d M Y, H:i') }} · {{ $transaksi->tipe_pesanan }}</p>
         </div>
-        <a href="{{ url()->previous() }}" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition">
+        <a href="{{ url()->previous() }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition shadow-xs">
             <i class="fa-solid fa-arrow-left"></i> Kembali
         </a>
     </div>

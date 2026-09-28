@@ -2,10 +2,10 @@
 
 @section('content')
 
-<div class="bg-charcoal-950 py-8 border-b border-charcoal-800">
+<div class="bg-charcoal-950 py-6 sm:py-8 border-b border-charcoal-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 class="text-2xl sm:text-3xl font-serif text-white mb-2">Checkout Pesanan</h1>
-        <p class="text-slate-400 text-sm font-light">Selesaikan pesanan Anda untuk segera kami proses.</p>
+        <h1 class="text-xl sm:text-3xl font-serif text-white mb-1.5 sm:mb-2">Checkout Pesanan</h1>
+        <p class="text-slate-400 text-xs sm:text-sm font-light">Selesaikan pesanan Anda untuk segera kami proses.</p>
     </div>
 </div>
 
@@ -159,7 +159,7 @@
             </div>
 
             <div class="lg:col-span-5">
-                <div class="bg-charcoal-950 rounded-3xl shadow-2xl p-6 sm:p-8 sticky top-28">
+                <div class="bg-charcoal-950 rounded-2xl sm:rounded-3xl shadow-2xl p-5 sm:p-8 lg:sticky lg:top-28">
                     <h3 class="text-lg font-serif font-bold text-white mb-6 border-b border-charcoal-800 pb-3">Ringkasan Pesanan</h3>
 
                     <div class="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">

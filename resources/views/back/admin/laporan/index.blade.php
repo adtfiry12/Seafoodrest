@@ -15,20 +15,20 @@
         </div>
 
         <!-- Filter Bulan & Tahun -->
-        <form action="{{ route('admin.laporan.index') }}" method="GET" class="flex gap-2">
-            <select name="bulan" class="bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 py-2">
+        <form action="{{ route('admin.laporan.index') }}" method="GET" class="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
+            <select name="bulan" class="w-full sm:w-auto bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 py-2 shadow-sm">
                 @for($i = 1; $i <= 12; $i++)
                     <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == sprintf('%02d', $i) ? 'selected' : '' }}>
                         {{ date('F', mktime(0, 0, 0, $i, 1)) }}
                     </option>
                 @endfor
             </select>
-            <select name="tahun" class="bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 py-2">
+            <select name="tahun" class="w-full sm:w-auto bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 py-2 shadow-sm">
                 @for($i = date('Y'); $i >= date('Y') - 3; $i--)
                     <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
                 @endfor
             </select>
-            <button type="submit" class="px-4 py-2 bg-charcoal-900 text-white rounded-lg hover:bg-charcoal-800 transition"><i class="fa-solid fa-filter"></i> Filter</button>
+            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-charcoal-900 text-white text-sm font-semibold rounded-lg hover:bg-charcoal-800 transition shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-filter"></i> Filter</button>
         </form>
     </div>
 

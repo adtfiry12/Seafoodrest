@@ -2,16 +2,16 @@
 
 @section('content')
 
-<section class="relative overflow-hidden bg-charcoal-950 py-14 sm:py-20 border-b-4 border-gold-600">
+<section class="relative overflow-hidden bg-charcoal-950 py-10 sm:py-20 border-b-4 border-gold-600">
     <div class="absolute inset-0">
         <img src="{{ asset('image/seafood.webp') }}" alt="Pesanan seafood Niskala Samudra" class="h-full w-full object-cover opacity-75">
         <div class="absolute inset-0 bg-charcoal-950/45"></div>
     </div>
     <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="max-w-2xl">
-            <p class="mb-3 text-[11px] font-bold uppercase tracking-[0.24em] text-gold-500">Niskala Samudra</p>
-            <h1 class="font-serif text-4xl leading-tight text-white sm:text-6xl">Pesanan saya</h1>
-            <p class="mt-5 max-w-xl text-sm leading-relaxed text-slate-300 sm:text-base">Pantau status pesanan, pembayaran, dan riwayat transaksi Anda.</p>
+            <p class="mb-2 sm:mb-3 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.24em] text-gold-500">Niskala Samudra</p>
+            <h1 class="font-serif text-2xl sm:text-4xl lg:text-5xl leading-tight text-white">Pesanan Saya</h1>
+            <p class="mt-3 sm:mt-5 max-w-xl text-xs sm:text-base leading-relaxed text-slate-300">Pantau status pesanan, pembayaran, dan riwayat transaksi Anda.</p>
         </div>
     </div>
 </section>
@@ -40,20 +40,20 @@
                         </div>
                     </div>
 
-                    <div class="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div class="grid grid-cols-2 sm:flex sm:items-center gap-x-6 gap-y-3 text-sm">
-                            <div><p class="text-xs text-slate-400">Tipe Pesanan</p><p class="mt-1 font-bold text-charcoal-900">{{ $trx->tipe_pesanan }}</p></div>
-                            <div><p class="text-xs text-slate-400">Isi Pesanan</p><p class="mt-1 font-bold text-charcoal-900">{{ $trx->detail->sum('qty') }} Porsi</p></div>
-                            <div><p class="text-xs text-slate-400">Pembayaran</p><p class="mt-1 font-bold {{ $trx->status_pembayaran === 'Lunas' ? 'text-emerald-600' : 'text-red-500' }}">{{ $trx->status_pembayaran }}</p></div>
+                    <div class="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-6 text-xs sm:text-sm">
+                            <div><p class="text-[11px] text-slate-400">Layanan</p><p class="mt-0.5 font-bold text-charcoal-900 truncate">{{ $trx->tipe_pesanan }}</p></div>
+                            <div><p class="text-[11px] text-slate-400">Porsi</p><p class="mt-0.5 font-bold text-charcoal-900">{{ $trx->detail->sum('qty') }} Menu</p></div>
+                            <div><p class="text-[11px] text-slate-400">Bayar</p><p class="mt-0.5 font-bold {{ $trx->status_pembayaran === 'Lunas' ? 'text-emerald-600' : 'text-red-500' }}">{{ $trx->status_pembayaran }}</p></div>
                         </div>
 
-                        <div class="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 border-slate-100 pt-4 sm:pt-0">
-                            <p class="text-lg font-bold text-gold-600">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</p>
+                        <div class="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0">
+                            <p class="text-base sm:text-lg font-bold text-gold-600">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</p>
                             <div class="flex gap-2">
-                                <a href="{{ route('front.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-9 h-9 bg-charcoal-900 text-white rounded-lg hover:bg-gold-600 transition"><i class="fa-solid fa-eye"></i></a>
-                                <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" target="_blank" title="Lihat struk" aria-label="Lihat struk" class="inline-flex items-center justify-center w-9 h-9 bg-slate-100 text-slate-600 rounded-lg border border-slate-200 hover:bg-slate-200 transition"><i class="fa-solid fa-receipt"></i></a>
+                                <a href="{{ route('front.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-charcoal-900 text-white rounded-xl hover:bg-gold-600 transition shadow-xs"><i class="fa-solid fa-eye text-xs sm:text-sm"></i></a>
+                                <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" target="_blank" title="Lihat struk" aria-label="Lihat struk" class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-slate-100 text-slate-600 rounded-xl border border-slate-200 hover:bg-slate-200 transition shadow-xs"><i class="fa-solid fa-receipt text-xs sm:text-sm"></i></a>
                                 @if($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran != 'Lunas')
-                                    <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" title="Bayar dengan QRIS" aria-label="Bayar dengan QRIS" class="inline-flex items-center justify-center w-9 h-9 bg-gold-600 text-white rounded-lg hover:bg-gold-500 transition"><i class="fa-solid fa-wallet"></i></a>
+                                    <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" title="Bayar dengan QRIS" aria-label="Bayar dengan QRIS" class="inline-flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 bg-gold-600 text-white rounded-xl hover:bg-gold-500 transition shadow-xs"><i class="fa-solid fa-wallet text-xs sm:text-sm"></i></a>
                                 @endif
                             </div>
                         </div>
