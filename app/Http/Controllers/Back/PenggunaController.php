@@ -10,9 +10,24 @@ use Illuminate\Support\Facades\Storage;
 
 class PenggunaController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pengguna = Pengguna::latest()->paginate(5);
+        $query = Pengguna::query();
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('no_hp', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+
+        $pengguna = $query->latest()->paginate(10)->withQueryString();
 
         return view('back.admin.pengguna.index', compact('pengguna'));
     }

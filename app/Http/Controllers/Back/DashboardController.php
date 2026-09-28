@@ -58,13 +58,21 @@ class DashboardController extends Controller
         $pesananBaru = Transaksi::where('status_pesanan', 'Menunggu ACC')->count();
         $pesananDapur = Transaksi::where('status_pesanan', 'Dimasak')->count();
         $pesananDelivery = Transaksi::where('status_pesanan', 'Diantar')->count();
+        $pesananSelesaiHariIni = Transaksi::where('status_pesanan', 'Selesai')->whereDate('updated_at', Carbon::today())->count();
 
-        // Cek menu yang stoknya sisa 5 atau kurang
+        // Pesanan aktif yang sedang diproses
+        $pesananAktif = Transaksi::with(['pelanggan', 'detail.menu'])
+            ->whereIn('status_pesanan', ['Menunggu ACC', 'Dimasak', 'Diantar'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        // Cek menu yang stoknya sisa 5 atau kurang (diurutkan dari yang paling kritis)
         $stokMenipis = Menu::where('stok', '<=', 5)->count();
-        $menuMenipis = Menu::where('stok', '<=', 5)->take(5)->get();
+        $menuMenipis = Menu::with('kategori')->where('stok', '<=', 5)->orderBy('stok', 'asc')->take(5)->get();
 
         return view('back.karyawan.dashboard', compact(
-            'pesananBaru', 'pesananDapur', 'pesananDelivery', 'stokMenipis', 'menuMenipis'
+            'pesananBaru', 'pesananDapur', 'pesananDelivery', 'pesananSelesaiHariIni', 'pesananAktif', 'stokMenipis', 'menuMenipis'
         ));
     }
 }

@@ -25,6 +25,31 @@
         </div>
     @endif
 
+    <!-- Filter & Search Pengguna -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <form action="{{ route('admin.pengguna.index') }}" method="GET" class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
+            <div class="relative w-full sm:w-64">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama / email / HP..." class="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:ring-gold-500 focus:border-gold-500 text-charcoal-900 shadow-sm">
+                <button type="submit" class="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-gold-600 transition">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </button>
+            </div>
+
+            <select name="role" onchange="this.form.submit()" class="bg-white border border-slate-200 text-sm rounded-xl focus:ring-gold-500 px-3.5 py-2.5 text-slate-700 shadow-sm w-full sm:w-auto">
+                <option value="">Semua Role</option>
+                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                <option value="karyawan" {{ request('role') == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
+                <option value="pelanggan" {{ request('role') == 'pelanggan' ? 'selected' : '' }}>Pelanggan</option>
+            </select>
+
+            @if(request('search') || request('role'))
+                <a href="{{ route('admin.pengguna.index') }}" class="px-3 py-2 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-xmark"></i> Reset
+                </a>
+            @endif
+        </form>
+    </div>
+
     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-600">

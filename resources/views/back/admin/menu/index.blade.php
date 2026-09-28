@@ -25,6 +25,58 @@
         </div>
     @endif
 
+    <!-- Filter & Search Menu -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <form x-ref="filterForm" action="{{ route('admin.menu.index') }}" method="GET" class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
+            <div class="relative w-full sm:w-64">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama menu..." class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full pl-4 pr-10 py-2.5 transition-all duration-200 hover:bg-white shadow-sm">
+                <button type="submit" class="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-gold-600 transition" aria-label="Cari menu">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Searchable Dropdown Kategori (Sesuai Style CRUD Create/Edit) -->
+            <div x-data="searchableFilterSelect(@js($kategoris->map(fn ($kat) => ['id' => $kat->id, 'label' => $kat->nama_kategori])->values()), @js((string) request('kategori_id', '')))" @click.outside="open = false" class="relative w-full sm:w-60">
+                <input type="hidden" name="kategori_id" :value="selected">
+                <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20 shadow-sm">
+                    <span class="truncate flex items-center gap-2">
+                        <i class="fa-solid fa-tags text-xs text-slate-400"></i>
+                        <span x-text="selectedLabel() || 'Semua Kategori'" class="font-medium text-charcoal-900"></span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-30 mt-2 min-w-[240px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                    <div class="border-b border-slate-100 p-2">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+                            <input type="search" x-model="search" placeholder="Cari kategori..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-charcoal-900 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
+                        </div>
+                    </div>
+                    <div class="max-h-60 overflow-y-auto p-1">
+                        <!-- Option: Semua Kategori -->
+                        <button type="button" @click="select('')" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selected === '' ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
+                            <span>Semua Kategori</span>
+                            <i x-show="selected === ''" class="fa-solid fa-check text-gold-600"></i>
+                        </button>
+                        <button type="button" x-show="filteredOptions().length === 0" class="w-full px-3 py-3 text-left text-sm text-slate-400" disabled>Tidak ada kategori ditemukan.</button>
+                        <template x-for="option in filteredOptions()" :key="option.id">
+                            <button type="button" @click="select(option.id)" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selected == String(option.id) ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
+                                <span x-text="option.label"></span>
+                                <i x-show="selected == String(option.id)" class="fa-solid fa-check text-gold-600"></i>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            @if(request('search') || request('kategori_id'))
+                <a href="{{ route('admin.menu.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/60 rounded-xl transition shadow-sm">
+                    <i class="fa-solid fa-xmark"></i> Reset Filter
+                </a>
+            @endif
+        </form>
+    </div>
+
     <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-600">
@@ -114,4 +166,41 @@
         @endif
     </div>
 </div>
+
+<script>
+    const initSearchableFilter = () => {
+        Alpine.data('searchableFilterSelect', (options, initialValue = '') => ({
+            open: false,
+            search: '',
+            selected: String(initialValue || ''),
+            options,
+
+            filteredOptions() {
+                const query = this.search.toLowerCase().trim();
+
+                return this.options.filter((option) => option.label.toLowerCase().includes(query));
+            },
+
+            selectedLabel() {
+                if (!this.selected) return 'Semua Kategori';
+                return this.options.find((option) => String(option.id) === this.selected)?.label || 'Semua Kategori';
+            },
+
+            select(id) {
+                this.selected = String(id || '');
+                this.open = false;
+                this.search = '';
+                this.$nextTick(() => {
+                    this.$root.closest('form').submit();
+                });
+            },
+        }));
+    };
+
+    if (window.Alpine) {
+        initSearchableFilter();
+    } else {
+        document.addEventListener('alpine:init', initSearchableFilter);
+    }
+</script>
 @endsection

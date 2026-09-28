@@ -12,11 +12,22 @@ use Illuminate\Support\Str;
 
 class MenuController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $menu = Menu::with('kategori')->latest()->paginate(10);
+        $query = Menu::with('kategori');
 
-        return view('back.admin.menu.index', compact('menu'));
+        if ($request->filled('search')) {
+            $query->where('nama_menu', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('kategori_id')) {
+            $query->where('kategori_id', $request->kategori_id);
+        }
+
+        $menu = $query->latest()->paginate(10)->withQueryString();
+        $kategoris = Kategori::all();
+
+        return view('back.admin.menu.index', compact('menu', 'kategoris'));
     }
 
     public function show(Menu $menu): View

@@ -234,5 +234,10 @@
             }
         });
     });
+
+    // Auto-refresh dashboard setiap 60 detik
+    setTimeout(function() {
+        window.location.reload();
+    }, 60000);
 </script>
 @endsection

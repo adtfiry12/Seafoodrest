@@ -122,10 +122,22 @@
                 </li>
             </ul>
 
-            <div class="mt-8 mb-4">
-                <a href="{{ route('home') }}" class="flex items-center p-3 text-charcoal-900 rounded-lg bg-gold-50 border border-gold-200 hover:bg-gold-100 group transition shadow-sm">
-                    <i class="fa-solid fa-arrow-up-right-from-square w-5 h-5 text-gold-600 transition"></i>
-                    <span class="ml-3 font-semibold text-gold-700">Lihat Website</span>
+            <div class="mt-6 mb-2 pt-4 border-t border-slate-100">
+                <a href="{{ route('home') }}" target="_blank" class="group relative block overflow-hidden rounded-2xl bg-charcoal-950 p-4 text-white shadow-md transition-all duration-300 hover:shadow-xl hover:shadow-charcoal-950/20 border border-charcoal-800 hover:border-gold-500/50">
+                    <div class="absolute -right-3 -bottom-3 w-14 h-14 bg-gold-500/10 rounded-full blur-lg group-hover:bg-gold-500/25 transition-all duration-300"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gold-400">
+                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Toko Online
+                            </span>
+                            <div class="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-slate-300 group-hover:text-gold-400 group-hover:bg-white/20 transition">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                            </div>
+                        </div>
+                        <p class="text-xs font-serif font-bold text-white group-hover:text-gold-300 transition">Lihat Website Publik</p>
+                        <p class="text-[11px] text-slate-400 mt-0.5">Buka katalog pelanggan</p>
+                    </div>
                 </a>
             </div>
         </div>
