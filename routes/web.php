@@ -12,6 +12,7 @@ use App\Http\Controllers\Back\SlideController;
 use App\Http\Controllers\Back\TransaksiController;
 use App\Http\Controllers\Front\CheckoutController;
 use App\Http\Controllers\Front\HomeController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Pengguna & No Login
@@ -97,6 +98,15 @@ Route::middleware('auth')->group(function () {
 
         Route::get('transaksi/{transaksi}/cetak', [TransaksiController::class, 'cetak'])->name('transaksi.cetak');
         Route::get('laporan', [LaporanController::class, 'index'])->name('laporan.index');
+        Route::get('laporan/cetak', [LaporanController::class, 'cetak'])->name('laporan.cetak');
     });
 
+});
+
+Route::fallback(function (Request $request) {
+    if ($request->expectsJson()) {
+        return response()->json(['message' => 'Halaman tidak ditemukan.'], 404);
+    }
+
+    return response()->view('errors.404', [], 404);
 });
