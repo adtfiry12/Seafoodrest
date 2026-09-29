@@ -23,7 +23,22 @@
                 <div class="flex justify-between gap-4"><span class="text-slate-400">Pembayaran</span><strong class="text-charcoal-900">{{ $transaksi->metode_pembayaran }}</strong></div>
                 <div class="flex justify-between gap-4"><span class="text-slate-400">Status bayar</span><strong class="text-charcoal-900">{{ $transaksi->status_pembayaran }}</strong></div>
                 @if($transaksi->alamat)
-                    <div class="pt-3 border-t border-slate-100"><p class="text-xs text-slate-400">Alamat delivery</p><p class="mt-1 leading-5 text-charcoal-900">{{ $transaksi->alamat }}</p></div>
+                    <div class="pt-3 border-t border-slate-100">
+                        <p class="text-xs text-slate-400">Alamat Pengantaran</p>
+                        <p class="mt-1 leading-5 text-charcoal-900">{{ $transaksi->alamat }}</p>
+                        @if($transaksi->patokan_alamat)
+                            <p class="mt-1 text-xs text-blue-700 bg-blue-50 p-2 rounded-lg"><i class="fa-solid fa-map-pin mr-1"></i> Patokan: {{ $transaksi->patokan_alamat }}</p>
+                        @endif
+                        <div class="mt-3 flex gap-2">
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($transaksi->alamat) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-bold transition">
+                                <i class="fa-solid fa-location-arrow"></i> Rute Maps
+                            </a>
+                            @php $cleanPhone = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $transaksi->no_hp_pelanggan)); @endphp
+                            <a href="https://wa.me/{{ $cleanPhone }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-bold transition">
+                                <i class="fa-brands fa-whatsapp"></i> Chat WA
+                            </a>
+                        </div>
+                    </div>
                 @endif
             </div>
         </div>
@@ -52,15 +67,52 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-            <h2 class="font-bold text-charcoal-900">Status Operasional</h2>
-            <div class="mt-4 flex items-center gap-3">
+        <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-3">
+            <h2 class="font-bold text-charcoal-900">Status & Log Operasional</h2>
+            <div class="flex flex-wrap items-center gap-3">
                 <span class="inline-flex rounded-lg bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700">{{ $transaksi->status_pesanan }}</span>
                 @if($transaksi->dibayar_pada)
                     <span class="text-xs text-emerald-600"><i class="fa-solid fa-circle-check mr-1"></i> Dibayar {{ $transaksi->dibayar_pada->format('d M Y, H:i') }}</span>
                 @endif
             </div>
+
+            @if($transaksi->tipe_pesanan === 'Delivery')
+                <div class="pt-3 border-t border-slate-100 space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-slate-400">Kurir Pengantar:</span>
+                        <strong class="text-charcoal-900">{{ $transaksi->kurir->nama ?? 'Belum Ditugaskan' }}</strong>
+                    </div>
+                    @if($transaksi->waktu_berangkat)
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Waktu Berangkat:</span>
+                            <span class="text-charcoal-900 font-mono">{{ $transaksi->waktu_berangkat->format('d M Y, H:i') }} WIB</span>
+                        </div>
+                    @endif
+                    @if($transaksi->waktu_sampai)
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Waktu Sampai / Selesai:</span>
+                            <span class="text-charcoal-900 font-mono">{{ $transaksi->waktu_sampai->format('d M Y, H:i') }} WIB</span>
+                        </div>
+                    @endif
+                    @if($transaksi->diterima_oleh)
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Diterima Oleh:</span>
+                            <strong class="text-emerald-700">{{ $transaksi->diterima_oleh }}</strong>
+                        </div>
+                    @endif
+                </div>
+
+                @if($transaksi->bukti_pengantaran)
+                    <div class="pt-3 border-t border-slate-100">
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Foto Bukti Serah Terima (POD)</p>
+                        <a href="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" target="_blank" class="block w-32 h-24 rounded-xl overflow-hidden border border-slate-200 shadow-xs hover:opacity-90 transition">
+                            <img src="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" alt="Bukti Pengantaran" class="w-full h-full object-cover">
+                        </a>
+                    </div>
+                @endif
+            @endif
         </div>
+
         <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
             <h2 class="font-bold text-charcoal-900">Catatan Pesanan</h2>
             <p class="mt-3 whitespace-pre-line text-sm leading-6 text-slate-600">{{ $transaksi->catatan ?: 'Tidak ada catatan tambahan.' }}</p>

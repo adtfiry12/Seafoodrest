@@ -70,7 +70,7 @@
                 @php
                     $pendingACC = \App\Models\Transaksi::where('status_pesanan', 'Menunggu ACC')->count();
                     $pendingDapur = \App\Models\Transaksi::where('status_pesanan', 'Dimasak')->count();
-                    $pendingDelivery = \App\Models\Transaksi::where('status_pesanan', 'Diantar')->count();
+                    $pendingDelivery = \App\Models\Transaksi::whereIn('status_pesanan', ['Siap Diantar', 'Diantar'])->count();
                 @endphp
 
                 <li class="pt-4 mt-4 space-y-2 border-t border-slate-200">

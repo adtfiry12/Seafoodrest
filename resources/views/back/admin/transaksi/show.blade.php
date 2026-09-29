@@ -53,7 +53,12 @@
                 <p class="text-sm font-medium mt-2"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">{{ $transaksi->tipe_pesanan }}</span></p>
 
                 @if($transaksi->tipe_pesanan == 'Delivery')
-                    <p class="text-sm text-slate-600 mt-2"><strong>Alamat:</strong> {{ $transaksi->alamat }}</p>
+                    <div class="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                        <p><strong>Alamat:</strong> {{ $transaksi->alamat }}</p>
+                        @if($transaksi->patokan_alamat)
+                            <p class="text-gold-700"><strong>Patokan:</strong> {{ $transaksi->patokan_alamat }}</p>
+                        @endif
+                    </div>
                 @endif
             </div>
             <div class="sm:text-right">
@@ -70,6 +75,63 @@
                 <span class="inline-flex px-3 py-1 bg-slate-100 text-charcoal-900 border border-slate-200 text-xs font-bold rounded-full">{{ strtoupper($transaksi->status_pesanan) }}</span>
             </div>
         </div>
+
+        @if($transaksi->tipe_pesanan == 'Delivery')
+            <!-- Info Ekspedisi Pengantaran Admin -->
+            <div class="px-6 sm:px-8 py-5 border-b border-slate-100 bg-slate-50/50">
+                <h4 class="text-sm font-bold text-charcoal-900 uppercase tracking-wider mb-3 border-l-4 border-gold-500 pl-3 flex items-center justify-between">
+                    <span>Informasi Ekspedisi Pengantaran</span>
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full {{ $transaksi->status_pesanan === 'Selesai' ? 'bg-emerald-100 text-emerald-800' : 'bg-gold-100 text-gold-800' }}">
+                        {{ $transaksi->status_pesanan }}
+                    </span>
+                </h4>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 block font-semibold uppercase">Kurir Ditugaskan</span>
+                        <span class="font-bold text-charcoal-900 block mt-1">{{ $transaksi->kurir->nama ?? 'Belum Ditugaskan' }}</span>
+                        <span class="text-xs text-slate-500">{{ $transaksi->kurir ? 'Staff Kurir' : 'Menunggu pickup' }}</span>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 block font-semibold uppercase">Waktu Berangkat</span>
+                        <span class="font-bold text-charcoal-900 block mt-1">{{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('H:i') . ' WIB' : '-' }}</span>
+                        <span class="text-xs text-slate-500">{{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('d M Y') : 'Belum jalan' }}</span>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 block font-semibold uppercase">Waktu Tiba & Penerima</span>
+                        <span class="font-bold text-charcoal-900 block mt-1">{{ $transaksi->waktu_sampai ? $transaksi->waktu_sampai->format('H:i') . ' WIB' : '-' }}</span>
+                        <span class="text-xs text-slate-500">Penerima: <strong>{{ $transaksi->diterima_oleh ?? '-' }}</strong></span>
+                    </div>
+
+                    <div class="bg-white p-3.5 rounded-xl border border-slate-200">
+                        <span class="text-xs text-slate-400 block font-semibold uppercase">Patokan Alamat</span>
+                        <span class="font-bold text-charcoal-900 block mt-1 text-xs leading-5">{{ $transaksi->patokan_alamat ?? 'Tidak ada patokan' }}</span>
+                    </div>
+                </div>
+
+                @if($transaksi->bukti_pengantaran)
+                    <div class="mt-4 p-4 bg-white rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center gap-4">
+                        <a href="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" target="_blank" class="block w-20 h-20 rounded-lg overflow-hidden border border-slate-200 group relative shrink-0">
+                            <img src="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" alt="Bukti Serah Terima" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 bg-charcoal-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-xs transition-opacity">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                            </div>
+                        </a>
+                        <div class="text-xs text-slate-600 space-y-1">
+                            <p class="font-bold text-sm text-charcoal-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-camera text-gold-500"></i> Bukti Foto Serah Terima (Proof of Delivery)
+                            </p>
+                            <p>Foto bukti serah terima telah diunggah oleh kurir saat pesanan diserahkan kepada <strong>{{ $transaksi->diterima_oleh }}</strong>.</p>
+                            <a href="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" target="_blank" class="inline-flex items-center gap-1 text-gold-600 font-bold hover:underline mt-1">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Buka Foto Ukuran Penuh
+                            </a>
+                        </div>
+                    </div>
+                @endif
+            </div>
+        @endif
 
         <!-- INI BAGIAN BUKTI PEMBAYARAN (MUNCUL JIKA QRIS) -->
         @if($transaksi->metode_pembayaran == 'QRIS')

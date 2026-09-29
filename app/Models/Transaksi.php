@@ -17,15 +17,21 @@ class Transaksi extends Model
         'kode_transaksi',
         'pengguna_id',
         'karyawan_id',
+        'kurir_id',
         'nama_pelanggan',
         'no_hp_pelanggan',
         'tipe_pesanan',
         'alamat',
+        'patokan_alamat',
         'metode_pembayaran',
         'bukti_pembayaran',
         'status_pembayaran',
         'dibayar_pada',
         'status_pesanan',
+        'waktu_berangkat',
+        'waktu_sampai',
+        'diterima_oleh',
+        'bukti_pengantaran',
         'subtotal_bayar',
         'ongkos_kirim',
         'total_bayar',
@@ -37,6 +43,8 @@ class Transaksi extends Model
     {
         return [
             'dibayar_pada' => 'datetime',
+            'waktu_berangkat' => 'datetime',
+            'waktu_sampai' => 'datetime',
             'stok_dikembalikan' => 'boolean',
         ];
     }
@@ -49,6 +57,11 @@ class Transaksi extends Model
     public function karyawan(): BelongsTo
     {
         return $this->belongsTo(Pengguna::class, 'karyawan_id');
+    }
+
+    public function kurir(): BelongsTo
+    {
+        return $this->belongsTo(Pengguna::class, 'kurir_id');
     }
 
     public function detail(): HasMany

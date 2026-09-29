@@ -110,9 +110,15 @@
                         </div>
                     </div>
 
-                    <div x-show="tipePesanan === 'Delivery'" x-collapse>
-                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Alamat Pengiriman Lengkap</label>
-                        <textarea name="alamat" rows="3" placeholder="Tuliskan jalan, nomor rumah, RT/RW, dan patokan..." class="w-full bg-slate-50 border border-slate-200 text-charcoal-900 rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500">{{ Auth::user()->alamat ?? '' }}</textarea>
+                    <div x-show="tipePesanan === 'Delivery'" x-collapse class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Alamat Pengiriman Lengkap</label>
+                            <textarea name="alamat" rows="3" placeholder="Tuliskan jalan, nomor rumah, RT/RW, kelurahan/kecamatan..." class="w-full bg-slate-50 border border-slate-200 text-charcoal-900 rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500">{{ Auth::user()->alamat ?? '' }}</textarea>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Patokan / Catatan Alamat (Opsional)</label>
+                            <input type="text" name="patokan_alamat" placeholder="Contoh: Pagar hitam depan masjid, samping warung kelontong" class="w-full bg-slate-50 border border-slate-200 text-charcoal-900 rounded-xl px-4 py-3 text-sm focus:ring-gold-500 focus:border-gold-500">
+                        </div>
                     </div>
                 </div>
 

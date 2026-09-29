@@ -29,6 +29,7 @@ class CheckoutController extends Controller
             'items.*.qty' => ['required', 'integer', 'min:1', 'max:100'],
             'no_hp' => ['required', 'string', 'max:20'],
             'alamat' => ['required_if:tipe_pesanan,Delivery', 'nullable', 'string', 'max:1000'],
+            'patokan_alamat' => ['nullable', 'string', 'max:255'],
             'catatan' => ['nullable', 'string', 'max:1000'],
             'opsi_dinein' => ['required_if:tipe_pesanan,Makan di Tempat', 'in:sekarang,reservasi'],
             'nomor_meja' => ['nullable', 'string', 'max:50'],
@@ -102,6 +103,7 @@ class CheckoutController extends Controller
                 'no_hp_pelanggan' => $validated['no_hp'],
                 'tipe_pesanan' => $enumTipePesanan,
                 'alamat' => $enumTipePesanan === 'Delivery' ? $validated['alamat'] : null,
+                'patokan_alamat' => $enumTipePesanan === 'Delivery' ? ($validated['patokan_alamat'] ?? null) : null,
                 'metode_pembayaran' => $enumMetodePembayaran,
                 'status_pembayaran' => 'Belum Lunas',
                 'status_pesanan' => 'Menunggu ACC',
@@ -161,7 +163,7 @@ class CheckoutController extends Controller
 
     public function detailPesanan(string $kode_transaksi)
     {
-        $transaksi = Transaksi::with(['pelanggan', 'detail.menu'])
+        $transaksi = Transaksi::with(['pelanggan', 'detail.menu', 'kurir'])
             ->where('pengguna_id', Auth::id())
             ->where('kode_transaksi', $kode_transaksi)
             ->firstOrFail();

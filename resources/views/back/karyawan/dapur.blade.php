@@ -69,14 +69,18 @@
                 </div>
 
                 <div class="p-4 bg-slate-50 border-t border-slate-100">
-                    <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pesanan Selesai Dimasak', 'Pastikan semua pesanan sudah matang dan siap disajikan.')">
+                    <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pesanan Selesai Dimasak', 'Pastikan semua hidangan sudah selesai dimasak dan dikemas dengan rapi.')">
                         @csrf
 
-                        <!-- Logika Cerdas: Jika Delivery diteruskan ke Kurir, Jika Makan di Tempat langsung Selesai -->
-                        <input type="hidden" name="status_pesanan" value="{{ $trx->tipe_pesanan == 'Delivery' ? 'Diantar' : 'Selesai' }}">
+                        <!-- Logika Cerdas: Jika Delivery masuk antrean Siap Diantar, Jika Makan di Tempat langsung Selesai -->
+                        <input type="hidden" name="status_pesanan" value="{{ $trx->tipe_pesanan == 'Delivery' ? 'Siap Diantar' : 'Selesai' }}">
 
                         <button type="submit" class="w-full py-3 bg-orange-500 text-white text-sm font-bold rounded-xl hover:bg-orange-600 transition shadow-sm shadow-orange-500/30 flex items-center justify-center gap-2">
-                            <i class="fa-solid fa-bell-concierge"></i> Pesanan Selesai Dimasak
+                            @if($trx->tipe_pesanan == 'Delivery')
+                                <i class="fa-solid fa-box-open"></i> Selesai Dimasak (Siap Diantar)
+                            @else
+                                <i class="fa-solid fa-bell-concierge"></i> Selesai Dimasak & Sajikan
+                            @endif
                         </button>
                     </form>
                 </div>

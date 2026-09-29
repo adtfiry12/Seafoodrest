@@ -43,21 +43,35 @@ class KaryawanOperasionalController extends Controller
 
     public function delivery(Request $request)
     {
-        $query = Transaksi::with('pelanggan', 'detail.menu')
-            ->where('status_pesanan', 'Diantar');
+        $query = Transaksi::with(['pelanggan', 'kurir', 'detail.menu'])
+            ->whereIn('status_pesanan', ['Siap Diantar', 'Diantar']);
 
-        if ($request->has('search') && $request->search != '') {
-            $query->where('kode_transaksi', 'like', '%'.$request->search.'%');
+        if ($request->filled('status') && in_array($request->status, ['Siap Diantar', 'Diantar'], true)) {
+            $query->where('status_pesanan', $request->status);
         }
 
-        $transaksi = $query->latest()->paginate(6)->withQueryString();
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
+                $q->where('kode_transaksi', 'like', '%'.$request->search.'%')
+                  ->orWhere('nama_pelanggan', 'like', '%'.$request->search.'%')
+                  ->orWhere('alamat', 'like', '%'.$request->search.'%');
+            });
+        }
 
-        return view('back.karyawan.delivery', compact('transaksi'));
+        $transaksi = $query->orderByRaw("CASE WHEN status_pesanan = 'Siap Diantar' THEN 1 ELSE 2 END")
+            ->latest()
+            ->paginate(6)
+            ->withQueryString();
+
+        $countSiap = Transaksi::where('status_pesanan', 'Siap Diantar')->count();
+        $countDiantar = Transaksi::where('status_pesanan', 'Diantar')->count();
+
+        return view('back.karyawan.delivery', compact('transaksi', 'countSiap', 'countDiantar'));
     }
 
     public function detailPesanan(string $kode_transaksi): View
     {
-        $transaksi = Transaksi::with(['pelanggan', 'detail.menu'])
+        $transaksi = Transaksi::with(['pelanggan', 'karyawan', 'kurir', 'detail.menu'])
             ->where('kode_transaksi', $kode_transaksi)
             ->firstOrFail();
 
@@ -66,17 +80,27 @@ class KaryawanOperasionalController extends Controller
 
     public function updateStatus(Request $request, $kode_transaksi)
     {
-        $validated = $request->validate([
-            'status_pesanan' => ['required', 'in:Dimasak,Diantar,Selesai,Dibatalkan'],
-            'status_pembayaran' => ['nullable', 'in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal'],
-        ]);
-
         $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
         $currentStatus = $transaksi->status_pesanan;
+
+        $rules = [
+            'status_pesanan' => ['required', 'in:Dimasak,Siap Diantar,Diantar,Selesai,Dibatalkan'],
+            'status_pembayaran' => ['nullable', 'in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal'],
+            'diterima_oleh' => ['nullable', 'string', 'max:100'],
+            'bukti_pengantaran' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+        ];
+
+        if ($request->input('status_pesanan') === 'Selesai' && $transaksi->tipe_pesanan === 'Delivery') {
+            $rules['diterima_oleh'] = ['required', 'string', 'max:100'];
+        }
+
+        $validated = $request->validate($rules);
         $nextStatus = $validated['status_pesanan'];
+
         $allowedNextStatuses = match ($currentStatus) {
             'Menunggu ACC' => ['Dimasak', 'Dibatalkan'],
-            'Dimasak' => $transaksi->tipe_pesanan === 'Delivery' ? ['Diantar'] : ['Selesai'],
+            'Dimasak' => $transaksi->tipe_pesanan === 'Delivery' ? ['Siap Diantar'] : ['Selesai'],
+            'Siap Diantar' => ['Diantar', 'Dibatalkan'],
             'Diantar' => ['Selesai'],
             default => [],
         };
@@ -90,18 +114,37 @@ class KaryawanOperasionalController extends Controller
         }
 
         if ($nextStatus === 'Selesai' && $transaksi->metode_pembayaran === 'COD') {
-            abort_unless($nextPaymentStatus === 'Lunas', 422, 'Pembayaran harus lunas sebelum pesanan selesai.');
+            abort_unless($nextPaymentStatus === 'Lunas', 422, 'Pembayaran COD harus lunas saat pesanan selesai diserahkan.');
         }
 
-        DB::transaction(function () use ($transaksi, $nextStatus, $nextPaymentStatus) {
+        DB::transaction(function () use ($transaksi, $nextStatus, $nextPaymentStatus, $request) {
             $statusPembayaran = $nextStatus === 'Dibatalkan' ? 'Batal' : $nextPaymentStatus;
 
-            $transaksi->update([
+            $updateData = [
                 'status_pesanan' => $nextStatus,
                 'status_pembayaran' => $statusPembayaran,
                 'dibayar_pada' => $statusPembayaran === 'Lunas' ? ($transaksi->dibayar_pada ?? now()) : null,
-                'karyawan_id' => Auth::id(),
-            ]);
+            ];
+
+            if (! $transaksi->karyawan_id) {
+                $updateData['karyawan_id'] = Auth::id();
+            }
+
+            if ($nextStatus === 'Diantar') {
+                $updateData['kurir_id'] = Auth::id();
+                $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? now();
+            }
+
+            if ($nextStatus === 'Selesai' && $transaksi->tipe_pesanan === 'Delivery') {
+                $updateData['waktu_sampai'] = now();
+                $updateData['diterima_oleh'] = $request->input('diterima_oleh');
+
+                if ($request->hasFile('bukti_pengantaran')) {
+                    $updateData['bukti_pengantaran'] = $request->file('bukti_pengantaran')->store('bukti_pengantaran', 'public');
+                }
+            }
+
+            $transaksi->update($updateData);
 
             if ($nextStatus === 'Dibatalkan') {
                 $transaksi->restoreStockIfNeeded();

@@ -118,7 +118,7 @@ class TransaksiController extends Controller
 
     public function show(Transaksi $transaksi)
     {
-        $transaksi->load(['pelanggan', 'karyawan', 'detail.menu']);
+        $transaksi->load(['pelanggan', 'karyawan', 'detail.menu', 'kurir']);
 
         return view('back.admin.transaksi.show', compact('transaksi'));
     }
@@ -132,7 +132,7 @@ class TransaksiController extends Controller
     {
         $validated = $request->validate([
             'status_pembayaran' => 'required|in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal',
-            'status_pesanan' => 'required|in:Menunggu ACC,Dimasak,Diantar,Selesai,Dibatalkan',
+            'status_pesanan' => 'required|in:Menunggu ACC,Dimasak,Siap Diantar,Diantar,Selesai,Dibatalkan',
         ]);
 
         if ($validated['status_pesanan'] === 'Dimasak' && $transaksi->metode_pembayaran === 'QRIS' && $validated['status_pembayaran'] !== 'Lunas') {

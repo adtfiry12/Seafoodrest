@@ -2,14 +2,26 @@
 
 @section('content')
 @php
-    $steps = [
-        'Menunggu ACC' => 1,
-        'Dimasak' => 2,
-        'Diantar' => 3,
-        'Selesai' => 4,
-    ];
+    $isDelivery = $transaksi->tipe_pesanan === 'Delivery';
+    if ($isDelivery) {
+        $steps = [
+            'Menunggu ACC' => 1,
+            'Dimasak' => 2,
+            'Siap Diantar' => 3,
+            'Diantar' => 4,
+            'Selesai' => 5,
+        ];
+        $totalSteps = 5;
+    } else {
+        $steps = [
+            'Menunggu ACC' => 1,
+            'Dimasak' => 2,
+            'Selesai' => 3,
+        ];
+        $totalSteps = 3;
+    }
     $currentStep = $steps[$transaksi->status_pesanan] ?? 1;
-    $isActiveOrder = in_array($transaksi->status_pesanan, ['Menunggu ACC', 'Dimasak', 'Diantar']);
+    $isActiveOrder = in_array($transaksi->status_pesanan, ['Menunggu ACC', 'Dimasak', 'Siap Diantar', 'Diantar']);
 @endphp
 
 <section class="relative overflow-hidden bg-charcoal-950 py-10 border-b-4 border-gold-600">
@@ -57,7 +69,7 @@
                 <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
                     <div>
                         <h2 class="font-serif text-lg sm:text-xl font-bold text-charcoal-900">Status Alur Pesanan</h2>
-                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Pantau tahapan penyiapan makanan Anda secara berkala.</p>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-0.5">Pantau tahapan proses pesanan Anda secara real-time.</p>
                     </div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider
                         {{ $transaksi->status_pesanan === 'Selesai' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-gold-50 text-gold-700 border border-gold-200' }}">
@@ -67,54 +79,246 @@
                 </div>
 
                 <div class="relative">
-                    <!-- Progress Line -->
-                    <div class="hidden sm:block absolute top-1/2 left-0 right-0 h-1 bg-slate-100 -translate-y-1/2 -z-0">
-                        <div class="h-full bg-gold-500 transition-all duration-700" style="width: {{ (($currentStep - 1) / 3) * 100 }}%"></div>
+                    @if($isDelivery)
+                        <!-- Progress Line Delivery (5 steps) -->
+                        <div class="hidden sm:block absolute top-1/2 left-0 right-0 h-1 bg-slate-100 -translate-y-1/2 -z-0">
+                            <div class="h-full bg-gold-500 transition-all duration-700" style="width: {{ (($currentStep - 1) / 4) * 100 }}%"></div>
+                        </div>
+
+                        <!-- 5 Steps Grid for Delivery -->
+                        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-2 relative z-10">
+                            <!-- Step 1 -->
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 1 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-2 sm:mb-3 transition-all
+                                    {{ $currentStep > 1 ? 'bg-emerald-500 text-white' : ($currentStep === 1 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20' : 'bg-slate-100 text-slate-400') }}">
+                                    <i class="fa-solid {{ $currentStep > 1 ? 'fa-check' : 'fa-receipt' }}"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">1. Diterima</span>
+                                <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Menunggu ACC Kasir</span>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 2 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-2 sm:mb-3 transition-all
+                                    {{ $currentStep > 2 ? 'bg-emerald-500 text-white' : ($currentStep === 2 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20 animate-pulse' : 'bg-slate-100 text-slate-400') }}">
+                                    <i class="fa-solid {{ $currentStep > 2 ? 'fa-check' : 'fa-fire-burner' }}"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">2. Dapur</span>
+                                <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Sedang Dimasak</span>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 3 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-2 sm:mb-3 transition-all
+                                    {{ $currentStep > 3 ? 'bg-emerald-500 text-white' : ($currentStep === 3 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20 animate-pulse' : 'bg-slate-100 text-slate-400') }}">
+                                    <i class="fa-solid {{ $currentStep > 3 ? 'fa-check' : 'fa-boxes-packing' }}"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">3. Dikemas</span>
+                                <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Siap Diantar Kurir</span>
+                            </div>
+
+                            <!-- Step 4 -->
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 4 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-2 sm:mb-3 transition-all
+                                    {{ $currentStep > 4 ? 'bg-emerald-500 text-white' : ($currentStep === 4 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20 animate-pulse' : 'bg-slate-100 text-slate-400') }}">
+                                    <i class="fa-solid {{ $currentStep > 4 ? 'fa-check' : 'fa-motorcycle' }}"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">4. Perjalanan</span>
+                                <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Menuju Lokasi Anda</span>
+                            </div>
+
+                            <!-- Step 5 -->
+                            <div class="col-span-2 sm:col-span-1 flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 5 ? 'bg-emerald-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-2 sm:mb-3 transition-all
+                                    {{ $currentStep >= 5 ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/20' : 'bg-slate-100 text-slate-400' }}">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">5. Tiba & Selesai</span>
+                                <span class="text-[10px] sm:text-[11px] text-slate-500 mt-0.5">Pesanan Diterima</span>
+                            </div>
+                        </div>
+                    @else
+                        <!-- Progress Line Dine In (3 steps) -->
+                        <div class="hidden sm:block absolute top-1/2 left-0 right-0 h-1 bg-slate-100 -translate-y-1/2 -z-0">
+                            <div class="h-full bg-gold-500 transition-all duration-700" style="width: {{ (($currentStep - 1) / 2) * 100 }}%"></div>
+                        </div>
+
+                        <!-- 3 Steps Grid for Dine In -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-2 relative z-10">
+                            <!-- Step 1 -->
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 1 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-3 transition-all
+                                    {{ $currentStep > 1 ? 'bg-emerald-500 text-white' : ($currentStep === 1 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20' : 'bg-slate-100 text-slate-400') }}">
+                                    <i class="fa-solid {{ $currentStep > 1 ? 'fa-check' : 'fa-receipt' }}"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">1. Diterima</span>
+                                <span class="text-[11px] text-slate-500 mt-0.5">Menunggu ACC Kasir</span>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 2 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-3 transition-all
+                                    {{ $currentStep > 2 ? 'bg-emerald-500 text-white' : ($currentStep === 2 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20 animate-pulse' : 'bg-slate-100 text-slate-400') }}">
+                                    <i class="fa-solid {{ $currentStep > 2 ? 'fa-check' : 'fa-fire-burner' }}"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">2. Dapur</span>
+                                <span class="text-[11px] text-slate-500 mt-0.5">Sedang Dimasak</span>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 3 ? 'bg-emerald-50/50 sm:bg-transparent' : 'opacity-50' }}">
+                                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-3 transition-all
+                                    {{ $currentStep >= 3 ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/20' : 'bg-slate-100 text-slate-400' }}">
+                                    <i class="fa-solid fa-bell-concierge"></i>
+                                </div>
+                                <span class="text-xs font-bold text-charcoal-900">3. Siap Saji</span>
+                                <span class="text-[11px] text-slate-500 mt-0.5">Dihidangkan ke Meja</span>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        @endif
+
+        @if($isDelivery)
+            <!-- Detail Pelacakan Kurir & Pengantaran (Khusus Layanan Delivery) -->
+            <div x-data="{ showPod: false }" class="rounded-2xl border border-slate-200 bg-white p-6 sm:p-7 shadow-sm overflow-hidden relative">
+                <!-- Header Box -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-11 h-11 rounded-xl bg-gold-50 border border-gold-200 text-gold-600 flex items-center justify-center text-lg shrink-0">
+                            <i class="fa-solid fa-truck-ramp-box"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-serif text-lg font-bold text-charcoal-900">Pelacakan Pengantaran</h2>
+                            <p class="text-xs text-slate-500">Informasi kurir, waktu serah terima, dan bukti pengantaran pesanan.</p>
+                        </div>
                     </div>
 
-                    <!-- Steps Grid -->
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-2 relative z-10">
-                        <!-- Step 1 -->
-                        <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 1 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-3 transition-all
-                                {{ $currentStep > 1 ? 'bg-emerald-500 text-white' : ($currentStep === 1 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20' : 'bg-slate-100 text-slate-400') }}">
-                                <i class="fa-solid {{ $currentStep > 1 ? 'fa-check' : 'fa-receipt' }}"></i>
-                            </div>
-                            <span class="text-xs font-bold text-charcoal-900">1. Diterima</span>
-                            <span class="text-[11px] text-slate-500 mt-0.5">Menunggu ACC Kasir</span>
+                    @if($transaksi->status_pesanan === 'Diantar')
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold self-start sm:self-auto">
+                            <span class="relative flex h-2 w-2">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            </span>
+                            <span>Kurir Sedang di Jalan</span>
                         </div>
-
-                        <!-- Step 2 -->
-                        <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 2 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-3 transition-all
-                                {{ $currentStep > 2 ? 'bg-emerald-500 text-white' : ($currentStep === 2 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20 animate-pulse' : 'bg-slate-100 text-slate-400') }}">
-                                <i class="fa-solid {{ $currentStep > 2 ? 'fa-check' : 'fa-fire-burner' }}"></i>
-                            </div>
-                            <span class="text-xs font-bold text-charcoal-900">2. Dapur</span>
-                            <span class="text-[11px] text-slate-500 mt-0.5">Sedang Dimasak</span>
+                    @elseif($transaksi->status_pesanan === 'Selesai')
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold self-start sm:self-auto">
+                            <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                            <span>Telah Diterima Pelanggan</span>
                         </div>
-
-                        <!-- Step 3 -->
-                        <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 3 ? 'bg-gold-50/50 sm:bg-transparent' : 'opacity-50' }}">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-3 transition-all
-                                {{ $currentStep > 3 ? 'bg-emerald-500 text-white' : ($currentStep === 3 ? 'bg-gold-500 text-white ring-4 ring-gold-500/20 animate-pulse' : 'bg-slate-100 text-slate-400') }}">
-                                <i class="fa-solid {{ $currentStep > 3 ? 'fa-check' : ($transaksi->tipe_pesanan === 'Delivery' ? 'fa-motorcycle' : 'fa-bell-concierge') }}"></i>
-                            </div>
-                            <span class="text-xs font-bold text-charcoal-900">3. {{ $transaksi->tipe_pesanan === 'Delivery' ? 'Pengantaran' : 'Siap Saji' }}</span>
-                            <span class="text-[11px] text-slate-500 mt-0.5">{{ $transaksi->tipe_pesanan === 'Delivery' ? 'Kurir Menuju Lokasi' : 'Dihidangkan ke Meja' }}</span>
+                    @elseif($transaksi->status_pesanan === 'Siap Diantar')
+                        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold self-start sm:self-auto">
+                            <i class="fa-solid fa-boxes-packing text-blue-600"></i>
+                            <span>Dikemas - Siap Diambil Kurir</span>
                         </div>
+                    @endif
+                </div>
 
-                        <!-- Step 4 -->
-                        <div class="flex flex-col items-center text-center p-3 rounded-xl transition {{ $currentStep >= 4 ? 'bg-emerald-50/50 sm:bg-transparent' : 'opacity-50' }}">
-                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-base font-bold shadow-sm mb-3 transition-all
-                                {{ $currentStep >= 4 ? 'bg-emerald-500 text-white ring-4 ring-emerald-500/20' : 'bg-slate-100 text-slate-400' }}">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </div>
-                            <span class="text-xs font-bold text-charcoal-900">4. Selesai</span>
-                            <span class="text-[11px] text-slate-500 mt-0.5">Santapan Dinikmati</span>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-5">
+                    <!-- Kurir -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-motorcycle text-gold-500"></i> Kurir Pengantar
+                        </p>
+                        <p class="text-sm font-bold text-charcoal-900 mt-1">
+                            {{ $transaksi->kurir->nama ?? 'Menunggu Penugasan' }}
+                        </p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">
+                            {{ $transaksi->kurir ? 'Staff Kurir Niskala Samudra' : 'Akan ditugaskan saat siap antar' }}
+                        </p>
+                    </div>
+
+                    <!-- Waktu Berangkat -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-regular fa-clock text-gold-500"></i> Waktu Berangkat
+                        </p>
+                        <p class="text-sm font-bold text-charcoal-900 mt-1">
+                            {{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('H:i') . ' WIB' : 'Belum Berangkat' }}
+                        </p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">
+                            {{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('d M Y') : 'Menunggu kurir berangkat' }}
+                        </p>
+                    </div>
+
+                    <!-- Waktu Tiba & Penerima -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                            <i class="fa-solid fa-house-chimney-user text-gold-500"></i> Penerima
+                        </p>
+                        <p class="text-sm font-bold text-charcoal-900 mt-1">
+                            {{ $transaksi->diterima_oleh ?? ($transaksi->status_pesanan === 'Selesai' ? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan) : 'Dalam Proses Antar') }}
+                        </p>
+                        <p class="text-[11px] text-slate-500 mt-0.5">
+                            {{ $transaksi->waktu_sampai ? 'Sampai pk ' . $transaksi->waktu_sampai->format('H:i') . ' WIB' : ($transaksi->status_pesanan === 'Diantar' ? 'Estimasi segera tiba' : '-') }}
+                        </p>
+                    </div>
+
+                    <!-- Bukti Pengantaran -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-camera text-gold-500"></i> Bukti Pengantaran
+                            </p>
+                            @if($transaksi->bukti_pengantaran)
+                                <div class="mt-2 flex items-center gap-3">
+                                    <button type="button" @click="showPod = true" class="relative group block w-14 h-14 rounded-lg overflow-hidden border border-slate-200 shadow-xs shrink-0 cursor-pointer">
+                                        <img src="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" alt="Bukti Serah Terima" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                        <div class="absolute inset-0 bg-charcoal-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs">
+                                            <i class="fa-solid fa-magnifying-glass-plus"></i>
+                                        </div>
+                                    </button>
+                                    <div>
+                                        <button type="button" @click="showPod = true" class="text-xs font-bold text-gold-600 hover:text-gold-700 underline text-left block">
+                                            Lihat Foto Bukti
+                                        </button>
+                                        <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">
+                                            <i class="fa-solid fa-shield-check"></i> Terverifikasi
+                                        </span>
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-xs text-slate-500 mt-2">
+                                    {{ $transaksi->status_pesanan === 'Selesai' ? 'Diserahkan langsung' : 'Tersedia setelah pesanan sampai' }}
+                                </p>
+                            @endif
                         </div>
                     </div>
                 </div>
+
+                @if($transaksi->status_pesanan === 'Diantar')
+                    <div class="mt-5 p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-3 text-amber-900 text-xs">
+                        <i class="fa-solid fa-circle-info text-amber-600 text-sm mt-0.5 shrink-0"></i>
+                        <div>
+                            <span class="font-bold">Tips Pengantaran:</span> Kurir kami sedang bergerak menuju alamat Anda. Harap pastikan nomor telepon Anda (<strong>{{ $transaksi->pelanggan->no_hp ?? $transaksi->no_hp_pelanggan }}</strong>) aktif dan dapat dihubungi jika kurir membutuhkan konfirmasi alamat.
+                        </div>
+                    </div>
+                @endif
+
+                <!-- Lightbox Modal untuk Bukti Pengantaran -->
+                @if($transaksi->bukti_pengantaran)
+                    <div x-show="showPod" style="display: none;" class="fixed inset-0 z-50 overflow-y-auto bg-charcoal-950/80 backdrop-blur-sm flex items-center justify-center p-4" x-transition.opacity>
+                        <div @click.away="showPod = false" class="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200">
+                            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                                <h3 class="font-bold text-charcoal-900 text-sm flex items-center gap-2">
+                                    <i class="fa-solid fa-camera text-gold-500"></i> Bukti Serah Terima Pesanan
+                                </h3>
+                                <button type="button" @click="showPod = false" class="text-slate-400 hover:text-charcoal-900 text-sm p-1 rounded-lg">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="p-4 bg-slate-50 flex items-center justify-center">
+                                <img src="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" alt="Foto Bukti Pengantaran" class="max-h-[70vh] rounded-xl object-contain shadow-sm">
+                            </div>
+                            <div class="p-4 bg-white border-t border-slate-100 text-xs text-slate-500 flex items-center justify-between">
+                                <span>Penerima: <strong>{{ $transaksi->diterima_oleh ?? '-' }}</strong></span>
+                                <span>Waktu: {{ $transaksi->waktu_sampai ? $transaksi->waktu_sampai->format('d M Y, H:i') : '-' }} WIB</span>
+                            </div>
+                        </div>
+                    </div>
+                @endif
             </div>
         @endif
 
@@ -147,7 +351,16 @@
                     <div><p class="text-xs text-slate-400">Nama Pemesan</p><p class="mt-1 font-medium text-charcoal-900">{{ $transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan }}</p></div>
                     <div><p class="text-xs text-slate-400">Nomor HP</p><p class="mt-1 text-charcoal-900">{{ $transaksi->pelanggan->no_hp ?? $transaksi->no_hp_pelanggan ?? 'Belum tersedia' }}</p></div>
                     @if($transaksi->alamat)
-                        <div><p class="text-xs text-slate-400">Alamat Pengiriman</p><p class="mt-1 leading-5 text-charcoal-900">{{ $transaksi->alamat }}</p></div>
+                        <div>
+                            <p class="text-xs text-slate-400">Alamat Pengiriman</p>
+                            <p class="mt-1 leading-5 text-charcoal-900">{{ $transaksi->alamat }}</p>
+                            @if($transaksi->patokan_alamat)
+                                <p class="mt-1.5 text-xs text-slate-500 flex items-center gap-1.5 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                    <i class="fa-solid fa-map-pin text-gold-500 shrink-0"></i>
+                                    <span><strong>Patokan:</strong> {{ $transaksi->patokan_alamat }}</span>
+                                </p>
+                            @endif
+                        </div>
                     @endif
                 </div>
             </div>

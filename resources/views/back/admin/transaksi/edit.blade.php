@@ -33,7 +33,8 @@
                 <select name="status_pesanan" id="status_pesanan" required class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 transition-all">
                     <option value="Menunggu ACC" {{ $transaksi->status_pesanan == 'Menunggu ACC' ? 'selected' : '' }}>Menunggu ACC (Pesanan Baru)</option>
                     <option value="Dimasak" {{ $transaksi->status_pesanan == 'Dimasak' ? 'selected' : '' }}>Dimasak di Dapur</option>
-                    <option value="Diantar" {{ $transaksi->status_pesanan == 'Diantar' ? 'selected' : '' }}>Diantar / Menunggu Diambil</option>
+                    <option value="Siap Diantar" {{ $transaksi->status_pesanan == 'Siap Diantar' ? 'selected' : '' }}>Siap Diantar (Dikemas / Menunggu Kurir)</option>
+                    <option value="Diantar" {{ $transaksi->status_pesanan == 'Diantar' ? 'selected' : '' }}>Diantar / Dalam Perjalanan Kurir</option>
                     <option value="Selesai" {{ $transaksi->status_pesanan == 'Selesai' ? 'selected' : '' }}>Selesai (Diterima)</option>
                     <option value="Dibatalkan" {{ $transaksi->status_pesanan == 'Dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
                 </select>
