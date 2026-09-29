@@ -42,8 +42,9 @@ class HomeController extends Controller
         });
     }
 
-    if ($request->has('search') && $request->search != '') {
-        $query->where('nama_menu', 'like', '%' . $request->search . '%');
+    if ($request->filled('search')) {
+        $search = mb_substr(trim((string) $request->search), 0, 100);
+        $query->where('nama_menu', 'like', '%' . $search . '%');
     }
 
     $menus = $query->paginate(12)->withQueryString();

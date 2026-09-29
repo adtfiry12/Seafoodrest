@@ -17,7 +17,8 @@ class MenuController extends Controller
         $query = Menu::with('kategori');
 
         if ($request->filled('search')) {
-            $query->where('nama_menu', 'like', '%' . $request->search . '%');
+            $search = mb_substr(trim((string) $request->search), 0, 100);
+            $query->where('nama_menu', 'like', '%' . $search . '%');
         }
 
         if ($request->filled('kategori_id')) {

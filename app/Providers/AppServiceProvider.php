@@ -36,5 +36,37 @@ class AppServiceProvider extends ServiceProvider
                 Limit::perMinute(20)->by($request->ip()),
             ];
         });
+
+        // Anti-DoS Register Flooding (Bcrypt CPU exhaustion protection)
+        RateLimiter::for('register', function (Request $request): array {
+            return [
+                Limit::perMinute(5)->by($request->ip()),
+            ];
+        });
+
+        // Anti-Spam Checkout / Stock Hoarding
+        RateLimiter::for('checkout', function (Request $request): array {
+            $userKey = $request->user()?->id ?: $request->ip();
+
+            return [
+                Limit::perMinute(10)->by($userKey),
+            ];
+        });
+
+        // Anti-DoS File Upload
+        RateLimiter::for('uploads', function (Request $request): array {
+            $userKey = $request->user()?->id ?: $request->ip();
+
+            return [
+                Limit::perMinute(10)->by($userKey),
+            ];
+        });
+
+        // Anti-Brute Force Password Update
+        RateLimiter::for('password_update', function (Request $request): array {
+            return [
+                Limit::perMinute(5)->by($request->user()?->id ?: $request->ip()),
+            ];
+        });
     }
 }

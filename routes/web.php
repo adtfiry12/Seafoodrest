@@ -26,9 +26,9 @@ Route::controller(HomeController::class)->group(function () {
 
 Route::controller(CheckoutController::class)->prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', 'index')->name('index');
-    Route::post('/proses', 'proses')->name('proses');
+    Route::post('/proses', 'proses')->middleware('throttle:checkout')->name('proses');
     Route::get('/qris/{kode_transaksi}', 'qris')->middleware('signed')->name('qris');
-    Route::post('/qris/{kode_transaksi}/upload', 'uploadBukti')->middleware('signed')->name('qris.upload');
+    Route::post('/qris/{kode_transaksi}/upload', 'uploadBukti')->middleware(['signed', 'throttle:uploads'])->name('qris.upload');
     Route::get('/sukses/{kode_transaksi}', 'sukses')->middleware('signed')->name('sukses');
 });
 
@@ -41,7 +41,7 @@ Route::middleware('guest')->controller(AuthController::class)->group(function ()
     Route::get('/login', 'showLogin')->name('login');
     Route::post('/login', 'login')->middleware('throttle:login')->name('login.submit');
     Route::get('/register', 'showRegister')->name('register');
-    Route::post('/register', 'register')->name('register.submit');
+    Route::post('/register', 'register')->middleware('throttle:register')->name('register.submit');
 });
 
 // Auth
@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/', 'update')->name('update');
-        Route::put('/password', 'updatePassword')->name('password');
+        Route::put('/password', 'updatePassword')->middleware('throttle:password_update')->name('password');
     });
 
     // Karyawan
