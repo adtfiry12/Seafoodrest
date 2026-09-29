@@ -100,8 +100,19 @@
                     </div>
 
                     <div class="bg-white p-3.5 rounded-xl border border-slate-200">
-                        <span class="text-xs text-slate-400 block font-semibold uppercase">Waktu Tiba & Penerima</span>
-                        <span class="font-bold text-charcoal-900 block mt-1">{{ $transaksi->waktu_sampai ? $transaksi->waktu_sampai->format('H:i') . ' WIB' : '-' }}</span>
+                        <span class="text-xs text-slate-400 block font-semibold uppercase">Waktu Tiba / Estimasi</span>
+                        <span class="font-bold text-charcoal-900 block mt-1">
+                            @if($transaksi->waktu_sampai)
+                                {{ $transaksi->waktu_sampai->format('H:i') . ' WIB' }}
+                                @if($transaksi->durasi_pengantaran)
+                                    <span class="text-[10px] font-semibold text-emerald-600 block">({{ $transaksi->durasi_pengantaran }})</span>
+                                @endif
+                            @elseif($transaksi->status_pesanan === 'Diantar')
+                                <span class="text-amber-600 text-xs font-semibold">{{ $transaksi->estimasi_sampai }}</span>
+                            @else
+                                <span class="text-slate-400 font-normal">25 - 35 Menit</span>
+                            @endif
+                        </span>
                         <span class="text-xs text-slate-500">Penerima: <strong>{{ $transaksi->diterima_oleh ?? '-' }}</strong></span>
                     </div>
 

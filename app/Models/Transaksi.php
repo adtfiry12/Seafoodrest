@@ -74,6 +74,36 @@ class Transaksi extends Model
         return 'kode_transaksi';
     }
 
+    public function getDurasiPengantaranAttribute(): ?string
+    {
+        if ($this->waktu_berangkat && $this->waktu_sampai) {
+            $menit = max(1, (int) $this->waktu_berangkat->diffInMinutes($this->waktu_sampai));
+            return $menit . ' menit';
+        }
+
+        if ($this->waktu_berangkat && $this->status_pesanan === 'Diantar') {
+            $menit = max(1, (int) $this->waktu_berangkat->diffInMinutes(now()));
+            return $menit . ' menit di perjalanan';
+        }
+
+        return null;
+    }
+
+    public function getEstimasiSampaiAttribute(): ?string
+    {
+        if ($this->waktu_sampai) {
+            return $this->waktu_sampai->format('H:i') . ' WIB';
+        }
+
+        if ($this->waktu_berangkat) {
+            $estMulai = $this->waktu_berangkat->copy()->addMinutes(20)->format('H:i');
+            $estAkhir = $this->waktu_berangkat->copy()->addMinutes(35)->format('H:i');
+            return "{$estMulai} - {$estAkhir} WIB (±25 mnt)";
+        }
+
+        return '25 - 35 menit setelah berangkat';
+    }
+
     public function restoreStockIfNeeded(): void
     {
         if ($this->stok_dikembalikan) {

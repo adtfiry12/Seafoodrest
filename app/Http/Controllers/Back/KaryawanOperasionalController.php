@@ -131,13 +131,15 @@ class KaryawanOperasionalController extends Controller
             }
 
             if ($nextStatus === 'Diantar') {
-                $updateData['kurir_id'] = Auth::id();
+                $updateData['kurir_id'] = $transaksi->kurir_id ?? Auth::id();
                 $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? now();
             }
 
             if ($nextStatus === 'Selesai' && $transaksi->tipe_pesanan === 'Delivery') {
+                $updateData['kurir_id'] = $transaksi->kurir_id ?? Auth::id();
+                $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? ($transaksi->created_at ?? now());
                 $updateData['waktu_sampai'] = now();
-                $updateData['diterima_oleh'] = $request->input('diterima_oleh');
+                $updateData['diterima_oleh'] = $request->input('diterima_oleh') ?: ($transaksi->diterima_oleh ?? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan));
 
                 if ($request->hasFile('bukti_pengantaran')) {
                     $updateData['bukti_pengantaran'] = $request->file('bukti_pengantaran')->store('bukti_pengantaran', 'public');

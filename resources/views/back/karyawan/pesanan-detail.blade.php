@@ -94,6 +94,12 @@
                             <span class="text-charcoal-900 font-mono">{{ $transaksi->waktu_sampai->format('d M Y, H:i') }} WIB</span>
                         </div>
                     @endif
+                    @if($transaksi->durasi_pengantaran)
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">Durasi Pengantaran:</span>
+                            <span class="text-emerald-700 font-bold">{{ $transaksi->durasi_pengantaran }}</span>
+                        </div>
+                    @endif
                     @if($transaksi->diterima_oleh)
                         <div class="flex justify-between">
                             <span class="text-slate-400">Diterima Oleh:</span>

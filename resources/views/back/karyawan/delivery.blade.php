@@ -172,7 +172,10 @@
                                         {{ $trx->kurir->nama ?? 'Karyawan' }}
                                     </strong>
                                     <span class="text-slate-500 font-mono text-[11px]">
-                                        <i class="fa-regular fa-clock mr-0.5"></i> Berangkat {{ $trx->waktu_berangkat?->format('H:i') ?? '-' }}
+                                        <i class="fa-regular fa-clock mr-0.5"></i> Berangkat {{ $trx->waktu_berangkat?->format('H:i') ?? '-' }} WIB
+                                        @if($trx->waktu_berangkat)
+                                            <span class="text-amber-600 font-sans font-bold text-[10px] block text-right">({{ $trx->waktu_berangkat->diffForHumans(null, true) }} jalan)</span>
+                                        @endif
                                     </span>
                                 </div>
                             </div>

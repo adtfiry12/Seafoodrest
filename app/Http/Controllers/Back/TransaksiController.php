@@ -148,12 +148,28 @@ class TransaksiController extends Controller
             : $validated['status_pembayaran'];
 
         DB::transaction(function () use ($validated, $statusPembayaran, $transaksi) {
-            $transaksi->update([
+            $updateData = [
                 ...$validated,
                 'status_pembayaran' => $statusPembayaran,
                 'karyawan_id' => Auth::id(),
                 'dibayar_pada' => $statusPembayaran === 'Lunas' ? ($transaksi->dibayar_pada ?? now()) : null,
-            ]);
+            ];
+
+            if ($transaksi->tipe_pesanan === 'Delivery') {
+                if ($validated['status_pesanan'] === 'Diantar') {
+                    $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? now();
+                    $updateData['kurir_id'] = $transaksi->kurir_id ?? Auth::id();
+                }
+
+                if ($validated['status_pesanan'] === 'Selesai') {
+                    $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? ($transaksi->created_at ?? now());
+                    $updateData['waktu_sampai'] = $transaksi->waktu_sampai ?? now();
+                    $updateData['kurir_id'] = $transaksi->kurir_id ?? Auth::id();
+                    $updateData['diterima_oleh'] = $transaksi->diterima_oleh ?? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan ?? 'Pelanggan');
+                }
+            }
+
+            $transaksi->update($updateData);
 
             if ($validated['status_pesanan'] === 'Dibatalkan') {
                 $transaksi->restoreStockIfNeeded();

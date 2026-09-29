@@ -218,70 +218,83 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-5">
                     <!-- Kurir -->
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
-                            <i class="fa-solid fa-motorcycle text-gold-500"></i> Kurir Pengantar
-                        </p>
-                        <p class="text-sm font-bold text-charcoal-900 mt-1">
-                            {{ $transaksi->kurir->nama ?? 'Menunggu Penugasan' }}
-                        </p>
-                        <p class="text-[11px] text-slate-500 mt-0.5">
-                            {{ $transaksi->kurir ? 'Staff Kurir Niskala Samudra' : 'Akan ditugaskan saat siap antar' }}
-                        </p>
-                    </div>
-
-                    <!-- Waktu Berangkat -->
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
-                            <i class="fa-regular fa-clock text-gold-500"></i> Waktu Berangkat
-                        </p>
-                        <p class="text-sm font-bold text-charcoal-900 mt-1">
-                            {{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('H:i') . ' WIB' : 'Belum Berangkat' }}
-                        </p>
-                        <p class="text-[11px] text-slate-500 mt-0.5">
-                            {{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('d M Y') : 'Menunggu kurir berangkat' }}
-                        </p>
-                    </div>
-
-                    <!-- Waktu Tiba & Penerima -->
-                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                        <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
-                            <i class="fa-solid fa-house-chimney-user text-gold-500"></i> Penerima
-                        </p>
-                        <p class="text-sm font-bold text-charcoal-900 mt-1">
-                            {{ $transaksi->diterima_oleh ?? ($transaksi->status_pesanan === 'Selesai' ? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan) : 'Dalam Proses Antar') }}
-                        </p>
-                        <p class="text-[11px] text-slate-500 mt-0.5">
-                            {{ $transaksi->waktu_sampai ? 'Sampai pk ' . $transaksi->waktu_sampai->format('H:i') . ' WIB' : ($transaksi->status_pesanan === 'Diantar' ? 'Estimasi segera tiba' : '-') }}
-                        </p>
-                    </div>
-
-                    <!-- Bukti Pengantaran -->
                     <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
                         <div>
                             <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
-                                <i class="fa-solid fa-camera text-gold-500"></i> Bukti Pengantaran
+                                <i class="fa-solid fa-motorcycle text-gold-500"></i> Kurir Pengantar
+                            </p>
+                            <p class="text-sm font-bold text-charcoal-900 mt-1">
+                                {{ $transaksi->kurir->nama ?? 'Menunggu Penugasan' }}
+                            </p>
+                            <p class="text-[11px] text-slate-500 mt-0.5">
+                                {{ $transaksi->kurir ? 'Staff Kurir Niskala Samudra' : 'Akan ditugaskan saat siap antar' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Waktu Berangkat -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                                <i class="fa-regular fa-clock text-gold-500"></i> Waktu Berangkat
+                            </p>
+                            <p class="text-sm font-bold text-charcoal-900 mt-1">
+                                {{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('H:i') . ' WIB' : 'Belum Berangkat' }}
+                            </p>
+                            <p class="text-[11px] text-slate-500 mt-0.5">
+                                {{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('d M Y') : 'Menunggu kurir berangkat' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Waktu Tiba / Estimasi -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-hourglass-half text-gold-500"></i> {{ $transaksi->status_pesanan === 'Selesai' ? 'Waktu Tiba' : 'Estimasi Tiba' }}
+                            </p>
+                            <p class="text-sm font-bold text-charcoal-900 mt-1">
+                                @if($transaksi->waktu_sampai)
+                                    Sampai pk {{ $transaksi->waktu_sampai->format('H:i') }} WIB
+                                @elseif($transaksi->status_pesanan === 'Diantar')
+                                    {{ $transaksi->estimasi_sampai }}
+                                @else
+                                    25 - 35 Menit
+                                @endif
+                            </p>
+                            <p class="text-[11px] text-slate-500 mt-0.5">
+                                @if($transaksi->status_pesanan === 'Selesai' && $transaksi->durasi_pengantaran)
+                                    <span class="text-emerald-600 font-semibold"><i class="fa-solid fa-check mr-1"></i> Durasi: {{ $transaksi->durasi_pengantaran }}</span>
+                                @elseif($transaksi->status_pesanan === 'Diantar')
+                                    <span class="text-amber-600 font-semibold"><i class="fa-solid fa-route mr-1"></i> {{ $transaksi->durasi_pengantaran ?? 'Sedang di perjalanan' }}</span>
+                                @else
+                                    Dihitung saat kurir berangkat
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Penerima & Bukti Pengantaran -->
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <p class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center gap-1.5">
+                                <i class="fa-solid fa-house-chimney-user text-gold-500"></i> Penerima
+                            </p>
+                            <p class="text-sm font-bold text-charcoal-900 mt-1 truncate">
+                                {{ $transaksi->diterima_oleh ?? ($transaksi->status_pesanan === 'Selesai' ? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan) : 'Dalam Proses') }}
                             </p>
                             @if($transaksi->bukti_pengantaran)
-                                <div class="mt-2 flex items-center gap-3">
-                                    <button type="button" @click="showPod = true" class="relative group block w-14 h-14 rounded-lg overflow-hidden border border-slate-200 shadow-xs shrink-0 cursor-pointer">
+                                <div class="mt-2 flex items-center gap-2">
+                                    <button type="button" @click="showPod = true" class="relative group block w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shadow-2xs shrink-0 cursor-pointer">
                                         <img src="{{ asset('storage/' . $transaksi->bukti_pengantaran) }}" alt="Bukti Serah Terima" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                                        <div class="absolute inset-0 bg-charcoal-950/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs">
-                                            <i class="fa-solid fa-magnifying-glass-plus"></i>
-                                        </div>
                                     </button>
-                                    <div>
-                                        <button type="button" @click="showPod = true" class="text-xs font-bold text-gold-600 hover:text-gold-700 underline text-left block">
-                                            Lihat Foto Bukti
-                                        </button>
-                                        <span class="text-[10px] text-emerald-600 font-semibold block mt-0.5">
-                                            <i class="fa-solid fa-shield-check"></i> Terverifikasi
-                                        </span>
-                                    </div>
+                                    <button type="button" @click="showPod = true" class="text-[11px] font-bold text-gold-600 hover:text-gold-700 underline text-left leading-tight">
+                                        Foto Bukti Serah Terima
+                                    </button>
                                 </div>
                             @else
-                                <p class="text-xs text-slate-500 mt-2">
-                                    {{ $transaksi->status_pesanan === 'Selesai' ? 'Diserahkan langsung' : 'Tersedia setelah pesanan sampai' }}
+                                <p class="text-[11px] text-slate-400 mt-0.5">
+                                    {{ $transaksi->status_pesanan === 'Selesai' ? 'Diserahkan langsung' : 'Foto saat tiba di lokasi' }}
                                 </p>
                             @endif
                         </div>
@@ -289,10 +302,17 @@
                 </div>
 
                 @if($transaksi->status_pesanan === 'Diantar')
-                    <div class="mt-5 p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-3 text-amber-900 text-xs">
-                        <i class="fa-solid fa-circle-info text-amber-600 text-sm mt-0.5 shrink-0"></i>
+                    <div class="mt-5 p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/90 flex items-start gap-3 text-amber-900 text-xs">
+                        <i class="fa-solid fa-route text-amber-600 text-sm mt-0.5 shrink-0"></i>
                         <div>
-                            <span class="font-bold">Tips Pengantaran:</span> Kurir kami sedang bergerak menuju alamat Anda. Harap pastikan nomor telepon Anda (<strong>{{ $transaksi->pelanggan->no_hp ?? $transaksi->no_hp_pelanggan }}</strong>) aktif dan dapat dihubungi jika kurir membutuhkan konfirmasi alamat.
+                            <span class="font-bold">Kurir Sedang Mengantar:</span> Berangkat pada pukul <strong>{{ $transaksi->waktu_berangkat ? $transaksi->waktu_berangkat->format('H:i') . ' WIB' : '-' }}</strong> dengan estimasi tiba di lokasi Anda <strong>{{ $transaksi->estimasi_sampai }}</strong>. Pastikan nomor telepon Anda (<strong>{{ $transaksi->pelanggan->no_hp ?? $transaksi->no_hp_pelanggan }}</strong>) dapat dihubungi.
+                        </div>
+                    </div>
+                @elseif($transaksi->status_pesanan === 'Selesai')
+                    <div class="mt-5 p-3.5 rounded-xl bg-emerald-50/80 border border-emerald-200/90 flex items-start gap-3 text-emerald-900 text-xs">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-sm mt-0.5 shrink-0"></i>
+                        <div>
+                            <span class="font-bold">Pesanan Telah Tiba:</span> Makanan telah diserahkan kepada <strong>{{ $transaksi->diterima_oleh ?? ($transaksi->pelanggan->nama ?? 'Pelanggan') }}</strong> pada pukul <strong>{{ $transaksi->waktu_sampai ? $transaksi->waktu_sampai->format('H:i') . ' WIB' : '-' }}</strong> (Total waktu antar: <strong>{{ $transaksi->durasi_pengantaran ?? 'Tepat Waktu' }}</strong>). Selamat menikmati sajian dari Niskala Samudra!
                         </div>
                     </div>
                 @endif
