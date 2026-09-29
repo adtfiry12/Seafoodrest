@@ -42,28 +42,42 @@
             </div>
 
             {{-- Search Box --}}
-            <div class="w-full lg:w-80 shrink-0">
+            <div class="w-full lg:w-80 shrink-0" x-data="{ query: @js(request('search', '')) }">
                 <form action="{{ route('menu') }}" method="GET" class="relative">
                     @if(request('kategori'))
                         <input type="hidden" name="kategori" value="{{ request('kategori') }}">
                     @endif
                     <div class="relative flex items-center">
-                        <span class="absolute left-3.5 text-slate-400 pointer-events-none">
-                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
-                        </span>
                         <input type="text"
                                name="search"
-                               value="{{ request('search') }}"
+                               x-model="query"
                                placeholder="Cari menu seafood..."
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-20 py-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 focus:bg-white transition-all text-charcoal-900 placeholder:text-slate-400">
-                        @if(request('search'))
-                            <a href="{{ route('menu', array_filter(['kategori' => request('kategori')])) }}" class="absolute right-14 text-slate-400 hover:text-slate-600 p-1" title="Hapus pencarian">
-                                <i class="fa-solid fa-xmark text-xs"></i>
-                            </a>
-                        @endif
-                        <button type="submit" class="absolute right-1.5 px-3 py-1.5 bg-gold-600 hover:bg-gold-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition shadow-xs">
-                            Cari
-                        </button>
+                               class="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-20 py-2.5 text-xs sm:text-sm focus:ring-2 focus:ring-gold-500/20 focus:border-gold-500 focus:bg-white transition-all text-charcoal-900 placeholder:text-slate-400 hover:bg-white shadow-xs">
+
+                        <div class="absolute right-1.5 inset-y-0 flex items-center gap-1.5">
+                            @if(request('search'))
+                                <a href="{{ route('menu', array_filter(['kategori' => request('kategori')])) }}"
+                                   class="w-7 h-7 rounded-lg bg-slate-200 hover:bg-rose-100 text-slate-600 hover:text-rose-600 flex items-center justify-center transition-all shadow-xs active:scale-95"
+                                   title="Hapus pencarian">
+                                    <i class="fa-solid fa-xmark text-xs"></i>
+                                </a>
+                            @else
+                                <button type="button"
+                                        x-show="query && query.length > 0"
+                                        x-cloak
+                                        @click="query = ''"
+                                        class="w-7 h-7 rounded-lg bg-slate-200 hover:bg-rose-100 text-slate-600 hover:text-rose-600 flex items-center justify-center transition-all shadow-xs active:scale-95"
+                                        title="Hapus ketikan">
+                                    <i class="fa-solid fa-xmark text-xs"></i>
+                                </button>
+                            @endif
+
+                            <button type="submit"
+                                    class="w-8 h-8 rounded-lg bg-gold-600 hover:bg-gold-500 active:scale-95 text-white flex items-center justify-center transition-all shadow-xs"
+                                    title="Cari hidangan">
+                                <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
