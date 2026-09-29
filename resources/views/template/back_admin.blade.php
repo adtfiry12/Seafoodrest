@@ -13,6 +13,8 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans antialiased" x-data="{ sidebarOpen: false, deleteModalOpen: false, deleteForm: null, deleteMessage: '', actionModalOpen: false, actionForm: null, actionTitle: '', actionMessage: '', openDeleteModal(event, message) { this.deleteForm = event.currentTarget; this.deleteMessage = message; this.deleteModalOpen = true; }, openActionModal(event, title, message) { this.actionForm = event.currentTarget; this.actionTitle = title; this.actionMessage = message; this.actionModalOpen = true; } }">
+    {{-- Global Progress Bar for Admin SPA Navigation --}}
+    <div id="pjax-progress" class="fixed top-0 left-0 right-0 h-1 z-[100] transition-all duration-300 pointer-events-none opacity-0" style="background: linear-gradient(90deg, #d97706, #fbbf24, #f59e0b); width: 0%;"></div>
 
     <nav class="fixed top-0 z-50 w-full bg-charcoal-950 border-b border-charcoal-800 shadow-sm">
         <div class="px-3 py-3 lg:px-5 lg:pl-3">
@@ -63,7 +65,7 @@
         <div class="h-full px-3 pb-4 overflow-y-auto bg-white flex flex-col justify-between">
             <ul class="space-y-2 font-medium text-sm">
                 <li>
-                    <a href="{{ route('admin.dashboard') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.dashboard') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                    <a href="{{ route('admin.dashboard') }}" class="sidebar-nav-link flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.dashboard') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
                         <i class="fa-solid fa-house w-5 h-5 transition duration-75 {{ request()->routeIs('admin.dashboard') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3">Dashboard</span>
                     </a>
@@ -71,19 +73,19 @@
 
                 <li class="pt-4 mt-4 space-y-2 border-t border-slate-200">
                     <p class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Master Data</p>
-                    <a href="{{ route('admin.kategori.index') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.kategori.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                    <a href="{{ route('admin.kategori.index') }}" class="sidebar-nav-link flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.kategori.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
                         <i class="fa-solid fa-tags w-5 h-5 transition {{ request()->routeIs('admin.kategori.*') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3">Kategori</span>
                     </a>
-                    <a href="{{ route('admin.menu.index') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.menu.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                    <a href="{{ route('admin.menu.index') }}" class="sidebar-nav-link flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.menu.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
                         <i class="fa-solid fa-utensils w-5 h-5 transition {{ request()->routeIs('admin.menu.*') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3">Menu Seafood</span>
                     </a>
-                    <a href="{{ route('admin.slide.index') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.slide.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                    <a href="{{ route('admin.slide.index') }}" class="sidebar-nav-link flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.slide.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
                         <i class="fa-solid fa-image w-5 h-5 transition {{ request()->routeIs('admin.slide.*') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3">Slide Banner</span>
                     </a>
-                    <a href="{{ route('admin.pengguna.index') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.pengguna.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                    <a href="{{ route('admin.pengguna.index') }}" class="sidebar-nav-link flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.pengguna.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
                         <i class="fa-solid fa-users w-5 h-5 transition {{ request()->routeIs('admin.pengguna.*') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3">Pengguna</span>
                     </a>
@@ -97,7 +99,7 @@
 
                 <li class="pt-4 mt-4 space-y-2 border-t border-slate-200">
                     <p class="px-3 text-xs font-bold text-slate-400 uppercase tracking-wider">Operasional</p>
-                    <a href="{{ route('admin.transaksi.index') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.transaksi.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                    <a href="{{ route('admin.transaksi.index') }}" class="sidebar-nav-link flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.transaksi.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
                         <i class="fa-solid fa-file-invoice-dollar w-5 h-5 transition {{ request()->routeIs('admin.transaksi.*') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3 flex-1 whitespace-nowrap">Transaksi</span>
                         <!-- Tampil badge merah hanya jika ada yang Menunggu ACC -->
@@ -107,7 +109,7 @@
                     </a>
 
                     <!-- Laporan (Sudah ada route-nya di bawah nanti) -->
-                    <a href="{{ route('admin.laporan.index') }}" class="flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.laporan.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
+                    <a href="{{ route('admin.laporan.index') }}" class="sidebar-nav-link flex items-center p-3 rounded-lg group transition {{ request()->routeIs('admin.laporan.*') ? 'bg-charcoal-900 text-white shadow-md' : 'text-charcoal-900 hover:bg-slate-100' }}">
                         <i class="fa-solid fa-chart-line w-5 h-5 transition {{ request()->routeIs('admin.laporan.*') ? 'text-gold-500' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3">Laporan Penjualan</span>
                     </a>
@@ -136,7 +138,7 @@
 
     <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 z-30 bg-charcoal-900/50 sm:hidden"></div>
 
-    <div class="sm:ml-64 pt-16 sm:pt-20 pb-10">
+    <div class="sm:ml-64 pt-16 sm:pt-20 pb-10" id="admin-main-content" style="transition: opacity 150ms ease-in-out;">
         @yield('content')
     </div>
 
@@ -186,5 +188,177 @@
         </div>
     </div>
 
+    <script>
+        (function() {
+            const ProgressBar = {
+                el: null,
+                timer: null,
+                getEl() {
+                    if (!this.el) this.el = document.getElementById('pjax-progress');
+                    return this.el;
+                },
+                start() {
+                    const bar = this.getEl();
+                    if (!bar) return;
+                    clearInterval(this.timer);
+                    bar.style.opacity = '1';
+                    bar.style.width = '30%';
+                    let cur = 30;
+                    this.timer = setInterval(() => {
+                        if (cur < 85) {
+                            cur += Math.random() * 12;
+                            bar.style.width = Math.min(cur, 85) + '%';
+                        }
+                    }, 120);
+                },
+                done() {
+                    const bar = this.getEl();
+                    if (!bar) return;
+                    clearInterval(this.timer);
+                    bar.style.width = '100%';
+                    setTimeout(() => {
+                        bar.style.opacity = '0';
+                        setTimeout(() => {
+                            bar.style.width = '0%';
+                        }, 250);
+                    }, 180);
+                }
+            };
+
+            function updateSidebarActive(pathname) {
+                const clean = (p) => (p || '').replace(/\/$/, '');
+                const current = clean(pathname);
+
+                document.querySelectorAll('.sidebar-nav-link').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (!href) return;
+                    try {
+                        const linkPath = clean(new URL(href, window.location.origin).pathname);
+                        const isMatch = linkPath === current || (linkPath !== '/admin' && current.startsWith(linkPath));
+
+                        const icon = link.querySelector('i');
+                        if (isMatch) {
+                            link.classList.add('bg-charcoal-900', 'text-white', 'shadow-md');
+                            link.classList.remove('text-charcoal-900', 'hover:bg-slate-100');
+                            if (icon) {
+                                icon.classList.add('text-gold-500');
+                                icon.classList.remove('text-slate-400', 'group-hover:text-gold-600');
+                            }
+                        } else {
+                            link.classList.remove('bg-charcoal-900', 'text-white', 'shadow-md');
+                            link.classList.add('text-charcoal-900', 'hover:bg-slate-100');
+                            if (icon) {
+                                icon.classList.remove('text-gold-500');
+                                icon.classList.add('text-slate-400', 'group-hover:text-gold-600');
+                            }
+                        }
+                    } catch (e) {}
+                });
+            }
+
+            async function pjaxNavigate(url, updateHistory = true) {
+                const main = document.getElementById('admin-main-content');
+                if (!main) {
+                    window.location.href = url;
+                    return;
+                }
+
+                ProgressBar.start();
+                main.style.opacity = '0.4';
+
+                try {
+                    const res = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (!res.ok) throw new Error('Failed to load page');
+
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const newMain = doc.getElementById('admin-main-content');
+
+                    if (newMain) {
+                        main.innerHTML = newMain.innerHTML;
+                        const newTitle = doc.querySelector('title');
+                        if (newTitle) document.title = newTitle.innerText;
+
+                        // Re-execute scripts inside content (e.g. Chart.js)
+                        main.querySelectorAll('script').forEach(oldScript => {
+                            const newScript = document.createElement('script');
+                            Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                            newScript.textContent = oldScript.textContent;
+                            oldScript.parentNode.replaceChild(newScript, oldScript);
+                        });
+
+                        if (window.Alpine) {
+                            window.Alpine.initTree(main);
+                        }
+
+                        if (updateHistory) {
+                            window.history.pushState({ adminPjax: true }, '', url);
+                        }
+
+                        updateSidebarActive(new URL(url, window.location.origin).pathname);
+                        window.scrollTo({ top: 0, behavior: 'instant' });
+                    } else {
+                        window.location.href = url;
+                    }
+                } catch (e) {
+                    window.location.href = url;
+                } finally {
+                    main.style.opacity = '1';
+                    ProgressBar.done();
+                }
+            }
+
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (!link) return;
+
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                if (link.target === '_blank' || link.hasAttribute('download')) return;
+                if (link.origin !== window.location.origin) return;
+
+                const href = link.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('javascript:')) return;
+
+                const urlObj = new URL(link.href);
+                const path = urlObj.pathname;
+
+                if (!path.startsWith('/admin')) return;
+                if (path.includes('/delete') || path.includes('/destroy')) return;
+                if (link.hasAttribute('data-no-pjax')) return;
+
+                e.preventDefault();
+                pjaxNavigate(link.href);
+            });
+
+            document.addEventListener('submit', (e) => {
+                const form = e.target.closest('form');
+                if (!form || form.method.toUpperCase() !== 'GET') return;
+
+                const action = form.getAttribute('action') || window.location.href;
+                try {
+                    const actionUrl = new URL(action, window.location.origin);
+                    if (actionUrl.pathname.startsWith('/admin')) {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        const params = new URLSearchParams();
+                        for (const [key, value] of formData.entries()) {
+                            if (value.trim() !== '') params.append(key, value.trim());
+                        }
+                        const query = params.toString();
+                        const targetUrl = actionUrl.origin + actionUrl.pathname + (query ? '?' + query : '');
+                        pjaxNavigate(targetUrl);
+                    }
+                } catch(err) {}
+            });
+
+            window.addEventListener('popstate', () => {
+                if (window.location.pathname.startsWith('/admin')) {
+                    pjaxNavigate(window.location.href, false);
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

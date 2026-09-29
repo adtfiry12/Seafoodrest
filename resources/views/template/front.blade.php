@@ -12,6 +12,8 @@
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans flex flex-col min-h-screen" x-data="cartSystem()">
+    {{-- Global Progress Bar for Seamless Page Transitions --}}
+    <div id="pjax-progress" class="fixed top-0 left-0 right-0 h-1 z-[100] transition-all duration-300 pointer-events-none opacity-0" style="background: linear-gradient(90deg, #d97706, #fbbf24, #f59e0b); width: 0%;"></div>
 
     <div class="bg-charcoal-950 text-slate-300 text-xs py-2 hidden md:block">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
@@ -44,13 +46,13 @@
                     </a>
                 </div>
 
-                <nav class="hidden md:flex space-x-8 font-medium items-center text-sm uppercase tracking-wider">
-                    <a href="{{ route('home') }}" class="transition {{ request()->routeIs('home') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Beranda</a>
-                    <a href="{{ route('tentang') }}" class="transition {{ request()->routeIs('tentang') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Tentang Kami</a>
-                    <a href="{{ route('menu') }}" class="transition {{ request()->routeIs('menu') || request()->routeIs('menu.detail') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Menu</a>
-                    <a href="{{ route('kontak') }}" class="transition {{ request()->routeIs('kontak') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Kontak</a>
+                <nav class="hidden md:flex space-x-8 font-medium items-center text-sm uppercase tracking-wider" id="desktop-nav">
+                    <a href="{{ route('home') }}" class="nav-link transition {{ request()->routeIs('home') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Beranda</a>
+                    <a href="{{ route('tentang') }}" class="nav-link transition {{ request()->routeIs('tentang') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Tentang Kami</a>
+                    <a href="{{ route('menu') }}" class="nav-link transition {{ request()->routeIs('menu') || request()->routeIs('menu.detail') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Menu</a>
+                    <a href="{{ route('kontak') }}" class="nav-link transition {{ request()->routeIs('kontak') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">Kontak</a>
                     @auth
-                        <a href="{{ route('front.pesanan') }}" class="transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">PESANAN</a>
+                        <a href="{{ route('front.pesanan') }}" class="nav-link transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 hover:text-gold-600' }}">PESANAN</a>
                     @else
                         <button type="button" @click="loginHistoryModalOpen = true" class="transition text-charcoal-800 hover:text-gold-600">PESANAN</button>
                     @endauth
@@ -96,13 +98,13 @@
         </div>
 
         <div x-show="mobileMenuOpen" x-collapse x-cloak class="md:hidden bg-white border-t border-slate-100 shadow-xl absolute w-full left-0 top-full max-h-[calc(100vh-4.5rem)] overflow-y-auto">
-            <div class="px-4 pt-2 pb-6 space-y-1">
-                <a href="{{ route('home') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('home') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Beranda</a>
-                <a href="{{ route('tentang') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('tentang') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Tentang Kami</a>
-                <a href="{{ route('menu') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('menu') || request()->routeIs('menu.detail') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Menu</a>
-                <a href="{{ route('kontak') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('kontak') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Kontak</a>
+            <div class="px-4 pt-2 pb-6 space-y-1" id="mobile-nav">
+                <a href="{{ route('home') }}" @click="mobileMenuOpen = false" class="mobile-nav-link block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('home') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Beranda</a>
+                <a href="{{ route('tentang') }}" @click="mobileMenuOpen = false" class="mobile-nav-link block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('tentang') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Tentang Kami</a>
+                <a href="{{ route('menu') }}" @click="mobileMenuOpen = false" class="mobile-nav-link block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('menu') || request()->routeIs('menu.detail') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Menu</a>
+                <a href="{{ route('kontak') }}" @click="mobileMenuOpen = false" class="mobile-nav-link block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('kontak') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">Kontak</a>
                 @auth
-                    <a href="{{ route('front.pesanan') }}" class="block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">PESANAN</a>
+                    <a href="{{ route('front.pesanan') }}" @click="mobileMenuOpen = false" class="mobile-nav-link block px-3 py-3 text-sm uppercase tracking-wider border-b border-slate-50 transition {{ request()->routeIs('front.pesanan') ? 'text-gold-600 font-bold' : 'text-charcoal-800 font-medium' }}">PESANAN</a>
                 @else
                     <button type="button" @click="loginHistoryModalOpen = true; mobileMenuOpen = false" class="block w-full px-3 py-3 text-left text-sm uppercase tracking-wider border-b border-slate-50 transition text-charcoal-800 hover:text-gold-600">PESANAN</button>
                 @endauth
@@ -173,7 +175,7 @@
         </div>
     </div>
 
-    <div class="grow">
+    <div class="grow" id="main-content" style="transition: opacity 150ms ease-in-out;">
         @yield('content')
     </div>
 
@@ -335,6 +337,227 @@
                 formatRupiah(angka) { return new Intl.NumberFormat('id-ID', { minimumFractionDigits: 0 }).format(angka); }
             }));
         });
+    </script>
+    <script>
+        // High-performance SPA Router & Progress Bar for Niskala Samudra Front-end
+        (function() {
+            const ProgressBar = {
+                el: null,
+                timer: null,
+                getEl() {
+                    if (!this.el) this.el = document.getElementById('pjax-progress');
+                    return this.el;
+                },
+                start() {
+                    const bar = this.getEl();
+                    if (!bar) return;
+                    clearInterval(this.timer);
+                    bar.style.opacity = '1';
+                    bar.style.width = '30%';
+                    let cur = 30;
+                    this.timer = setInterval(() => {
+                        if (cur < 85) {
+                            cur += Math.random() * 12;
+                            bar.style.width = Math.min(cur, 85) + '%';
+                        }
+                    }, 120);
+                },
+                done() {
+                    const bar = this.getEl();
+                    if (!bar) return;
+                    clearInterval(this.timer);
+                    bar.style.width = '100%';
+                    setTimeout(() => {
+                        bar.style.opacity = '0';
+                        setTimeout(() => {
+                            bar.style.width = '0%';
+                        }, 250);
+                    }, 180);
+                }
+            };
+
+            function updateNavActiveState(pathname) {
+                const clean = (p) => (p || '/').replace(/\/$/, '') || '/';
+                const currentPath = clean(pathname);
+
+                document.querySelectorAll('.nav-link, .mobile-nav-link').forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (!href) return;
+                    try {
+                        const linkPath = clean(new URL(href, window.location.origin).pathname);
+                        const isMatch = linkPath === currentPath || (linkPath !== '/' && currentPath.startsWith(linkPath));
+
+                        if (isMatch) {
+                            link.classList.add('text-gold-600', 'font-bold');
+                            link.classList.remove('text-charcoal-800', 'font-medium');
+                        } else {
+                            link.classList.remove('text-gold-600', 'font-bold');
+                            link.classList.add('text-charcoal-800', 'font-medium');
+                        }
+                    } catch (e) {}
+                });
+            }
+
+            // --- Menu Catalog Filter AJAX (Seamless, Banner remains static) ---
+            window.navigateMenu = async function(url, updateHistory = true) {
+                const root = document.getElementById('menu-catalog-root');
+                if (!root) {
+                    window.pjaxNavigate(url, updateHistory);
+                    return;
+                }
+
+                root.classList.add('opacity-40', 'pointer-events-none');
+                ProgressBar.start();
+
+                try {
+                    const res = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (!res.ok) throw new Error('Response error');
+
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const newRoot = doc.getElementById('menu-catalog-root');
+
+                    if (newRoot) {
+                        root.innerHTML = newRoot.innerHTML;
+                        if (window.Alpine) {
+                            window.Alpine.initTree(root);
+                        }
+                        if (updateHistory) {
+                            window.history.pushState({ isMenuFilter: true }, '', url);
+                        }
+                        const newTitle = doc.querySelector('title');
+                        if (newTitle) document.title = newTitle.innerText;
+                    } else {
+                        window.location.href = url;
+                    }
+                } catch (e) {
+                    window.location.href = url;
+                } finally {
+                    root.classList.remove('opacity-40', 'pointer-events-none');
+                    ProgressBar.done();
+                }
+            };
+
+            // --- Global PJAX Navigation for #main-content ---
+            window.pjaxNavigate = async function(url, updateHistory = true) {
+                const main = document.getElementById('main-content');
+                if (!main) {
+                    window.location.href = url;
+                    return;
+                }
+
+                ProgressBar.start();
+                main.style.opacity = '0.5';
+
+                try {
+                    const res = await fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    });
+                    if (!res.ok) throw new Error('Failed to load page');
+
+                    const html = await res.text();
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const newMain = doc.getElementById('main-content');
+
+                    if (newMain) {
+                        main.innerHTML = newMain.innerHTML;
+                        const newTitle = doc.querySelector('title');
+                        if (newTitle) document.title = newTitle.innerText;
+
+                        if (window.Alpine) {
+                            window.Alpine.initTree(main);
+                        }
+
+                        if (updateHistory) {
+                            window.history.pushState({ pjax: true }, '', url);
+                        }
+
+                        updateNavActiveState(new URL(url, window.location.origin).pathname);
+                        window.scrollTo({ top: 0, behavior: 'instant' });
+                    } else {
+                        window.location.href = url;
+                    }
+                } catch (e) {
+                    window.location.href = url;
+                } finally {
+                    main.style.opacity = '1';
+                    ProgressBar.done();
+                }
+            };
+
+            // Global Click Interceptor
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (!link) return;
+
+                // Ignore modified clicks
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+                if (link.target === '_blank' || link.hasAttribute('download')) return;
+                if (link.origin !== window.location.origin) return;
+
+                const href = link.getAttribute('href');
+                if (!href || href === '#' || href.startsWith('javascript:')) return;
+
+                const urlObj = new URL(link.href);
+                const path = urlObj.pathname;
+
+                // Exclude system/auth/checkout/struk routes
+                const excluded = ['/admin', '/karyawan', '/login', '/logout', '/register', '/checkout', '/struk'];
+                if (excluded.some(prefix => path.startsWith(prefix))) return;
+                if (link.hasAttribute('data-no-pjax')) return;
+
+                // Case 1: Filter / pagination on /menu while already on /menu
+                const isCurrentlyMenu = window.location.pathname === '/menu';
+                const isTargetMenuListing = path === '/menu';
+                const isInsideMenuCatalog = !!e.target.closest('#menu-catalog-root');
+
+                if (isCurrentlyMenu && isTargetMenuListing && isInsideMenuCatalog) {
+                    if (!path.startsWith('/menu/')) {
+                        e.preventDefault();
+                        window.navigateMenu(link.href);
+                        return;
+                    }
+                }
+
+                // Case 2: Standard internal navigation between front pages
+                e.preventDefault();
+                window.pjaxNavigate(link.href);
+            });
+
+            // Global Form Submit Interceptor for Menu Search
+            document.addEventListener('submit', (e) => {
+                const form = e.target.closest('form');
+                if (!form) return;
+
+                const action = form.getAttribute('action') || window.location.href;
+                try {
+                    const actionUrl = new URL(action, window.location.origin);
+                    if (actionUrl.pathname === '/menu' && form.method.toUpperCase() === 'GET' && document.getElementById('menu-catalog-root')) {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        const params = new URLSearchParams();
+                        for (const [key, value] of formData.entries()) {
+                            if (value.trim() !== '') params.append(key, value.trim());
+                        }
+                        const query = params.toString();
+                        const targetUrl = actionUrl.origin + actionUrl.pathname + (query ? '?' + query : '');
+                        window.navigateMenu(targetUrl);
+                    }
+                } catch(err) {}
+            });
+
+            // Browser Back/Forward Navigation
+            window.addEventListener('popstate', (e) => {
+                const isMenuPage = window.location.pathname === '/menu';
+                if (isMenuPage && document.getElementById('menu-catalog-root')) {
+                    window.navigateMenu(window.location.href, false);
+                } else {
+                    window.pjaxNavigate(window.location.href, false);
+                }
+            });
+        })();
     </script>
 </body>
 </html>
