@@ -28,6 +28,11 @@ class AppServiceProvider extends ServiceProvider
         if (request()->header('x-forwarded-proto') === 'https' || request()->server('HTTP_X_FORWARDED_PROTO') === 'https') {
             URL::forceScheme('https');
         }
+
+        // Jika diakses melalui Cloudflare Tunnel / reverse proxy HTTPS, gunakan compiled assets agar tidak request ke localhost:5173
+        if (request()->hasHeader('cf-ray') || request()->header('x-forwarded-proto') === 'https' || str_contains((string) request()->getHost(), 'trycloudflare.com')) {
+            \Illuminate\Support\Facades\Vite::useHotFile(storage_path('vite.hot'));
+        }
         RateLimiter::for('login', function (Request $request): array {
             $email = Str::lower((string) $request->input('email'));
 
