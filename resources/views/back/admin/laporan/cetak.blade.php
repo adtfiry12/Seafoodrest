@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Penjualan {{ $nama_bulan }} {{ $tahun }} - Niskala Samudra</title>
+    <title>Laporan Penjualan {{ $periode }} - Niskala Samudra</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         body {
@@ -30,7 +30,7 @@
 
         <!-- Action Buttons (Hidden on Print) -->
         <div class="no-print flex items-center justify-between pb-6 mb-6 border-b border-slate-200">
-            <a href="{{ route('admin.laporan.index', ['bulan' => $bulan, 'tahun' => $tahun]) }}" class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
+            <a href="{{ route('admin.laporan.index', ['dari' => $dari->format('Y-m-d'), 'sampai' => $sampai->format('Y-m-d')]) }}" class="inline-flex items-center gap-2 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition">
                 <i class="fa-solid fa-arrow-left"></i> Kembali ke Laporan
             </a>
             <button onclick="window.print()" class="inline-flex items-center gap-2 px-5 py-2.5 bg-charcoal-900 text-white rounded-lg text-sm font-bold hover:bg-charcoal-800 shadow-md transition">
@@ -53,7 +53,7 @@
         <!-- Judul & Periode Laporan -->
         <div class="text-center mb-6">
             <h2 class="text-xl font-bold uppercase underline">LAPORAN REKAPITULASI PENJUALAN</h2>
-            <p class="text-sm font-sans mt-1">Periode: <strong>{{ $nama_bulan }} {{ $tahun }}</strong></p>
+            <p class="text-sm font-sans mt-1">Periode: <strong>{{ $periode }}</strong></p>
             <p class="text-xs font-sans text-slate-500">Dicetak pada: {{ now()->translatedFormat('d F Y, H:i') }} WIB oleh {{ Auth::user()->nama ?? 'Administrator' }}</p>
         </div>
 

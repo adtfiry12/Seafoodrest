@@ -3,8 +3,8 @@
 @section('content')
 <div class="space-y-6 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
-        <div class="flex items-center gap-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 lg:items-center gap-5 pb-5 border-b border-slate-200">
+        <div class="flex items-center gap-4 min-h-12">
             <div class="inline-flex items-center justify-center w-12 h-12 bg-gold-50 text-gold-600 rounded-xl shrink-0">
                 <i class="fa-solid fa-chart-line text-xl"></i>
             </div>
@@ -14,21 +14,18 @@
             </div>
         </div>
 
-        <!-- Filter Bulan & Tahun -->
-        <form action="{{ route('admin.laporan.index') }}" method="GET" class="flex flex-wrap sm:flex-nowrap gap-2 w-full sm:w-auto">
-            <select name="bulan" class="w-full sm:w-auto bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 py-2 shadow-sm">
-                @for($i = 1; $i <= 12; $i++)
-                    <option value="{{ sprintf('%02d', $i) }}" {{ $bulan == sprintf('%02d', $i) ? 'selected' : '' }}>
-                        {{ date('F', mktime(0, 0, 0, $i, 1)) }}
-                    </option>
-                @endfor
-            </select>
-            <select name="tahun" class="w-full sm:w-auto bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 py-2 shadow-sm">
-                @for($i = date('Y'); $i >= date('Y') - 3; $i--)
-                    <option value="{{ $i }}" {{ $tahun == $i ? 'selected' : '' }}>{{ $i }}</option>
-                @endfor
-            </select>
-            <button type="submit" class="w-full sm:w-auto px-4 py-2 bg-charcoal-900 text-white text-sm font-semibold rounded-lg hover:bg-charcoal-800 transition shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-filter"></i> Filter</button>
+        <!-- Filter Periode -->
+        <form action="{{ route('admin.laporan.index') }}" method="GET" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 items-end gap-2 w-full">
+            <div>
+                <label for="dari" class="block mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Dari</label>
+                <input id="dari" type="date" name="dari" value="{{ $dari->format('Y-m-d') }}" class="h-10 w-full bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 shadow-sm">
+            </div>
+            <div>
+                <label for="sampai" class="block mb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">Sampai</label>
+                <input id="sampai" type="date" name="sampai" value="{{ $sampai->format('Y-m-d') }}" class="h-10 w-full bg-white border border-slate-200 text-sm rounded-lg focus:ring-gold-500 px-3 shadow-sm">
+            </div>
+            <button type="submit" class="h-10 w-full px-3 bg-charcoal-900 text-white text-sm font-semibold rounded-lg hover:bg-charcoal-800 transition shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-filter"></i><span>Filter</span></button>
+            <a href="{{ route('admin.laporan.cetak', request()->query()) }}" target="_blank" class="h-10 w-full px-3 bg-gold-600 text-white text-sm font-semibold rounded-lg hover:bg-gold-500 transition shadow-sm flex items-center justify-center gap-2"><i class="fa-solid fa-print"></i><span>Cetak</span></a>
         </form>
     </div>
 
@@ -77,7 +74,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-12 text-center text-slate-400">Tidak ada data penjualan di bulan ini.</td>
+                            <td colspan="4" class="px-6 py-12 text-center text-slate-400">Tidak ada data penjualan pada periode ini.</td>
                         </tr>
                     @endforelse
                 </tbody>
