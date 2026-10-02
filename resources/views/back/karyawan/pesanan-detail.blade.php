@@ -30,12 +30,18 @@
                             <p class="mt-1 text-xs text-blue-700 bg-blue-50 p-2 rounded-lg"><i class="fa-solid fa-map-pin mr-1"></i> Patokan: {{ $transaksi->patokan_alamat }}</p>
                         @endif
                         <div class="mt-3 flex gap-2">
-                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($transaksi->alamat) }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg text-xs font-bold transition">
-                                <i class="fa-solid fa-location-arrow"></i> Rute Maps
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($transaksi->alamat) }}"
+                               target="_blank"
+                               class="group inline-flex items-center gap-1.5 px-3.5 py-2 bg-blue-50/90 hover:bg-blue-600 text-blue-700 hover:text-white rounded-xl text-xs font-bold border border-blue-200/80 hover:border-blue-600 transition-all duration-200 shadow-2xs active:scale-95">
+                                <i class="fa-solid fa-location-arrow text-xs text-blue-600 group-hover:text-white transition-colors duration-200"></i>
+                                <span>Rute Maps</span>
                             </a>
                             @php $cleanPhone = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $transaksi->no_hp_pelanggan)); @endphp
-                            <a href="https://wa.me/{{ $cleanPhone }}" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg text-xs font-bold transition">
-                                <i class="fa-brands fa-whatsapp"></i> Chat WA
+                            <a href="https://wa.me/{{ $cleanPhone }}"
+                               target="_blank"
+                               class="group inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50/90 hover:bg-emerald-600 text-emerald-700 hover:text-white rounded-xl text-xs font-bold border border-emerald-200/80 hover:border-emerald-600 transition-all duration-200 shadow-2xs active:scale-95">
+                                <i class="fa-brands fa-whatsapp text-sm text-emerald-600 group-hover:text-white transition-colors duration-200"></i>
+                                <span>Chat WA</span>
                             </a>
                         </div>
                     </div>

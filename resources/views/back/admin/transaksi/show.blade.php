@@ -53,11 +53,19 @@
                 <p class="text-sm font-medium mt-2"><span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded border border-blue-200">{{ $transaksi->tipe_pesanan }}</span></p>
 
                 @if($transaksi->tipe_pesanan == 'Delivery')
-                    <div class="mt-3 p-3 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1">
+                    <div class="mt-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-600 space-y-2">
                         <p><strong>Alamat:</strong> {{ $transaksi->alamat }}</p>
                         @if($transaksi->patokan_alamat)
                             <p class="text-gold-700"><strong>Patokan:</strong> {{ $transaksi->patokan_alamat }}</p>
                         @endif
+                        <div class="pt-1">
+                            <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($transaksi->alamat) }}"
+                               target="_blank"
+                               class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50/90 hover:bg-blue-600 text-blue-700 hover:text-white rounded-lg text-xs font-semibold border border-blue-200/80 hover:border-blue-600 transition-all duration-200 shadow-2xs active:scale-95">
+                                <i class="fa-solid fa-location-arrow text-[11px] text-blue-600 group-hover:text-white transition-colors duration-200"></i>
+                                <span>Buka Rute Maps</span>
+                            </a>
+                        </div>
                     </div>
                 @endif
             </div>

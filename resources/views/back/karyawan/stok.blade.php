@@ -75,8 +75,8 @@
                             <h3 class="font-semibold text-xs sm:text-sm text-charcoal-950 leading-snug truncate" title="{{ $menu->nama_menu }}">{{ $menu->nama_menu }}</h3>
                             <p class="text-xs text-slate-500 mt-1 tabular-nums">Rp {{ number_format($menu->harga, 0, ',', '.') }}</p>
                         </div>
-                        <a href="{{ route('karyawan.stok.detail', $menu->slug) }}" title="Lihat detail menu dan pesanan" aria-label="Lihat detail menu dan pesanan" class="inline-flex items-center justify-center w-7 h-7 shrink-0 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition">
-                            <i class="fa-solid fa-eye text-xs"></i>
+                        <a href="{{ route('karyawan.stok.detail', $menu->slug) }}" title="Lihat detail menu dan pesanan" aria-label="Lihat detail menu dan pesanan" class="group inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 shadow-2xs active:scale-95">
+                            <i class="fa-solid fa-eye text-xs group-hover:scale-110 transition-transform"></i>
                         </a>
                     </div>
                 </div>

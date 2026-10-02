@@ -32,7 +32,7 @@
                     </div>
                     <div class="sm:col-span-2">
                         <p class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider mb-0.5">Metode Pembayaran</p>
-                        <p class="font-medium text-charcoal-900">{{ $transaksi->metode_pembayaran }}</p>
+                        <p class="font-medium text-charcoal-900">{{ $transaksi->metode_pembayaran === 'QRIS' ? 'QRIS / Transfer Bank' : $transaksi->metode_pembayaran }}</p>
                     </div>
                 </div>
             </div>

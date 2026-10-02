@@ -28,5 +28,7 @@ class DatabaseSeeder extends Seeder
                 'foto' => null,
             ]
         );
+
+        $this->call(MenuDanSlideSeeder::class);
     }
 }

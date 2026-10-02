@@ -23,24 +23,61 @@
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-4">
                     <h3 class="font-bold text-charcoal-900 border-b border-slate-100 pb-2">Detail Pesanan</h3>
 
+                    @php
+                        $pelangganOptions = collect([
+                            ['id' => '', 'nama' => '', 'no_hp' => '', 'label' => '-- Pelanggan Umum (Guest) --']
+                        ])->merge(
+                            $pelanggan->map(fn($p) => [
+                                'id' => (string) $p->id,
+                                'nama' => $p->nama,
+                                'no_hp' => $p->no_hp ?? '',
+                                'label' => $p->nama . ($p->no_hp ? ' (' . $p->no_hp . ')' : '')
+                            ])
+                        )->values();
+                    @endphp
+
                     <div>
                         <label class="block text-sm font-semibold text-charcoal-900 mb-2">Pelanggan</label>
-                        <select name="pengguna_id" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
-                            <option value="">-- Pelanggan Umum (Guest) --</option>
-                            @foreach($pelanggan as $p)
-                                <option value="{{ $p->id }}">{{ $p->nama }} - {{ $p->no_hp }}</option>
-                            @endforeach
-                        </select>
+                        <div x-data="searchablePelangganSelect(@js($pelangganOptions), @js((string) old('pengguna_id')))" @click.outside="open = false" class="relative">
+                            <input type="hidden" name="pengguna_id" :value="selected">
+                            <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
+                                <span class="truncate" x-text="selectedLabel() || '-- Pelanggan Umum (Guest) --'" :class="selected ? 'text-charcoal-900 font-medium' : 'text-slate-500'"></span>
+                                <i class="fa-solid fa-chevron-down text-xs text-slate-400 shrink-0 ml-2 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                            </button>
+                            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                <div class="border-b border-slate-100 p-2 bg-slate-50/50">
+                                    <div class="relative">
+                                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
+                                        <input type="search" x-model="search" placeholder="Cari nama atau no. HP..." class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs sm:text-sm text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
+                                    </div>
+                                </div>
+                                <div class="max-h-56 overflow-y-auto p-1 custom-scrollbar divide-y divide-slate-50">
+                                    <button type="button" x-show="filteredOptions().length === 0" class="w-full px-3 py-3 text-center text-xs text-slate-400" disabled>Tidak ada data pelanggan ditemukan.</button>
+                                    <template x-for="option in filteredOptions()" :key="option.id">
+                                        <button type="button" @click="select(option)" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm text-charcoal-900 hover:bg-gold-50 hover:text-gold-700 transition">
+                                            <div class="truncate">
+                                                <span class="font-medium" x-text="option.nama || option.label"></span>
+                                                <span x-show="option.no_hp" class="text-xs text-slate-400 ml-1.5" x-text="'(' + option.no_hp + ')'"></span>
+                                            </div>
+                                            <i x-show="selected == String(option.id)" class="fa-solid fa-check text-gold-600 shrink-0 ml-2"></i>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                        @error('pengguna_id') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label for="nama_pelanggan" class="block text-sm font-semibold text-charcoal-900 mb-2">Nama Pemesan</label>
-                        <input type="text" name="nama_pelanggan" id="nama_pelanggan" placeholder="Nama pelanggan umum" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
+                        <input type="text" name="nama_pelanggan" id="nama_pelanggan" value="{{ old('nama_pelanggan') }}" placeholder="Nama pelanggan umum" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
+                        @error('nama_pelanggan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label for="no_hp_pelanggan" class="block text-sm font-semibold text-charcoal-900 mb-2">No. HP Pemesan</label>
-                        <input type="text" name="no_hp_pelanggan" id="no_hp_pelanggan" placeholder="Nomor WhatsApp pelanggan" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
+                        <input type="text" name="no_hp_pelanggan" id="no_hp_pelanggan" value="{{ old('no_hp_pelanggan') }}" placeholder="Nomor WhatsApp pelanggan" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
+                        @error('no_hp_pelanggan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
@@ -154,6 +191,44 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
+        Alpine.data('searchablePelangganSelect', (options, initialValue = '') => ({
+            open: false,
+            search: '',
+            selected: String(initialValue || ''),
+            options,
+
+            filteredOptions() {
+                const query = this.search.toLowerCase().trim();
+                if (!query) return this.options;
+                return this.options.filter((opt) =>
+                    opt.label.toLowerCase().includes(query) ||
+                    (opt.no_hp && opt.no_hp.toLowerCase().includes(query)) ||
+                    (opt.nama && opt.nama.toLowerCase().includes(query))
+                );
+            },
+
+            selectedLabel() {
+                const found = this.options.find((opt) => String(opt.id) === this.selected);
+                return found ? found.label : '-- Pelanggan Umum (Guest) --';
+            },
+
+            select(option) {
+                this.selected = String(option.id);
+                this.open = false;
+                this.search = '';
+
+                const namaInput = document.getElementById('nama_pelanggan');
+                const hpInput = document.getElementById('no_hp_pelanggan');
+                if (option.id) {
+                    if (namaInput) namaInput.value = option.nama;
+                    if (hpInput) hpInput.value = option.no_hp || '';
+                } else {
+                    if (namaInput) namaInput.value = '';
+                    if (hpInput) hpInput.value = '';
+                }
+            }
+        }));
+
         Alpine.data('posSystem', (menus) => ({
             tipePesanan: 'Dine-In',
             cart: [],

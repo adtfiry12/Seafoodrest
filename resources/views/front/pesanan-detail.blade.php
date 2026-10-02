@@ -362,7 +362,7 @@
             <div class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs">
                 <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Metode Bayar</p>
                 <p class="mt-1.5 font-semibold text-charcoal-950 text-sm sm:text-base flex items-center gap-2">
-                    <i class="fa-solid fa-wallet text-gold-500"></i> {{ $transaksi->metode_pembayaran }}
+                    <i class="fa-solid fa-wallet text-gold-500"></i> {{ $transaksi->metode_pembayaran === 'QRIS' ? 'QRIS / Transfer' : $transaksi->metode_pembayaran }}
                 </p>
             </div>
         </div>

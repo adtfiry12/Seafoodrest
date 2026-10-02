@@ -45,14 +45,14 @@
                     </span>
                     <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
                 </button>
-                <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-30 mt-2 min-w-[240px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 min-w-[240px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
                     <div class="border-b border-slate-100 p-2">
                         <div class="relative">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
                             <input type="search" x-model="search" placeholder="Cari kategori..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-charcoal-900 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
                         </div>
                     </div>
-                    <div class="max-h-60 overflow-y-auto p-1">
+                    <div class="max-h-60 overflow-y-auto p-1 custom-scrollbar">
                         <!-- Option: Semua Kategori -->
                         <button type="button" @click="select('')" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selected === '' ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
                             <span>Semua Kategori</span>

@@ -112,17 +112,17 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 text-right space-x-1">
-                                <a href="{{ route('admin.transaksi.show', $item->kode_transaksi) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200" title="Detail Invoice">
-                                    <i class="fa-solid fa-eye"></i>
+                                <a href="{{ route('admin.transaksi.show', $item->kode_transaksi) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-blue-600 text-slate-500 hover:text-white border border-slate-200/80 hover:border-blue-600 transition-all duration-200 shadow-2xs active:scale-95" title="Detail Invoice">
+                                    <i class="fa-solid fa-eye text-xs"></i>
                                 </a>
-                                <a href="{{ route('admin.transaksi.edit', $item->kode_transaksi) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition-all duration-200" title="Update Status">
-                                    <i class="fa-solid fa-pen-to-square"></i>
+                                <a href="{{ route('admin.transaksi.edit', $item->kode_transaksi) }}" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 shadow-2xs active:scale-95" title="Update Status">
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
                                 </a>
                                 <form action="{{ route('admin.transaksi.destroy', $item->kode_transaksi) }}" method="POST" class="inline-block" @submit.prevent="openDeleteModal($event, 'Hapus transaksi ini? Stok menu akan dikembalikan.')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all duration-200">
-                                        <i class="fa-solid fa-trash"></i>
+                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-rose-600 text-slate-500 hover:text-white border border-slate-200/80 hover:border-rose-600 transition-all duration-200 shadow-2xs active:scale-95" title="Hapus Transaksi">
+                                        <i class="fa-solid fa-trash text-xs"></i>
                                     </button>
                                 </form>
                             </td>

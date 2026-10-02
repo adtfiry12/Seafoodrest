@@ -4,20 +4,40 @@
 
 <div class="space-y-6 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-    <div class="bg-charcoal-950 rounded-2xl p-6 sm:p-7 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-charcoal-800 shadow-sm relative overflow-hidden">
-        <div class="relative z-10">
-            <h1 class="text-xl sm:text-2xl font-serif font-bold tracking-tight">
-                Selamat Datang, <span class="text-gold-400 font-semibold">{{ Auth::user()->nama ?? 'Admin' }}</span> 👋
+    <!-- Header Ringkasan Penjualan Restoran -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-1.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/70 font-semibold text-[10px] uppercase tracking-wider">
+                    <i class="fa-solid fa-utensils text-[9px] text-amber-600"></i> Niskala Samudra Resto
+                </span>
+                <span class="text-slate-300">•</span>
+                <span class="font-medium text-slate-500 text-xs">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal-950 tracking-tight">
+                Ringkasan Penjualan & Operasional
             </h1>
-            <p class="text-slate-400 mt-1 text-xs sm:text-sm leading-relaxed max-w-xl">
-                Ringkasan performa penjualan dan status operasional Niskala Samudra hari ini, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}.
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">
+                Pantau perputaran omzet harian, antrean transaksi masuk, dan performa menu hidangan hari ini.
             </p>
         </div>
-        <div class="relative z-10 hidden md:block">
-            <div class="bg-charcoal-900/90 border border-charcoal-800 px-4 py-2.5 rounded-xl text-center shadow-2xs">
-                <p class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold mb-0.5">Waktu Saat Ini</p>
-                <p class="text-lg font-bold text-gold-400 font-mono tracking-wide" x-data="{ time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }" x-init="setInterval(() => time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), 1000)" x-text="time"></p>
+
+        <div class="flex items-center gap-2.5 shrink-0">
+            <div class="bg-white border border-slate-200/90 rounded-xl px-3.5 py-2 shadow-2xs text-right">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu Layanan</p>
+                <p class="text-sm font-bold font-mono text-charcoal-900 tabular-nums"
+                   x-data="{ time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }"
+                   x-init="setInterval(() => time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), 1000)"
+                   x-text="time + ' WIB'"></p>
             </div>
+            <a href="{{ route('admin.transaksi.create') }}" class="inline-flex items-center gap-2 px-4 py-2.5 bg-charcoal-950 hover:bg-gold-600 text-white text-xs font-semibold rounded-xl shadow-xs transition active:scale-95">
+                <i class="fa-solid fa-plus text-[10px]"></i>
+                <span>Catat Transaksi</span>
+            </a>
+            <a href="{{ route('admin.laporan.index') }}" class="group inline-flex items-center gap-2 px-3.5 py-2.5 bg-white hover:bg-gold-50 hover:text-gold-900 border border-slate-200/90 hover:border-gold-300 text-slate-700 text-xs font-semibold rounded-xl shadow-2xs transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-chart-pie text-xs text-gold-600 group-hover:text-gold-700 transition-colors"></i>
+                <span class="hidden sm:inline">Rekap Laporan</span>
+            </a>
         </div>
     </div>
 
@@ -37,8 +57,8 @@
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Pesanan Menunggu</p>
-                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $pesananBaru }} <span class="text-xs text-slate-500 font-normal">Antrian</span></h3>
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Antrean Pesanan</p>
+                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $pesananBaru }} <span class="text-xs text-slate-500 font-normal">Perlu Konfirmasi</span></h3>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center text-sm shrink-0">
                     <i class="fa-solid fa-bell-concierge"></i>
@@ -49,8 +69,8 @@
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Menu</p>
-                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $totalMenu }} <span class="text-xs text-slate-500 font-normal">Item Aktif</span></h3>
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Menu Hidangan</p>
+                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $totalMenu }} <span class="text-xs text-slate-500 font-normal">Varian Aktif</span></h3>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-sm shrink-0">
                     <i class="fa-solid fa-utensils"></i>
@@ -61,8 +81,8 @@
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Pelanggan</p>
-                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $totalPelanggan }} <span class="text-xs text-slate-500 font-normal">Akun</span></h3>
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Pelanggan</p>
+                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $totalPelanggan }} <span class="text-xs text-slate-500 font-normal">Akun Terdaftar</span></h3>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center text-sm shrink-0">
                     <i class="fa-solid fa-users"></i>
@@ -74,7 +94,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <div class="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3.5">
-                <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Grafik Pendapatan (7 Hari Terakhir)</h3>
+                <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Tren Penjualan 7 Hari Terakhir</h3>
             </div>
             <div class="relative h-72 w-full">
                 <canvas id="salesChart"></canvas>
@@ -82,7 +102,7 @@
         </div>
 
         <div class="lg:col-span-1 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Menu Paling Laris</h3>
+            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Menu Paling Diminati</h3>
             <div class="space-y-3.5">
                 @forelse($topMenus as $top)
                     <div class="flex items-center gap-3">
@@ -112,8 +132,8 @@
 
     <div class="bg-white border border-slate-200/80 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
         <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">5 Transaksi Terbaru</h3>
-            <a href="{{ route('admin.transaksi.index') }}" class="text-xs font-semibold text-gold-700 hover:text-gold-800 transition">Lihat Semua &rarr;</a>
+            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Transaksi Terkini</h3>
+            <a href="{{ route('admin.transaksi.index') }}" class="text-xs font-semibold text-gold-700 hover:text-gold-800 transition">Semua Transaksi &rarr;</a>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-left text-xs sm:text-sm text-slate-600">
@@ -145,8 +165,8 @@
                                 @endif
                             </td>
                             <td class="px-5 py-3.5 text-right">
-                                <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" title="Lihat detail transaksi" aria-label="Lihat detail transaksi" class="inline-flex items-center justify-center w-8 h-8 bg-slate-100 text-slate-500 hover:bg-gold-50 hover:text-gold-700 rounded-lg transition-colors text-xs">
-                                    <i class="fa-solid fa-eye"></i>
+                                <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" title="Lihat detail transaksi" aria-label="Lihat detail transaksi" class="group inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 text-xs shadow-2xs active:scale-95">
+                                    <i class="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
                                 </a>
                             </td>
                         </tr>

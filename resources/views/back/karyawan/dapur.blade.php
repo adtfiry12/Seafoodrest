@@ -24,8 +24,8 @@
 
             <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                 <span class="text-xs font-semibold text-slate-400 hidden sm:block">Auto Refresh: <span class="text-emerald-600">ON</span></span>
-                <button onclick="window.location.reload();" class="px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:bg-slate-50 hover:text-gold-600 transition shadow-xs flex items-center gap-2">
-                    <i class="fa-solid fa-rotate-right text-xs"></i> <span>Refresh</span>
+                <button onclick="window.location.reload();" class="group px-4 py-2.5 bg-white border border-slate-200/90 hover:border-gold-300 hover:bg-gold-50/80 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-gold-900 transition-all duration-200 shadow-2xs flex items-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-rotate-right text-xs text-gold-600 group-hover:rotate-180 transition-transform duration-500"></i> <span>Refresh</span>
                 </button>
             </div>
         </div>
@@ -59,7 +59,7 @@
                 <div class="p-4 flex-1 bg-white space-y-3">
                     <div class="flex items-center justify-between gap-3">
                         <div><p class="text-[11px] text-slate-400 font-medium">Pelanggan</p><p class="font-semibold text-charcoal-950 text-xs sm:text-sm truncate">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</p></div>
-                        <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-7 h-7 shrink-0 rounded-lg text-slate-400 hover:text-gold-600 hover:bg-gold-50 transition"><i class="fa-solid fa-eye text-xs"></i></a>
+                        <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="group inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 shadow-2xs active:scale-95"><i class="fa-solid fa-eye text-xs group-hover:scale-110 transition-transform"></i></a>
                     </div>
                     <div class="flex items-center justify-between rounded-xl bg-amber-50/70 border border-amber-200/60 px-3.5 py-2.5 text-xs sm:text-sm"><span class="text-amber-800 font-medium flex items-center gap-1.5"><i class="fa-solid fa-utensils text-xs"></i> Total menu</span><strong class="text-amber-900 font-semibold">{{ $trx->detail->sum('qty') }} Porsi</strong></div>
                     @if($trx->catatan)
@@ -74,11 +74,11 @@
                         <!-- Logika Cerdas: Jika Delivery masuk antrean Siap Diantar, Jika Makan di Tempat langsung Selesai -->
                         <input type="hidden" name="status_pesanan" value="{{ $trx->tipe_pesanan == 'Delivery' ? 'Siap Diantar' : 'Selesai' }}">
 
-                        <button type="submit" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-charcoal-950 hover:text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2">
+                        <button type="submit" class="group w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-charcoal-950 hover:text-white text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 shadow-xs flex items-center justify-center gap-2 active:scale-95">
                             @if($trx->tipe_pesanan == 'Delivery')
-                                <i class="fa-solid fa-box-open text-xs"></i> <span>Selesai Dimasak (Siap Diantar)</span>
+                                <i class="fa-solid fa-box-open text-xs group-hover:scale-110 transition-transform"></i> <span>Selesai Dimasak (Siap Diantar)</span>
                             @else
-                                <i class="fa-solid fa-bell-concierge text-xs"></i> <span>Selesai Dimasak & Sajikan</span>
+                                <i class="fa-solid fa-bell-concierge text-xs group-hover:scale-110 transition-transform"></i> <span>Selesai Dimasak & Sajikan</span>
                             @endif
                         </button>
                     </form>

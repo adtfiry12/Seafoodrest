@@ -54,7 +54,7 @@
                     @auth
                         <a href="{{ route('front.pesanan') }}" class="nav-link py-1 transition-colors {{ request()->routeIs('front.pesanan*') ? 'text-gold-500' : 'text-slate-700 hover:text-gold-500' }}">Pesanan</a>
                     @else
-                        <button type="button" @click="loginHistoryModalOpen = true" class="py-1 transition-colors text-slate-700 hover:text-gold-500 uppercase tracking-wider font-bold">Pesanan</button>
+                        <button type="button" @click="loginHistoryModalOpen = true" class="nav-link py-1 transition-colors text-slate-700 hover:text-gold-500 uppercase tracking-wider font-bold text-xs lg:text-[13px]">Pesanan</button>
                     @endauth
                 </nav>
 
@@ -106,11 +106,11 @@
                 @auth
                     <a href="{{ route('front.pesanan') }}" @click="mobileMenuOpen = false" class="mobile-nav-link block px-3 py-2.5 rounded-lg transition {{ request()->routeIs('front.pesanan*') ? 'text-gold-600 bg-gold-50' : 'text-slate-700 hover:bg-slate-50' }}">Pesanan</a>
                 @else
-                    <button type="button" @click="loginHistoryModalOpen = true; mobileMenuOpen = false" class="block w-full px-3 py-2.5 text-left rounded-lg transition text-slate-700 hover:text-gold-600 hover:bg-slate-50">Pesanan</button>
+                    <button type="button" @click="loginHistoryModalOpen = true; mobileMenuOpen = false" class="mobile-nav-link block w-full px-3 py-2.5 text-left rounded-lg transition text-slate-700 hover:text-gold-600 hover:bg-slate-50 uppercase font-bold tracking-wider">Pesanan</button>
                 @endauth
 
                 @guest
-                    <a href="{{ route('login') }}" class="block px-3 py-2.5 mt-3 text-sm font-semibold text-white bg-charcoal-900 text-center rounded-xl hover:bg-gold-600 transition shadow-xs">Login / Masuk</a>
+                    <a href="{{ route('login') }}" class="block px-3 py-2.5 mt-3 text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-charcoal-900 text-center rounded-xl hover:bg-gold-600 transition shadow-xs">Login / Masuk</a>
                 @else
                     <div class="mt-3 pt-3 border-t border-slate-100">
                         <p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Akun Saya</p>

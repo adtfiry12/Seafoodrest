@@ -3,98 +3,137 @@
 @section('content')
 
 @if($slides->count() > 0)
-    <section class="relative bg-charcoal-950 overflow-hidden group select-none"
+    <section class="relative bg-charcoal-950 overflow-hidden group select-none touch-pan-y"
              x-data="{
                  activeSlide: 1,
                  totalSlides: {{ $slides->count() }},
                  isPaused: false,
+                 timer: null,
+                 touchStartX: 0,
+                 touchStartY: 0,
+                 touchEndX: 0,
+                 touchEndY: 0,
                  init() {
-                     setInterval(() => {
+                     this.startTimer();
+                 },
+                 startTimer() {
+                     this.stopTimer();
+                     this.timer = setInterval(() => {
                          if (!this.isPaused) {
-                             this.activeSlide = this.activeSlide === this.totalSlides ? 1 : this.activeSlide + 1;
+                             this.next();
                          }
                      }, 6000);
                  },
+                 stopTimer() {
+                     if (this.timer) {
+                         clearInterval(this.timer);
+                         this.timer = null;
+                     }
+                 },
                  next() {
                      this.activeSlide = this.activeSlide === this.totalSlides ? 1 : this.activeSlide + 1;
+                     this.startTimer();
                  },
                  prev() {
                      this.activeSlide = this.activeSlide === 1 ? this.totalSlides : this.activeSlide - 1;
+                     this.startTimer();
+                 },
+                 handleTouchStart(e) {
+                     if (!e.changedTouches || e.changedTouches.length === 0) return;
+                     this.touchStartX = e.changedTouches[0].clientX;
+                     this.touchStartY = e.changedTouches[0].clientY;
+                     this.isPaused = true;
+                 },
+                 handleTouchEnd(e) {
+                     if (!e.changedTouches || e.changedTouches.length === 0) return;
+                     this.touchEndX = e.changedTouches[0].clientX;
+                     this.touchEndY = e.changedTouches[0].clientY;
+                     this.isPaused = false;
+                     this.handleSwipe();
+                 },
+                 handleSwipe() {
+                     const diffX = this.touchEndX - this.touchStartX;
+                     const diffY = this.touchEndY - this.touchStartY;
+                     const threshold = 40;
+
+                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+                         if (diffX < 0) {
+                             this.next();
+                         } else {
+                             this.prev();
+                         }
+                     }
                  }
              }"
              @mouseenter="isPaused = true"
-             @mouseleave="isPaused = false">
+             @mouseleave="isPaused = false"
+             @touchstart.passive="handleTouchStart($event)"
+             @touchend.passive="handleTouchEnd($event)">
 
-        <div class="relative h-[420px] sm:h-[540px] lg:h-[600px] w-full">
-            @foreach($slides as $index => $slide)
-                <div x-show="activeSlide === {{ $index + 1 }}"
-                     x-transition:enter="transition ease-out duration-700"
-                     x-transition:enter-start="opacity-0 scale-105"
-                     x-transition:enter-end="opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-500"
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute inset-0"
-                     {{ $index > 0 ? 'x-cloak' : '' }}>
+        <div class="relative h-[420px] sm:h-[540px] lg:h-[600px] w-full overflow-hidden">
+            <div class="flex h-full w-full transition-transform duration-500 ease-out will-change-transform"
+                 :style="`transform: translateX(-${(activeSlide - 1) * 100}%);`">
+                @foreach($slides as $index => $slide)
+                    <div class="w-full h-full shrink-0 relative">
+                        <!-- Background Image & Clean Gradient Overlay -->
+                        <img src="{{ asset('storage/' . $slide->gambar) }}" class="w-full h-full object-cover object-center pointer-events-none" alt="{{ $slide->judul }}" draggable="false">
+                        <div class="absolute inset-0 bg-charcoal-950/60 pointer-events-none"></div>
+                        <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950/90 via-transparent to-black/20 pointer-events-none"></div>
 
-                    <!-- Background Image & Clean Gradient Overlay -->
-                    <img src="{{ asset('storage/' . $slide->gambar) }}" class="w-full h-full object-cover object-center" alt="{{ $slide->judul }}">
-                    <div class="absolute inset-0 bg-charcoal-950/60"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950/90 via-transparent to-black/20"></div>
+                        <!-- Slide Content: Clean, Centered, Professional -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-6 sm:py-10">
+                                <span class="inline-block text-gold-400 text-xs sm:text-sm font-medium tracking-widest uppercase mb-2 sm:mb-3">
+                                    {{ $slide->sub_judul ?: 'Niskala Samudra' }}
+                                </span>
 
-                    <!-- Slide Content: Clean, Centered, Professional -->
-                    <div class="absolute inset-0 flex items-center justify-center">
-                        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-6 sm:py-10">
-                            <span class="inline-block text-gold-400 text-xs sm:text-sm font-medium tracking-widest uppercase mb-2 sm:mb-3">
-                                {{ $slide->sub_judul ?: 'Niskala Samudra' }}
-                            </span>
+                                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-3 sm:mb-5 leading-tight sm:leading-[1.18] max-w-2xl mx-auto">
+                                    {{ $slide->judul }}
+                                </h1>
 
-                            <h1 class="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-3 sm:mb-5 leading-tight sm:leading-[1.18] max-w-2xl mx-auto">
-                                {{ $slide->judul }}
-                            </h1>
+                                <p class="text-slate-200 text-xs sm:text-sm lg:text-base mb-6 sm:mb-8 max-w-xl mx-auto font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
+                                    {{ $slide->deskripsi }}
+                                </p>
 
-                            <p class="text-slate-200 text-xs sm:text-sm lg:text-base mb-6 sm:mb-8 max-w-xl mx-auto font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
-                                {{ $slide->deskripsi }}
-                            </p>
-
-                            <div class="flex flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full sm:w-auto px-2 sm:px-0">
-                                @if($slide->menu_id && $slide->menu)
-                                    <a href="{{ route('menu.detail', $slide->menu->slug) }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
-                                        Lihat Menu <i class="fa-solid fa-arrow-right text-[11px]"></i>
+                                <div class="flex flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full sm:w-auto px-2 sm:px-0">
+                                    @if($slide->menu_id && $slide->menu)
+                                        <a href="{{ route('menu.detail', $slide->menu->slug) }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
+                                            Lihat Menu <i class="fa-solid fa-arrow-right text-[11px]"></i>
+                                        </a>
+                                    @else
+                                        <a href="{{ route('menu') }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
+                                            Eksplorasi Menu <i class="fa-solid fa-arrow-right text-[11px]"></i>
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('tentang') }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition backdrop-blur-xs whitespace-nowrap">
+                                        Tentang Kami
                                     </a>
-                                @else
-                                    <a href="{{ route('menu') }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
-                                        Eksplorasi Menu <i class="fa-solid fa-arrow-right text-[11px]"></i>
-                                    </a>
-                                @endif
-                                <a href="{{ route('tentang') }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition backdrop-blur-xs whitespace-nowrap">
-                                    Tentang Kami
-                                </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
 
         @if($slides->count() > 1)
             <!-- Clean Subtle Navigation Arrows -->
             <button @click="prev()"
                     aria-label="Slide sebelumnya"
-                    class="hidden sm:flex absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all">
+                    class="hidden sm:flex absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all z-20">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
             </button>
 
             <button @click="next()"
                     aria-label="Slide selanjutnya"
-                    class="hidden sm:flex absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all">
+                    class="hidden sm:flex absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all z-20">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
             </button>
 
             <!-- Bottom Progress Indicators -->
             <div class="absolute bottom-5 left-0 right-0 flex justify-center items-center space-x-2 z-20">
                 @foreach($slides as $index => $slide)
-                    <button @click="activeSlide = {{ $index + 1 }}"
+                    <button @click="activeSlide = {{ $index + 1 }}; startTimer();"
                             aria-label="Pindah ke slide {{ $index + 1 }}"
                             :class="activeSlide === {{ $index + 1 }} ? 'bg-gold-500 w-6' : 'bg-white/30 hover:bg-white/60 w-2'"
                             class="h-1.5 rounded-full transition-all duration-300"></button>

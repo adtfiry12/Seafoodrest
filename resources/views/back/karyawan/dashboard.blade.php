@@ -3,42 +3,38 @@
 @section('content')
 <div class="space-y-6 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
 
-    <!-- Banner Welcome & Live Clock -->
-    <div class="bg-charcoal-950 border border-charcoal-800/80 rounded-2xl p-6 sm:p-7 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-6 shadow-sm relative overflow-hidden">
-        <div class="absolute -right-20 -top-20 w-72 h-72 rounded-full bg-gold-500/10 blur-3xl pointer-events-none"></div>
-
-        <div class="relative z-10">
-            <div class="flex items-center gap-2.5 mb-2">
-                <span class="px-2.5 py-0.5 rounded-md text-[11px] font-semibold tracking-wide bg-gold-500/15 text-gold-400 border border-gold-500/25">
-                    Shift Operasional
+    <!-- Header Layanan & Antrean Pesanan -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-5 border-b border-slate-200">
+        <div>
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-1.5">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200/80 font-semibold text-[10px] uppercase tracking-wider">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Layanan Restoran Aktif
                 </span>
-                <span class="inline-flex items-center gap-1.5 text-xs text-slate-300">
-                    <span class="relative flex h-2 w-2">
-                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    Live Data
-                </span>
+                <span class="text-slate-300">•</span>
+                <span class="font-medium text-slate-500 text-xs">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</span>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-serif font-bold tracking-tight text-white">
-                Halo, <span class="text-gold-400">{{ Auth::user()->nama ?? 'Karyawan' }}</span>! 👋
+            <h1 class="text-2xl sm:text-3xl font-serif font-bold text-charcoal-950 tracking-tight">
+                Layanan & Antrean Pesanan
             </h1>
-            <p class="text-slate-400 mt-1.5 text-sm sm:text-base max-w-xl font-normal leading-relaxed">
-                Pantau antrean pesanan, status dapur, pengantaran, dan stok menu restoran secara realtime.
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">
+                Kelola konfirmasi kasir, kesiapan hidangan dapur, dan alur pengantaran pesanan tamu.
             </p>
         </div>
 
-        <!-- Live Clock & Quick Refresh -->
-        <div class="relative z-10 flex-shrink-0 w-full md:w-auto flex flex-col sm:flex-row md:flex-col items-center sm:items-end gap-3">
-            <div class="bg-charcoal-900/90 border border-charcoal-800 px-5 py-3 rounded-xl text-center shadow-xs w-full sm:w-auto">
-                <p class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold mb-0.5">{{ \Carbon\Carbon::now()->translatedFormat('l, d F Y') }}</p>
-                <p class="text-2xl sm:text-3xl font-bold text-gold-400 font-mono tracking-tight tabular-nums"
-                   x-data="{ time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) }"
-                   x-init="setInterval(() => time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }), 1000)"
-                   x-text="time"></p>
+        <div class="flex items-center gap-2.5 shrink-0">
+            <!-- Digital Clock with WIB -->
+            <div class="bg-white border border-slate-200/90 rounded-xl px-3.5 py-2 shadow-2xs text-right">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu Layanan</p>
+                <p class="text-sm font-bold font-mono text-charcoal-900 tabular-nums"
+                   x-data="{ time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }"
+                   x-init="setInterval(() => time = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }), 1000)"
+                   x-text="time + ' WIB'"></p>
             </div>
-            <button onclick="window.location.reload();" class="text-xs text-slate-400 hover:text-gold-400 transition inline-flex items-center gap-1.5 self-center sm:self-end">
-                <i class="fa-solid fa-rotate-right"></i> Auto-refresh 30s
+            <!-- Quick Manual Refresh -->
+            <button onclick="window.location.reload();" title="Perbarui Data Antrean" class="group inline-flex items-center gap-2 px-3.5 py-2.5 bg-white hover:bg-gold-50 hover:text-gold-900 border border-slate-200/90 hover:border-gold-300 text-slate-700 text-xs font-semibold rounded-xl shadow-2xs transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-rotate-right text-xs text-gold-600 group-hover:rotate-180 transition-transform duration-500"></i>
+                <span class="hidden sm:inline">Perbarui Antrean</span>
             </button>
         </div>
     </div>
@@ -50,10 +46,10 @@
         <a href="{{ route('karyawan.pesanan_baru') }}" class="group bg-white border {{ $pesananBaru > 0 ? 'border-red-200 ring-1 ring-red-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500">Antrian Kasir</p>
+                    <p class="text-xs font-semibold text-slate-500">Pesanan Masuk (Kasir)</p>
                     <h3 class="text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananBaru }}</h3>
                     <p class="text-xs mt-1.5 {{ $pesananBaru > 0 ? 'text-red-600 font-semibold' : 'text-slate-400' }}">
-                        {{ $pesananBaru > 0 ? 'Perlu tindakan segera' : 'Tidak ada antrean' }}
+                        {{ $pesananBaru > 0 ? 'Menunggu konfirmasi kasir' : 'Tidak ada antrean baru' }}
                     </p>
                 </div>
                 <div class="w-11 h-11 rounded-xl {{ $pesananBaru > 0 ? 'bg-red-50 text-red-600 border border-red-100' : 'bg-slate-100 text-slate-400' }} flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
@@ -61,7 +57,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500 group-hover:text-red-600 transition">
-                <span>Kelola Pesanan</span>
+                <span>Konfirmasi Pesanan</span>
                 <i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
         </a>
@@ -70,10 +66,10 @@
         <a href="{{ route('karyawan.dapur') }}" class="group bg-white border {{ $pesananDapur > 0 ? 'border-amber-200 ring-1 ring-amber-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500">Antrian Dapur</p>
+                    <p class="text-xs font-semibold text-slate-500">Proses Dapur</p>
                     <h3 class="text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananDapur }}</h3>
                     <p class="text-xs mt-1.5 {{ $pesananDapur > 0 ? 'text-amber-600 font-semibold' : 'text-slate-400' }}">
-                        {{ $pesananDapur > 0 ? 'Sedang dimasak (FIFO)' : 'Dapur siap melayani' }}
+                        {{ $pesananDapur > 0 ? 'Sedang dimasak chef (FIFO)' : 'Dapur siap terima order' }}
                     </p>
                 </div>
                 <div class="w-11 h-11 rounded-xl {{ $pesananDapur > 0 ? 'bg-amber-50 text-amber-600 border border-amber-100' : 'bg-slate-100 text-slate-400' }} flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
@@ -81,7 +77,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500 group-hover:text-amber-600 transition">
-                <span>Stasiun Dapur</span>
+                <span>Buka Stasiun Dapur</span>
                 <i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
         </a>
@@ -90,10 +86,10 @@
         <a href="{{ route('karyawan.delivery') }}" class="group bg-white border {{ $pesananDelivery > 0 ? 'border-sky-200 ring-1 ring-sky-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500">Siap Antar</p>
+                    <p class="text-xs font-semibold text-slate-500">Siap Antar / Saji</p>
                     <h3 class="text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananDelivery }}</h3>
                     <p class="text-xs mt-1.5 {{ $pesananDelivery > 0 ? 'text-sky-600 font-semibold' : 'text-slate-400' }}">
-                        {{ $pesananDelivery > 0 ? 'Pesanan dalam perjalanan' : 'Semua terkirim' }}
+                        {{ $pesananDelivery > 0 ? 'Dalam perjalanan ke tamu' : 'Semua hidangan tersaji' }}
                     </p>
                 </div>
                 <div class="w-11 h-11 rounded-xl {{ $pesananDelivery > 0 ? 'bg-sky-50 text-sky-600 border border-sky-100' : 'bg-slate-100 text-slate-400' }} flex items-center justify-center text-lg shrink-0 group-hover:scale-105 transition-transform">
@@ -101,7 +97,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500 group-hover:text-sky-600 transition">
-                <span>Pengantaran</span>
+                <span>Pantau Pengantaran</span>
                 <i class="fa-solid fa-arrow-right text-[11px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
         </a>
@@ -110,9 +106,9 @@
         <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs relative overflow-hidden flex flex-col justify-between">
             <div class="flex justify-between items-start">
                 <div>
-                    <p class="text-xs font-semibold text-slate-500">Selesai Hari Ini</p>
+                    <p class="text-xs font-semibold text-slate-500">Pesanan Tuntas</p>
                     <h3 class="text-3xl font-bold font-serif text-emerald-600 mt-1 tabular-nums">{{ $pesananSelesaiHariIni }}</h3>
-                    <p class="text-xs text-slate-400 mt-1.5">Pesanan tuntas di shift ini</p>
+                    <p class="text-xs text-slate-400 mt-1.5">Total hidangan tersaji hari ini</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center text-lg shrink-0">
                     <i class="fa-solid fa-circle-check"></i>
@@ -120,7 +116,7 @@
             </div>
             <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-medium text-slate-500">
                 <span>Status Pelayanan</span>
-                <span class="text-emerald-700 font-semibold">Optimal</span>
+                <span class="text-emerald-700 font-semibold">Pelayanan Lancar</span>
             </div>
         </div>
 
@@ -137,8 +133,8 @@
                         <i class="fa-solid fa-list-check"></i>
                     </div>
                     <div>
-                        <h3 class="font-serif font-bold text-lg text-charcoal-950">Antrean Pesanan Aktif</h3>
-                        <p class="text-xs text-slate-500 font-normal">Daftar pesanan yang saat ini sedang dalam proses operasional.</p>
+                        <h3 class="font-serif font-bold text-lg text-charcoal-950">Daftar Pesanan Berjalan</h3>
+                        <p class="text-xs text-slate-500 font-normal">Pesanan aktif yang sedang ditangani di kasir, stasiun dapur, atau pengantaran.</p>
                     </div>
                 </div>
                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 w-fit">
@@ -180,9 +176,9 @@
                                 </p>
                             </div>
 
-                            <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-charcoal-900 hover:text-white rounded-lg text-xs font-semibold text-charcoal-800 transition shrink-0">
+                            <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" class="group inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-charcoal-950 hover:text-white rounded-lg text-xs font-semibold text-charcoal-800 transition-all duration-200 shrink-0 shadow-2xs active:scale-95">
                                 <span>Detail</span>
-                                <i class="fa-solid fa-chevron-right text-[9px]"></i>
+                                <i class="fa-solid fa-chevron-right text-[9px] text-slate-400 group-hover:text-gold-400 group-hover:translate-x-0.5 transition-all"></i>
                             </a>
                         </div>
                     </div>
@@ -204,7 +200,7 @@
                 <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-boxes-stacked text-purple-600"></i>
-                        <h3 class="font-bold text-charcoal-900 text-sm">Peringatan Stok</h3>
+                        <h3 class="font-bold text-charcoal-900 text-sm">Ketersediaan Menu</h3>
                     </div>
                     @if($stokMenipis > 0)
                         <span class="px-2 py-0.5 bg-red-50 text-red-600 border border-red-200 text-[11px] font-semibold rounded-md">Perlu Restock</span>
@@ -233,37 +229,37 @@
                     @empty
                         <div class="py-6 text-center text-slate-400">
                             <i class="fa-solid fa-circle-check text-2xl mb-1.5 text-emerald-500"></i>
-                            <p class="text-xs font-medium text-slate-600">Semua stok menu aman (> 5).</p>
+                            <p class="text-xs font-medium text-slate-600">Ketersediaan semua menu aman (> 5 porsi).</p>
                         </div>
                     @endforelse
                 </div>
 
                 <a href="{{ route('karyawan.stok') }}" class="mt-4 block w-full text-center py-2.5 bg-slate-50 hover:bg-gold-50 hover:text-gold-800 text-slate-700 text-xs font-semibold rounded-xl transition border border-slate-200/80 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-boxes-packing"></i> Kelola & Tambah Stok
+                    <i class="fa-solid fa-boxes-packing"></i> Kelola Ketersediaan Menu
                 </a>
             </div>
 
             <!-- Card Akses Cepat Operasional (Compact) -->
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs">
                 <h3 class="font-bold text-charcoal-900 text-sm mb-3 pb-2 border-b border-slate-100 flex items-center gap-2">
-                    <i class="fa-solid fa-bolt text-gold-500"></i> Pintasan Kerja
+                    <i class="fa-solid fa-bolt text-gold-500"></i> Akses Cepat Operasional
                 </h3>
                 <div class="grid grid-cols-2 gap-2.5 text-xs font-medium">
-                    <a href="{{ route('karyawan.pesanan_baru') }}" class="p-3 bg-slate-50/70 hover:bg-red-50/60 hover:text-red-700 border border-slate-200/70 rounded-xl transition flex flex-col items-center text-center gap-1.5 group">
-                        <i class="fa-solid fa-cash-register text-base text-red-500 group-hover:scale-105 transition-transform"></i>
-                        <span>Pos Kasir</span>
+                    <a href="{{ route('karyawan.pesanan_baru') }}" class="p-3 bg-slate-50/70 hover:bg-red-50/70 hover:text-red-700 border border-slate-200/70 hover:border-red-300 rounded-xl transition-all duration-200 flex flex-col items-center text-center gap-1.5 group hover:shadow-xs hover:-translate-y-0.5 active:scale-95">
+                        <i class="fa-solid fa-cash-register text-base text-red-500 group-hover:scale-110 transition-transform"></i>
+                        <span>Meja Kasir</span>
                     </a>
-                    <a href="{{ route('karyawan.dapur') }}" class="p-3 bg-slate-50/70 hover:bg-orange-50/60 hover:text-orange-700 border border-slate-200/70 rounded-xl transition flex flex-col items-center text-center gap-1.5 group">
-                        <i class="fa-solid fa-kitchen-set text-base text-orange-500 group-hover:scale-105 transition-transform"></i>
-                        <span>Dapur (FIFO)</span>
+                    <a href="{{ route('karyawan.dapur') }}" class="p-3 bg-slate-50/70 hover:bg-orange-50/70 hover:text-orange-700 border border-slate-200/70 hover:border-orange-300 rounded-xl transition-all duration-200 flex flex-col items-center text-center gap-1.5 group hover:shadow-xs hover:-translate-y-0.5 active:scale-95">
+                        <i class="fa-solid fa-kitchen-set text-base text-orange-500 group-hover:scale-110 transition-transform"></i>
+                        <span>Stasiun Dapur</span>
                     </a>
-                    <a href="{{ route('karyawan.delivery') }}" class="p-3 bg-slate-50/70 hover:bg-sky-50/60 hover:text-sky-700 border border-slate-200/70 rounded-xl transition flex flex-col items-center text-center gap-1.5 group">
-                        <i class="fa-solid fa-motorcycle text-base text-sky-500 group-hover:scale-105 transition-transform"></i>
-                        <span>Kurir Delivery</span>
+                    <a href="{{ route('karyawan.delivery') }}" class="p-3 bg-slate-50/70 hover:bg-sky-50/70 hover:text-sky-700 border border-slate-200/70 hover:border-sky-300 rounded-xl transition-all duration-200 flex flex-col items-center text-center gap-1.5 group hover:shadow-xs hover:-translate-y-0.5 active:scale-95">
+                        <i class="fa-solid fa-motorcycle text-base text-sky-500 group-hover:scale-110 transition-transform"></i>
+                        <span>Pengantaran</span>
                     </a>
-                    <a href="{{ route('karyawan.stok') }}" class="p-3 bg-slate-50/70 hover:bg-purple-50/60 hover:text-purple-700 border border-slate-200/70 rounded-xl transition flex flex-col items-center text-center gap-1.5 group">
-                        <i class="fa-solid fa-boxes-packing text-base text-purple-500 group-hover:scale-105 transition-transform"></i>
-                        <span>Input Stok</span>
+                    <a href="{{ route('karyawan.stok') }}" class="p-3 bg-slate-50/70 hover:bg-purple-50/70 hover:text-purple-700 border border-slate-200/70 hover:border-purple-300 rounded-xl transition-all duration-200 flex flex-col items-center text-center gap-1.5 group hover:shadow-xs hover:-translate-y-0.5 active:scale-95">
+                        <i class="fa-solid fa-boxes-packing text-base text-purple-500 group-hover:scale-110 transition-transform"></i>
+                        <span>Update Stok</span>
                     </a>
                 </div>
             </div>

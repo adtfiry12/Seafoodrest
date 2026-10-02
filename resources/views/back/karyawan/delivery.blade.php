@@ -42,8 +42,8 @@
                 </button>
             </form>
 
-            <button onclick="window.location.reload();" class="w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-50 hover:text-gold-600 transition shadow-xs flex items-center justify-center gap-2">
-                <i class="fa-solid fa-rotate-right"></i> <span>Refresh</span>
+            <button onclick="window.location.reload();" class="group w-full sm:w-auto px-4 py-2.5 bg-white border border-slate-200/90 hover:border-gold-300 hover:bg-gold-50/80 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-gold-900 transition-all duration-200 shadow-2xs flex items-center justify-center gap-2 active:scale-95">
+                <i class="fa-solid fa-rotate-right text-xs text-gold-600 group-hover:rotate-180 transition-transform duration-500"></i> <span>Refresh</span>
             </button>
         </div>
     </div>
@@ -51,15 +51,15 @@
     <!-- Filter Status Tabs -->
     <div class="flex items-center gap-2 overflow-x-auto pb-1">
         <a href="{{ route('karyawan.delivery', array_filter(['search' => request('search')])) }}"
-           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap {{ !request('status') ? 'bg-charcoal-900 text-gold-400 shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap {{ !request('status') ? 'bg-charcoal-900 text-gold-400 shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-charcoal-950 border border-slate-200 hover:border-slate-300 shadow-2xs' }}">
             Semua ({{ $countSiap + $countDiantar }})
         </a>
         <a href="{{ route('karyawan.delivery', array_filter(['status' => 'Siap Diantar', 'search' => request('search')])) }}"
-           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap {{ request('status') === 'Siap Diantar' ? 'bg-charcoal-900 text-gold-400 shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap {{ request('status') === 'Siap Diantar' ? 'bg-charcoal-900 text-gold-400 shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-charcoal-950 border border-slate-200 hover:border-slate-300 shadow-2xs' }}">
             Siap Diantar ({{ $countSiap }})
         </a>
         <a href="{{ route('karyawan.delivery', array_filter(['status' => 'Diantar', 'search' => request('search')])) }}"
-           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap {{ request('status') === 'Diantar' ? 'bg-charcoal-900 text-gold-400 shadow-sm' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200' }}">
+           class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition whitespace-nowrap {{ request('status') === 'Diantar' ? 'bg-charcoal-900 text-gold-400 shadow-xs' : 'bg-white text-slate-600 hover:bg-slate-100 hover:text-charcoal-950 border border-slate-200 hover:border-slate-300 shadow-2xs' }}">
             Sedang Jalan ({{ $countDiantar }})
         </a>
     </div>
@@ -123,8 +123,8 @@
                                 <p class="font-bold text-charcoal-900 text-sm truncate">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</p>
                                 <p class="text-xs text-slate-500 font-mono mt-0.5"><i class="fa-solid fa-phone text-[10px] text-slate-400 mr-1"></i> {{ $trx->no_hp_pelanggan }}</p>
                             </div>
-                            <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-xl text-slate-400 hover:text-charcoal-900 hover:bg-slate-100 transition border border-slate-200">
-                                <i class="fa-solid fa-eye text-xs"></i>
+                            <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="group inline-flex items-center justify-center w-8 h-8 shrink-0 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 shadow-2xs active:scale-95">
+                                <i class="fa-solid fa-eye text-xs group-hover:scale-110 transition-transform"></i>
                             </a>
                         </div>
 
@@ -148,16 +148,16 @@
                             <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode($trx->alamat) }}"
                                target="_blank"
                                rel="noopener"
-                               class="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-slate-100 hover:bg-blue-600 hover:text-white text-slate-700 text-xs font-bold transition shadow-2xs">
-                                <i class="fa-solid fa-location-arrow text-xs text-blue-600 group-hover:text-white"></i>
+                               class="group inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-50/90 hover:bg-blue-600 text-blue-700 hover:text-white text-xs font-bold transition-all duration-200 shadow-2xs border border-blue-200/80 hover:border-blue-600 active:scale-95">
+                                <i class="fa-solid fa-location-arrow text-xs text-blue-600 group-hover:text-white transition-colors duration-200"></i>
                                 <span>Rute Maps</span>
                             </a>
 
                             <a href="https://wa.me/{{ $phoneClean }}?text={{ urlencode('Halo kak, saya kurir Niskala Samudra ingin mengantarkan pesanan ' . $trx->kode_transaksi . ' ke alamat kakak. Apakah kakak berada di lokasi?') }}"
                                target="_blank"
                                rel="noopener"
-                               class="inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 text-xs font-bold transition shadow-2xs">
-                                <i class="fa-brands fa-whatsapp text-sm"></i>
+                               class="group inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-50/90 hover:bg-emerald-600 text-emerald-700 hover:text-white text-xs font-bold transition-all duration-200 shadow-2xs border border-emerald-200/80 hover:border-emerald-600 active:scale-95">
+                                <i class="fa-brands fa-whatsapp text-sm text-emerald-600 group-hover:text-white transition-colors duration-200"></i>
                                 <span>Chat WA</span>
                             </a>
                         </div>
