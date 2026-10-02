@@ -3,23 +3,32 @@
 @section('content')
 
 @if($slides->count() > 0)
-    <section class="relative bg-charcoal-950 overflow-hidden group select-none touch-pan-y"
+    <section class="relative bg-charcoal-950 overflow-hidden group select-none touch-pan-y cursor-grab active:cursor-grabbing"
              x-data="{
                  activeSlide: 1,
                  totalSlides: {{ $slides->count() }},
                  isPaused: false,
                  timer: null,
-                 touchStartX: 0,
-                 touchStartY: 0,
-                 touchEndX: 0,
-                 touchEndY: 0,
+                 isDragging: false,
+                 startX: 0,
+                 startY: 0,
+                 dragOffsetX: 0,
+                 hasMoved: false,
+                 sliderWidth: 1,
                  init() {
+                     this.updateWidth();
+                     window.addEventListener('resize', () => this.updateWidth());
                      this.startTimer();
+                 },
+                 updateWidth() {
+                     if (this.$refs.sliderTrack) {
+                         this.sliderWidth = this.$refs.sliderTrack.offsetWidth || window.innerWidth;
+                     }
                  },
                  startTimer() {
                      this.stopTimer();
                      this.timer = setInterval(() => {
-                         if (!this.isPaused) {
+                         if (!this.isPaused && !this.isDragging) {
                              this.next();
                          }
                      }, 6000);
@@ -31,52 +40,85 @@
                      }
                  },
                  next() {
+                     this.dragOffsetX = 0;
                      this.activeSlide = this.activeSlide === this.totalSlides ? 1 : this.activeSlide + 1;
                      this.startTimer();
                  },
                  prev() {
+                     this.dragOffsetX = 0;
                      this.activeSlide = this.activeSlide === 1 ? this.totalSlides : this.activeSlide - 1;
                      this.startTimer();
                  },
-                 handleTouchStart(e) {
-                     if (!e.changedTouches || e.changedTouches.length === 0) return;
-                     this.touchStartX = e.changedTouches[0].clientX;
-                     this.touchStartY = e.changedTouches[0].clientY;
-                     this.isPaused = true;
+                 startDrag(x, y) {
+                     this.updateWidth();
+                     this.isDragging = true;
+                     this.startX = x;
+                     this.startY = y;
+                     this.dragOffsetX = 0;
+                     this.hasMoved = false;
+                     this.stopTimer();
                  },
-                 handleTouchEnd(e) {
-                     if (!e.changedTouches || e.changedTouches.length === 0) return;
-                     this.touchEndX = e.changedTouches[0].clientX;
-                     this.touchEndY = e.changedTouches[0].clientY;
-                     this.isPaused = false;
-                     this.handleSwipe();
-                 },
-                 handleSwipe() {
-                     const diffX = this.touchEndX - this.touchStartX;
-                     const diffY = this.touchEndY - this.touchStartY;
-                     const threshold = 40;
+                 onDrag(x, y) {
+                     if (!this.isDragging) return;
+                     const diffX = x - this.startX;
+                     const diffY = y - this.startY;
 
-                     if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
-                         if (diffX < 0) {
-                             this.next();
-                         } else {
-                             this.prev();
-                         }
+                     // Allow vertical scroll if user moves more vertically (mobile)
+                     if (!this.hasMoved && Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 8) {
+                         this.isDragging = false;
+                         this.dragOffsetX = 0;
+                         return;
                      }
+
+                     if (Math.abs(diffX) > 6) {
+                         this.hasMoved = true;
+                     }
+
+                     // Rubber-band resistance on ends
+                     let offset = diffX;
+                     if ((this.activeSlide === 1 && diffX > 0) || (this.activeSlide === this.totalSlides && diffX < 0)) {
+                         offset = diffX * 0.35;
+                     }
+                     this.dragOffsetX = offset;
+                 },
+                 endDrag() {
+                     if (!this.isDragging) return;
+                     this.isDragging = false;
+                     const threshold = Math.min(this.sliderWidth * 0.12, 60);
+
+                     if (this.dragOffsetX < -threshold) {
+                         this.next();
+                     } else if (this.dragOffsetX > threshold) {
+                         this.prev();
+                     } else {
+                         this.dragOffsetX = 0;
+                         this.startTimer();
+                     }
+
+                     setTimeout(() => {
+                         this.hasMoved = false;
+                     }, 80);
                  }
              }"
              @mouseenter="isPaused = true"
-             @mouseleave="isPaused = false"
-             @touchstart.passive="handleTouchStart($event)"
-             @touchend.passive="handleTouchEnd($event)">
+             @mouseleave="isPaused = false; if (isDragging) endDrag()"
+             @mousedown="if ($event.button === 0) startDrag($event.clientX, $event.clientY)"
+             @mousemove="onDrag($event.clientX, $event.clientY)"
+             @mouseup="endDrag()"
+             @touchstart.passive="if ($event.touches && $event.touches.length === 1) startDrag($event.touches[0].clientX, $event.touches[0].clientY)"
+             @touchmove.passive="if (isDragging && $event.touches && $event.touches.length === 1) onDrag($event.touches[0].clientX, $event.touches[0].clientY)"
+             @touchend="endDrag()"
+             @touchcancel="endDrag()">
 
         <div class="relative h-[420px] sm:h-[540px] lg:h-[600px] w-full overflow-hidden">
-            <div class="flex h-full w-full transition-transform duration-500 ease-out will-change-transform"
-                 :style="`transform: translateX(-${(activeSlide - 1) * 100}%);`">
+            <div x-ref="sliderTrack"
+                 class="flex h-full w-full will-change-transform"
+                 :class="isDragging ? 'transition-none' : 'transition-transform duration-500 ease-out'"
+                 :style="`transform: translateX(calc(-${(activeSlide - 1) * 100}% + ${dragOffsetX}px));`">
                 @foreach($slides as $index => $slide)
                     <div class="w-full h-full shrink-0 relative">
                         <!-- Background Image & Clean Gradient Overlay -->
-                        <img src="{{ asset('storage/' . $slide->gambar) }}" class="w-full h-full object-cover object-center pointer-events-none" alt="{{ $slide->judul }}" draggable="false">
+                        <img src="{{ asset('storage/' . $slide->gambar) }}" class="w-full h-full object-cover object-center pointer-events-none select-none" alt="{{ $slide->judul }}" draggable="false">
                         <div class="absolute inset-0 bg-charcoal-950/60 pointer-events-none"></div>
                         <div class="absolute inset-0 bg-gradient-to-t from-charcoal-950/90 via-transparent to-black/20 pointer-events-none"></div>
 
@@ -87,25 +129,31 @@
                                     {{ $slide->sub_judul ?: 'Niskala Samudra' }}
                                 </span>
 
-                                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-3 sm:mb-5 leading-tight sm:leading-[1.18] max-w-2xl mx-auto">
+                                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-serif font-bold text-white mb-3 sm:mb-5 leading-tight sm:leading-[1.18] max-w-2xl mx-auto select-none">
                                     {{ $slide->judul }}
                                 </h1>
 
-                                <p class="text-slate-200 text-xs sm:text-sm lg:text-base mb-6 sm:mb-8 max-w-xl mx-auto font-light leading-relaxed line-clamp-2 sm:line-clamp-none">
+                                <p class="text-slate-200 text-xs sm:text-sm lg:text-base mb-6 sm:mb-8 max-w-xl mx-auto font-light leading-relaxed line-clamp-2 sm:line-clamp-none select-none">
                                     {{ $slide->deskripsi }}
                                 </p>
 
                                 <div class="flex flex-row items-center justify-center gap-2.5 sm:gap-3.5 w-full sm:w-auto px-2 sm:px-0">
                                     @if($slide->menu_id && $slide->menu)
-                                        <a href="{{ route('menu.detail', $slide->menu->slug) }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
+                                        <a href="{{ route('menu.detail', $slide->menu->slug) }}"
+                                           @click="if (hasMoved) { $event.preventDefault(); $event.stopPropagation(); }"
+                                           class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
                                             Lihat Menu <i class="fa-solid fa-arrow-right text-[11px]"></i>
                                         </a>
                                     @else
-                                        <a href="{{ route('menu') }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
+                                        <a href="{{ route('menu') }}"
+                                           @click="if (hasMoved) { $event.preventDefault(); $event.stopPropagation(); }"
+                                           class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-gold-600 hover:bg-gold-500 text-white font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition shadow-md shadow-gold-950/30 active:scale-95 whitespace-nowrap">
                                             Eksplorasi Menu <i class="fa-solid fa-arrow-right text-[11px]"></i>
                                         </a>
                                     @endif
-                                    <a href="{{ route('tentang') }}" class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition backdrop-blur-xs whitespace-nowrap">
+                                    <a href="{{ route('tentang') }}"
+                                       @click="if (hasMoved) { $event.preventDefault(); $event.stopPropagation(); }"
+                                       class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 sm:px-7 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 text-white border border-white/20 font-semibold text-xs sm:text-sm tracking-wide rounded-xl transition backdrop-blur-xs whitespace-nowrap">
                                         Tentang Kami
                                     </a>
                                 </div>
@@ -120,13 +168,13 @@
             <!-- Clean Subtle Navigation Arrows -->
             <button @click="prev()"
                     aria-label="Slide sebelumnya"
-                    class="hidden sm:flex absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all z-20">
+                    class="hidden sm:flex absolute left-4 sm:left-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer">
                 <i class="fa-solid fa-chevron-left text-xs"></i>
             </button>
 
             <button @click="next()"
                     aria-label="Slide selanjutnya"
-                    class="hidden sm:flex absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all z-20">
+                    class="hidden sm:flex absolute right-4 sm:right-6 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full items-center justify-center bg-black/25 hover:bg-black/50 text-white border border-white/15 backdrop-blur-xs opacity-0 group-hover:opacity-100 transition-all z-20 cursor-pointer">
                 <i class="fa-solid fa-chevron-right text-xs"></i>
             </button>
 
@@ -136,7 +184,7 @@
                     <button @click="activeSlide = {{ $index + 1 }}; startTimer();"
                             aria-label="Pindah ke slide {{ $index + 1 }}"
                             :class="activeSlide === {{ $index + 1 }} ? 'bg-gold-500 w-6' : 'bg-white/30 hover:bg-white/60 w-2'"
-                            class="h-1.5 rounded-full transition-all duration-300"></button>
+                            class="h-1.5 rounded-full transition-all duration-300 cursor-pointer"></button>
                 @endforeach
             </div>
         @endif

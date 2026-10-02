@@ -28,15 +28,62 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4">
 
-            {{-- Category Filter Pills --}}
-            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+            {{-- Category Filter Pills (Mouse Drag-to-Scroll on Desktop & Native Touch on Mobile) --}}
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0 cursor-grab active:cursor-grabbing select-none"
+                 x-data="{
+                     isDown: false,
+                     startX: 0,
+                     scrollLeft: 0,
+                     hasMoved: false,
+                     init() {
+                         const activeEl = this.$el.querySelector('.is-active-pill');
+                         if (activeEl) {
+                             activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                         }
+                     },
+                     startDrag(e) {
+                         if (e.button !== 0) return;
+                         this.isDown = true;
+                         this.hasMoved = false;
+                         this.startX = e.pageX - this.$el.offsetLeft;
+                         this.scrollLeft = this.$el.scrollLeft;
+                     },
+                     stopDrag() {
+                         this.isDown = false;
+                         setTimeout(() => { this.hasMoved = false; }, 60);
+                     },
+                     onDrag(e) {
+                         if (!this.isDown) return;
+                         e.preventDefault();
+                         const x = e.pageX - this.$el.offsetLeft;
+                         const walk = (x - this.startX) * 1.4;
+                         if (Math.abs(walk) > 4) {
+                             this.hasMoved = true;
+                         }
+                         this.$el.scrollLeft = this.scrollLeft - walk;
+                     },
+                     handleItemClick(e) {
+                         if (this.hasMoved) {
+                             e.preventDefault();
+                             e.stopPropagation();
+                         }
+                     }
+                 }"
+                 @mousedown="startDrag($event)"
+                 @mouseleave="stopDrag()"
+                 @mouseup="stopDrag()"
+                 @mousemove="onDrag($event)">
                 <a href="{{ route('menu', array_filter(['search' => request('search')])) }}"
-                   class="shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 {{ !request('kategori') ? 'bg-charcoal-950 text-gold-400 font-semibold shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200/80' }}">
+                   @click="handleItemClick($event)"
+                   draggable="false"
+                   class="shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 select-none {{ !request('kategori') ? 'is-active-pill bg-charcoal-950 text-gold-400 font-semibold shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200/80' }}">
                     Semua Menu
                 </a>
                 @foreach($kategori as $kat)
                     <a href="{{ route('menu', array_filter(['kategori' => $kat->slug, 'search' => request('search')])) }}"
-                       class="shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 {{ request('kategori') == $kat->slug ? 'bg-charcoal-950 text-gold-400 font-semibold shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200/80' }}">
+                       @click="handleItemClick($event)"
+                       draggable="false"
+                       class="shrink-0 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl text-xs sm:text-sm font-medium transition-all duration-200 select-none {{ request('kategori') == $kat->slug ? 'is-active-pill bg-charcoal-950 text-gold-400 font-semibold shadow-xs' : 'bg-slate-100 text-slate-700 hover:bg-slate-200/80' }}">
                         {{ $kat->nama_kategori }}
                     </a>
                 @endforeach
@@ -91,13 +138,30 @@
 <section class="bg-slate-50/70 py-8 sm:py-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {{-- Header Status / Active Filter Badge --}}
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        @php
+            $activeKategori = request('kategori') ? $kategori->firstWhere('slug', request('kategori')) : null;
+            $hasFilter = request('search') || request('kategori');
+        @endphp
+
+        {{-- Header Status --}}
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Daftar Pilihan</p>
+                <span class="text-xs font-semibold uppercase tracking-wider text-gold-600 block mb-1">
+                    @if(request('search'))
+                        Hasil Pencarian
+                    @elseif($activeKategori)
+                        Kategori Menu
+                    @else
+                        Daftar Pilihan
+                    @endif
+                </span>
                 <h2 class="text-xl sm:text-2xl font-serif font-bold text-charcoal-950">
-                    @if(request('kategori'))
-                        Kategori {{ $kategori->firstWhere('slug', request('kategori'))->nama_kategori ?? 'Pilihan' }}
+                    @if(request('search') && $activeKategori)
+                        {{ $activeKategori->nama_kategori }} <span class="text-slate-400 font-sans font-normal text-lg sm:text-xl">&bull;</span> "{{ request('search') }}"
+                    @elseif(request('search'))
+                        Pencarian "{{ request('search') }}"
+                    @elseif($activeKategori)
+                        {{ $activeKategori->nama_kategori }}
                     @else
                         Semua Hidangan
                     @endif
@@ -108,23 +172,36 @@
             </div>
         </div>
 
-        {{-- Active Filter Notification --}}
-        @if(request('search') || request('kategori'))
-            <div class="mb-6 p-3 sm:p-4 bg-amber-50/80 border border-amber-200/80 rounded-2xl flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
-                <div class="flex items-center gap-2 text-charcoal-800">
-                    <i class="fa-solid fa-filter text-gold-600 text-xs"></i>
-                    <span>
-                        Filter aktif:
-                        @if(request('kategori'))
-                            <span class="font-semibold text-charcoal-900 bg-white px-2 py-0.5 rounded-md border border-amber-200 ml-1">Kategori: {{ $kategori->firstWhere('slug', request('kategori'))->nama_kategori ?? request('kategori') }}</span>
-                        @endif
-                        @if(request('search'))
-                            <span class="font-semibold text-charcoal-900 bg-white px-2 py-0.5 rounded-md border border-amber-200 ml-1">Kata kunci: "{{ request('search') }}"</span>
-                        @endif
-                    </span>
-                </div>
-                <a href="{{ route('menu') }}" class="inline-flex items-center gap-1 text-xs font-semibold text-rose-600 hover:text-rose-700 bg-white hover:bg-rose-50 px-2.5 py-1 rounded-xl border border-rose-200 transition">
-                    <i class="fa-solid fa-xmark text-xs"></i> Reset Filter
+        {{-- Sleek, Minimal Filter Chips (No Ugly Yellow Alert Banner) --}}
+        @if($hasFilter)
+            <div class="flex flex-wrap items-center gap-2 mb-6 text-xs">
+                <span class="text-slate-400 font-medium mr-0.5 flex items-center gap-1.5">
+                    <i class="fa-solid fa-sliders text-[11px] text-slate-400"></i> Filter aktif:
+                </span>
+
+                @if($activeKategori)
+                    <a href="{{ route('menu', array_filter(['search' => request('search')])) }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-rose-50 text-charcoal-800 hover:text-rose-600 border border-slate-200/90 hover:border-rose-200 rounded-full text-xs font-medium transition shadow-2xs group"
+                       title="Hapus filter kategori {{ $activeKategori->nama_kategori }}">
+                        <span class="text-slate-400 group-hover:text-rose-500 text-[11px]">Kategori:</span>
+                        <span class="font-semibold">{{ $activeKategori->nama_kategori }}</span>
+                        <i class="fa-solid fa-xmark text-[10px] text-slate-400 group-hover:text-rose-600 ml-0.5"></i>
+                    </a>
+                @endif
+
+                @if(request('search'))
+                    <a href="{{ route('menu', array_filter(['kategori' => request('kategori')])) }}"
+                       class="inline-flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-rose-50 text-charcoal-800 hover:text-rose-600 border border-slate-200/90 hover:border-rose-200 rounded-full text-xs font-medium transition shadow-2xs group"
+                       title="Hapus filter kata kunci">
+                        <span class="text-slate-400 group-hover:text-rose-500 text-[11px]">Kata kunci:</span>
+                        <span class="font-semibold font-serif">"{{ request('search') }}"</span>
+                        <i class="fa-solid fa-xmark text-[10px] text-slate-400 group-hover:text-rose-600 ml-0.5"></i>
+                    </a>
+                @endif
+
+                <a href="{{ route('menu') }}"
+                   class="inline-flex items-center gap-1 text-xs text-slate-400 hover:text-rose-600 hover:underline underline-offset-4 font-medium transition ml-1 py-1">
+                    <i class="fa-solid fa-rotate-left text-[10px]"></i> Reset semua
                 </a>
             </div>
         @endif
