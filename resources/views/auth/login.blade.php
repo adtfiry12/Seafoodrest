@@ -20,61 +20,61 @@
     <div class="relative z-10 flex min-h-screen flex-col items-center justify-center py-10 px-4 sm:px-6">
 
         <!-- Card Login -->
-        <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gold-500/20 overflow-hidden my-auto">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden my-auto">
 
-            <div class="px-6 sm:px-8 pt-8 sm:pt-10 pb-6 text-center border-b border-slate-100 bg-slate-50">
-                <a href="{{ url('/') }}" class="inline-flex flex-col items-center gap-2 mb-4 group">
-                    <img src="{{ asset('image/niskala sammudra.png') }}" alt="Logo Niskala Samudra" class="h-12 sm:h-14 w-auto object-contain transition group-hover:scale-105">
-                    <span class="text-xl sm:text-2xl font-bold tracking-wide text-charcoal-950 font-serif leading-none mt-2">
-                        Niskala<span class="text-gold-600">Samudra</span>
+            <div class="px-6 sm:px-8 pt-7 sm:pt-9 pb-5 text-center border-b border-slate-100 bg-slate-50/70">
+                <a href="{{ url('/') }}" class="inline-flex flex-col items-center gap-1.5 mb-3 group">
+                    <img src="{{ asset('image/niskala sammudra.png') }}" alt="Logo Niskala Samudra" class="h-11 sm:h-12 w-auto object-contain transition group-hover:opacity-90">
+                    <span class="text-xl sm:text-2xl font-bold tracking-tight text-charcoal-950 font-serif leading-none mt-1">
+                        Niskala<span class="text-gold-600 font-semibold ml-0.5">Samudra</span>
                     </span>
                 </a>
-                <p class="text-xs sm:text-sm text-slate-500 font-light">Silakan masuk ke akun Anda.</p>
+                <p class="text-xs sm:text-sm text-slate-500 font-normal">Silakan masuk ke akun Anda.</p>
             </div>
 
-            <div class="p-6 sm:p-8">
-                <form action="{{ route('login.submit') }}" method="POST" class="space-y-5 sm:space-y-6">
+            <div class="p-6 sm:p-7">
+                <form action="{{ route('login.submit') }}" method="POST" class="space-y-4 sm:space-y-5">
                     @csrf
 
                     <div>
-                        <label for="email" class="block text-xs sm:text-sm font-semibold text-charcoal-900 mb-1 sm:mb-2">Alamat Email</label>
+                        <label for="email" class="block text-xs font-semibold text-charcoal-900 mb-1.5">Alamat Email</label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fa-solid fa-envelope text-slate-400"></i>
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-envelope text-slate-400 text-xs"></i>
                             </div>
                             <input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus
-                                class="block w-full pl-10 pr-3 py-2.5 sm:py-3 border @error('email') border-red-500 @else border-slate-300 @enderror rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
+                                class="block w-full pl-9 pr-3 py-2.5 border @error('email') border-rose-500 @else border-slate-200 @enderror rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
                         </div>
                         @error('email')
-                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                            <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <div class="flex items-center justify-between mb-1 sm:mb-2">
-                            <label for="password" class="block text-xs sm:text-sm font-semibold text-charcoal-900">Kata Sandi</label>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label for="password" class="block text-xs font-semibold text-charcoal-900">Kata Sandi</label>
                         </div>
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="fa-solid fa-lock text-slate-400"></i>
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-slate-400 text-xs"></i>
                             </div>
                             <input type="password" id="password" name="password" required
-                                class="block w-full pl-10 pr-10 py-2.5 sm:py-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 transition">
+                                class="block w-full pl-9 pr-9 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
                         </div>
                     </div>
 
-                    <div class="pt-2">
-                        <button type="submit" class="w-full bg-charcoal-900 hover:bg-gold-600 text-white font-semibold py-3 px-4 rounded-lg transition duration-300 text-sm tracking-wider uppercase shadow-md flex justify-center items-center gap-2 group">
-                            Masuk <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    <div class="pt-1.5">
+                        <button type="submit" class="w-full bg-charcoal-950 hover:bg-gold-600 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 text-xs sm:text-sm tracking-wider uppercase shadow-xs flex justify-center items-center gap-2 group">
+                            Masuk <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-0.5 transition-transform"></i>
                         </button>
                     </div>
                 </form>
             </div>
 
-            <div class="px-6 sm:px-8 py-4 sm:py-5 border-t border-slate-100 bg-slate-50 text-center">
-                <p class="text-xs sm:text-sm text-slate-600">
+            <div class="px-6 sm:px-8 py-4 border-t border-slate-100 bg-slate-50/70 text-center">
+                <p class="text-xs sm:text-sm text-slate-600 font-normal">
                     Belum punya akun?
-                    <a href="{{ route('register') }}" class="font-bold text-gold-600 hover:text-gold-700 hover:underline transition-all">Daftar sekarang</a>
+                    <a href="{{ route('register') }}" class="font-semibold text-gold-700 hover:text-gold-800 hover:underline transition-all">Daftar sekarang</a>
                 </p>
             </div>
 

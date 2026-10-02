@@ -56,10 +56,10 @@
     <div id="area-struk" class="bg-white p-6 w-full max-w-xs shadow-lg border border-gray-200">
 
         <div class="text-center mb-6 no-print">
-            <button onclick="window.print()" class="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded hover:bg-blue-700">
+            <button onclick="window.print()" class="px-4 py-2 bg-charcoal-900 text-white text-xs font-semibold rounded-lg hover:bg-gold-600 transition shadow-xs cursor-pointer">
                 Print Struk Manual
             </button>
-            <p class="text-xs text-gray-400 mt-2">Struk akan otomatis dicetak saat halaman dibuka.</p>
+            <p class="text-[11px] text-gray-400 mt-1.5">Struk akan otomatis dicetak saat halaman dibuka.</p>
         </div>
 
         <div class="text-center border-b-2 border-dashed border-gray-400 pb-3 mb-3 flex flex-col items-center">

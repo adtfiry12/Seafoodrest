@@ -30,24 +30,24 @@
             @php $currentStatus = request('status', 'Semua'); @endphp
 
             <a href="{{ route('admin.transaksi.index', ['search' => request('search')]) }}"
-               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Semua' ? 'bg-charcoal-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
+               class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $currentStatus == 'Semua' ? 'bg-charcoal-900 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50' }}">
                 Semua Pesanan
             </a>
             <a href="{{ route('admin.transaksi.index', ['status' => 'Menunggu ACC', 'search' => request('search')]) }}"
-               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Menunggu ACC' ? 'bg-red-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-                <i class="fa-solid fa-bell-concierge mr-1"></i> Menunggu ACC
+               class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $currentStatus == 'Menunggu ACC' ? 'bg-red-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-bell-concierge mr-1 text-[10px]"></i> Menunggu ACC
             </a>
             <a href="{{ route('admin.transaksi.index', ['status' => 'Dimasak', 'search' => request('search')]) }}"
-               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Dimasak' ? 'bg-yellow-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-                <i class="fa-solid fa-fire-burner mr-1"></i> Dimasak
+               class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $currentStatus == 'Dimasak' ? 'bg-amber-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-fire-burner mr-1 text-[10px]"></i> Dimasak
             </a>
             <a href="{{ route('admin.transaksi.index', ['status' => 'Diantar', 'search' => request('search')]) }}"
-               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Diantar' ? 'bg-blue-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-                <i class="fa-solid fa-motorcycle mr-1"></i> Diantar
+               class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $currentStatus == 'Diantar' ? 'bg-sky-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-motorcycle mr-1 text-[10px]"></i> Diantar
             </a>
             <a href="{{ route('admin.transaksi.index', ['status' => 'Selesai', 'search' => request('search')]) }}"
-               class="px-4 py-2 text-sm font-medium rounded-full transition-all {{ $currentStatus == 'Selesai' ? 'bg-emerald-500 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50' }}">
-                <i class="fa-solid fa-check-double mr-1"></i> Selesai
+               class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $currentStatus == 'Selesai' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-check-double mr-1 text-[10px]"></i> Selesai
             </a>
         </div>
 
@@ -55,14 +55,14 @@
             @if(request('status'))
                 <input type="hidden" name="status" value="{{ request('status') }}">
             @endif
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode transaksi..." class="w-full bg-white border border-slate-200 rounded-full pl-4 pr-10 py-2 text-sm focus:ring-gold-500 focus:border-gold-500 text-charcoal-900 shadow-sm">
-            <button type="submit" class="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-gold-600 transition">
-                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode transaksi..." class="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2 text-xs sm:text-sm focus:ring-gold-500 focus:border-gold-500 text-charcoal-900 shadow-xs">
+            <button type="submit" class="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-gold-600 transition" aria-label="Cari">
+                <i class="fa-solid fa-magnifying-glass text-xs"></i>
             </button>
         </form>
     </div>
 
-    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
         <div class="overflow-x-auto">
             <table class="w-full text-left text-sm text-slate-600">
                 <thead class="bg-slate-50 text-xs font-bold text-slate-500 uppercase tracking-wider border-b border-slate-200">
@@ -78,36 +78,36 @@
                     @forelse($transaksi as $item)
                         <tr class="hover:bg-slate-50/80 transition-colors duration-150">
                             <td class="px-6 py-4">
-                                <p class="font-bold text-charcoal-900">{{ $item->kode_transaksi }}</p>
-                                <p class="text-xs text-slate-500">{{ $item->created_at->format('d M Y, H:i') }}</p>
+                                <p class="font-mono font-bold text-charcoal-950">{{ $item->kode_transaksi }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">{{ $item->created_at->format('d M Y, H:i') }}</p>
                             </td>
                             <td class="px-6 py-4">
                                 <p class="font-semibold text-charcoal-900">{{ $item->pelanggan->nama ?? $item->nama_pelanggan ?? 'Pelanggan Umum' }}</p>
                                 <span class="inline-flex items-center gap-1 mt-1 text-xs font-medium text-slate-500">
-                                    <i class="fa-solid fa-bell-concierge"></i> {{ $item->tipe_pesanan }}
+                                    <i class="fa-solid fa-bell-concierge text-[10px]"></i> {{ $item->tipe_pesanan }}
                                 </span>
                             </td>
                             <td class="px-6 py-4">
-                                <p class="font-bold text-gold-600">Rp {{ number_format($item->total_bayar, 0, ',', '.') }}</p>
-                                <p class="text-xs text-slate-500">{{ $item->metode_pembayaran }}</p>
+                                <p class="font-bold text-gold-600 tabular-nums">Rp {{ number_format($item->total_bayar, 0, ',', '.') }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">{{ $item->metode_pembayaran }}</p>
                             </td>
-                            <td class="px-6 py-4 space-y-1.5">
+                            <td class="px-6 py-4 space-y-1">
                                 <div>
                                     @if($item->status_pembayaran == 'Lunas')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-700">Lunas</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Lunas</span>
                                     @elseif($item->status_pembayaran == 'Batal')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-700">Batal</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200">Batal</span>
                                     @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-yellow-100 text-yellow-700">{{ $item->status_pembayaran }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-amber-50 text-amber-700 border border-amber-200">{{ $item->status_pembayaran }}</span>
                                     @endif
                                 </div>
                                 <div>
                                     @if($item->status_pesanan == 'Selesai')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">{{ $item->status_pesanan }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">{{ $item->status_pesanan }}</span>
                                     @elseif($item->status_pesanan == 'Dibatalkan')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-600 border border-red-200">{{ $item->status_pesanan }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200">{{ $item->status_pesanan }}</span>
                                     @else
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-200">{{ $item->status_pesanan }}</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">{{ $item->status_pesanan }}</span>
                                     @endif
                                 </div>
                             </td>
