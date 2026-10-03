@@ -65,8 +65,12 @@
                     </button>
                     <div class="h-5 w-px bg-slate-200 mx-0.5 hidden md:block"></div>
                     @guest
-                        <a href="{{ route('login') }}" class="hidden md:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-slate-700 hover:text-gold-700 hover:bg-slate-50 transition border border-transparent hover:border-slate-200">
-                            Masuk <i class="fa-regular fa-user text-xs"></i>
+                        <a href="{{ route('login') }}" class="hidden md:inline-flex items-center gap-1.5 py-1 text-xs font-semibold text-slate-700 hover:text-gold-500 transition-colors">
+                            <i class="fa-regular fa-circle-user text-[15px]"></i>
+                            <span>Masuk</span>
+                        </a>
+                        <a href="{{ route('login') }}" aria-label="Masuk ke Akun" class="md:hidden p-2 text-slate-700 hover:text-gold-500 transition-colors focus:outline-none">
+                            <i class="fa-regular fa-circle-user text-lg"></i>
                         </a>
                     @else
                         <div class="hidden md:block relative" x-data="{ open: false }">
@@ -88,6 +92,9 @@
                                 </form>
                             </div>
                         </div>
+                        <a href="{{ route('profile.index') }}" aria-label="Profil Akun" class="md:hidden flex items-center p-1 rounded-full text-slate-700 hover:text-gold-500 transition">
+                            <img src="{{ Auth::user()->foto ? asset('storage/'.Auth::user()->foto) : 'https://ui-avatars.com/api/?name='.urlencode(Auth::user()->nama).'&background=18181b&color=fbbf24' }}" class="w-7 h-7 rounded-full object-cover">
+                        </a>
                     @endguest
                     <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2 rounded-xl text-slate-700 hover:text-gold-600 hover:bg-slate-100 focus:outline-none">
                         <i class="fa-solid fa-bars text-xl" x-show="!mobileMenuOpen"></i>
@@ -110,7 +117,10 @@
                 @endauth
 
                 @guest
-                    <a href="{{ route('login') }}" class="block px-3 py-2.5 mt-3 text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-charcoal-900 text-center rounded-xl hover:bg-gold-600 transition shadow-xs">Login / Masuk</a>
+                    <a href="{{ route('login') }}" class="flex items-center justify-center gap-2 px-3 py-2.5 mt-3 text-xs sm:text-sm font-bold uppercase tracking-wider text-white bg-charcoal-900 text-center rounded-xl hover:bg-gold-600 transition shadow-xs">
+                        <i class="fa-regular fa-circle-user text-base text-gold-400"></i>
+                        <span>Masuk Akun</span>
+                    </a>
                 @else
                     <div class="mt-3 pt-3 border-t border-slate-100">
                         <p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Akun Saya</p>
