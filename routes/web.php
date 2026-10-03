@@ -54,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::controller(CheckoutController::class)->prefix('pesanan')->name('front.')->group(function () {
         Route::get('/', 'pesanan')->name('pesanan');
         Route::get('/{kode_transaksi}', 'detailPesanan')->name('pesanan.detail');
+        Route::post('/{kode_transaksi}/batal', 'batalkanPesanan')->name('pesanan.batal');
     });
 
     Route::get('/transaksi/{transaksi}/bukti-pembayaran', [TransaksiController::class, 'buktiPembayaran'])

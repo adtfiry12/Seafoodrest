@@ -21,7 +21,8 @@
         $totalSteps = 3;
     }
     $currentStep = $steps[$transaksi->status_pesanan] ?? 1;
-    $isActiveOrder = in_array($transaksi->status_pesanan, ['Menunggu ACC', 'Dimasak', 'Siap Diantar', 'Diantar']);
+    $isCancelled = in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true) || $transaksi->status_pembayaran === 'Batal';
+    $isActiveOrder = in_array($transaksi->status_pesanan, ['Menunggu ACC', 'Dimasak', 'Siap Diantar', 'Diantar']) && ! $isCancelled;
 @endphp
 
 <section class="relative overflow-hidden bg-charcoal-950 py-10 sm:py-14 border-b border-charcoal-800/80">
@@ -56,15 +57,28 @@
 <section class="min-h-[60vh] bg-slate-50/70 py-10 sm:py-14">
     <div class="mx-auto max-w-5xl space-y-6 px-4 sm:px-6 lg:px-8">
 
+        @if(session('success'))
+            <div class="rounded-2xl border border-emerald-200/80 bg-emerald-50 p-4 text-emerald-800 text-xs sm:text-sm font-medium flex items-center gap-3">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-base shrink-0"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="rounded-2xl border border-red-200/80 bg-red-50 p-4 text-red-800 text-xs sm:text-sm font-medium flex items-center gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-base shrink-0"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
         <!-- Visual Stepper Progress Bar -->
-        @if($transaksi->status_pesanan === 'Dibatalkan')
+        @if($isCancelled)
             <div class="rounded-2xl border border-red-200/80 bg-red-50/80 p-5 sm:p-6 shadow-xs flex items-center gap-4 text-red-700">
                 <div class="w-11 h-11 rounded-xl bg-red-100 flex items-center justify-center text-xl shrink-0">
                     <i class="fa-solid fa-circle-xmark"></i>
                 </div>
                 <div>
                     <h3 class="font-bold text-base">Pesanan Telah Dibatalkan</h3>
-                    <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pesanan ini telah dibatalkan oleh pihak restoran atau pelanggan. Hubungi kami jika terdapat kendala.</p>
+                    <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pesanan ini telah dibatalkan oleh pihak restoran atau sistem (melebihi batas waktu pembayaran). Hubungi kami jika terdapat kendala.</p>
                 </div>
             </div>
         @else
@@ -354,8 +368,8 @@
             </div>
             <div class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs">
                 <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Pembayaran</p>
-                <p class="mt-1.5 font-semibold text-sm sm:text-base {{ $transaksi->status_pembayaran === 'Lunas' ? 'text-emerald-600' : 'text-amber-600' }} flex items-center gap-2">
-                    <i class="fa-solid {{ $transaksi->status_pembayaran === 'Lunas' ? 'fa-circle-check' : 'fa-clock' }}"></i>
+                <p class="mt-1.5 font-semibold text-sm sm:text-base {{ $transaksi->status_pembayaran === 'Lunas' ? 'text-emerald-600' : ($isCancelled ? 'text-red-600' : 'text-amber-600') }} flex items-center gap-2">
+                    <i class="fa-solid {{ $transaksi->status_pembayaran === 'Lunas' ? 'fa-circle-check' : ($isCancelled ? 'fa-circle-xmark' : 'fa-clock') }}"></i>
                     {{ $transaksi->status_pembayaran }}
                 </p>
             </div>
@@ -412,9 +426,18 @@
 
         <div class="flex flex-col sm:flex-row flex-wrap gap-2.5">
             <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200/80 bg-white px-5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal-950 hover:bg-slate-50 transition shadow-xs"><i class="fa-solid fa-receipt"></i> Lihat Struk</a>
-            @if($transaksi->metode_pembayaran === 'QRIS' && $transaksi->status_pembayaran !== 'Lunas')
+            @if($transaksi->metode_pembayaran === 'QRIS' && $transaksi->status_pembayaran === 'Belum Lunas' && !$isCancelled && $transaksi->status_pesanan !== 'Selesai')
                 <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal-950 hover:bg-gold-600 hover:text-white transition shadow-xs"><i class="fa-solid fa-wallet"></i> Lanjutkan Pembayaran</a>
             @endif
+            @if($transaksi->status_pesanan === 'Menunggu ACC' && $transaksi->status_pembayaran === 'Belum Lunas' && !$isCancelled)
+                <form action="{{ route('front.pesanan.batal', $transaksi->kode_transaksi) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')" class="w-full sm:w-auto">
+                    @csrf
+                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-5 py-2.5 text-xs sm:text-sm font-semibold transition shadow-xs">
+                        <i class="fa-solid fa-ban"></i> Batalkan Pesanan
+                    </button>
+                </form>
+            @endif
+        </div>
     </div>
 </section>
 @endsection

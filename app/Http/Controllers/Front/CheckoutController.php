@@ -138,6 +138,7 @@ class CheckoutController extends Controller
     public function qris($kode_transaksi)
     {
         $transaksi = $this->accessibleTransaction($kode_transaksi);
+        $transaksi->batalkanJikaKedaluwarsa();
         $transaksi->load('detail.menu');
 
         return view('front.checkout.qris', compact('transaksi'));
@@ -153,6 +154,8 @@ class CheckoutController extends Controller
 
     public function pesanan()
     {
+        Transaksi::batalkanSemuaQrisKedaluwarsa();
+
         $transaksi = Transaksi::with('detail')
             ->where('pengguna_id', Auth::id())
             ->latest()
@@ -168,7 +171,28 @@ class CheckoutController extends Controller
             ->where('kode_transaksi', $kode_transaksi)
             ->firstOrFail();
 
+        $transaksi->batalkanJikaKedaluwarsa();
+
         return view('front.pesanan-detail', compact('transaksi'));
+    }
+
+    public function batalkanPesanan(string $kode_transaksi)
+    {
+        $transaksi = $this->accessibleTransaction($kode_transaksi);
+
+        if (! in_array($transaksi->status_pesanan, ['Menunggu ACC'], true) || $transaksi->status_pembayaran === 'Lunas') {
+            return back()->with('error', 'Pesanan yang sedang diproses atau sudah lunas tidak dapat dibatalkan.');
+        }
+
+        DB::transaction(function () use ($transaksi) {
+            $transaksi->update([
+                'status_pesanan' => 'Dibatalkan',
+                'status_pembayaran' => 'Batal',
+            ]);
+            $transaksi->restoreStockIfNeeded();
+        });
+
+        return back()->with('success', 'Pesanan ' . $transaksi->kode_transaksi . ' berhasil dibatalkan.');
     }
 
     public function struk($kode_transaksi)
@@ -186,6 +210,10 @@ class CheckoutController extends Controller
         ]);
 
         $transaksi = $this->accessibleTransaction($kode_transaksi);
+
+        if ($transaksi->batalkanJikaKedaluwarsa() || in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true) || $transaksi->status_pembayaran === 'Batal') {
+            return back()->with('error', 'Batas waktu pembayaran QRIS (1 jam) telah berakhir dan pesanan telah dibatalkan.');
+        }
 
         abort_if($transaksi->metode_pembayaran !== 'QRIS' || $transaksi->status_pembayaran !== 'Belum Lunas', 422, 'Bukti pembayaran hanya dapat diunggah satu kali untuk transaksi yang belum dibayar.');
 

@@ -120,4 +120,80 @@ class Transaksi extends Model
 
         $this->update(['stok_dikembalikan' => true]);
     }
+
+    public function isQrisExpired(): bool
+    {
+        if ($this->metode_pembayaran !== 'QRIS') {
+            return false;
+        }
+
+        if ($this->status_pembayaran !== 'Belum Lunas') {
+            return false;
+        }
+
+        if (in_array($this->status_pesanan, ['Dibatalkan', 'Batal', 'Selesai'], true)) {
+            return false;
+        }
+
+        return $this->created_at ? $this->created_at->addHour()->isPast() : false;
+    }
+
+    public function getQrisBatasWaktuAttribute(): ?\Carbon\Carbon
+    {
+        if ($this->metode_pembayaran !== 'QRIS' || ! $this->created_at) {
+            return null;
+        }
+
+        return $this->created_at->copy()->addHour();
+    }
+
+    public function getSisaDetikQrisAttribute(): int
+    {
+        if (! $this->qris_batas_waktu) {
+            return 0;
+        }
+
+        return max(0, (int) now()->diffInSeconds($this->qris_batas_waktu, false));
+    }
+
+    public function batalkanJikaKedaluwarsa(): bool
+    {
+        if ($this->isQrisExpired()) {
+            \Illuminate\Support\Facades\DB::transaction(function () {
+                $this->update([
+                    'status_pesanan' => 'Dibatalkan',
+                    'status_pembayaran' => 'Batal',
+                ]);
+                $this->restoreStockIfNeeded();
+            });
+            $this->refresh();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function batalkanSemuaQrisKedaluwarsa(): int
+    {
+        $expiredTransactions = static::where('metode_pembayaran', 'QRIS')
+            ->where('status_pembayaran', 'Belum Lunas')
+            ->whereNotIn('status_pesanan', ['Dibatalkan', 'Batal', 'Selesai'])
+            ->where('created_at', '<=', now()->subHour())
+            ->get();
+
+        $count = 0;
+        foreach ($expiredTransactions as $trx) {
+            \Illuminate\Support\Facades\DB::transaction(function () use ($trx) {
+                $trx->update([
+                    'status_pesanan' => 'Dibatalkan',
+                    'status_pembayaran' => 'Batal',
+                ]);
+                $trx->restoreStockIfNeeded();
+            });
+            $count++;
+        }
+
+        return $count;
+    }
 }

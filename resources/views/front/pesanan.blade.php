@@ -19,8 +19,24 @@
 <section class="min-h-[60vh] bg-slate-50/70 py-10 sm:py-14">
     <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 
+        @if(session('success'))
+            <div class="mb-5 rounded-2xl border border-emerald-200/80 bg-emerald-50 p-4 text-emerald-800 text-xs sm:text-sm font-medium flex items-center gap-3">
+                <i class="fa-solid fa-circle-check text-emerald-600 text-base shrink-0"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="mb-5 rounded-2xl border border-red-200/80 bg-red-50 p-4 text-red-800 text-xs sm:text-sm font-medium flex items-center gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-red-600 text-base shrink-0"></i>
+                <span>{{ session('error') }}</span>
+            </div>
+        @endif
+
         <div class="space-y-4 sm:space-y-5">
             @forelse($transaksi as $trx)
+                @php
+                    $isBatal = in_array($trx->status_pesanan, ['Dibatalkan', 'Batal'], true) || $trx->status_pembayaran === 'Batal';
+                @endphp
                 <div class="bg-white rounded-2xl shadow-xs border border-slate-200/80 overflow-hidden">
                     <div class="bg-slate-50/80 px-5 py-3.5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div>
@@ -44,7 +60,7 @@
                         <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-6 text-xs sm:text-sm">
                             <div><p class="text-[11px] text-slate-400 font-medium">Layanan</p><p class="mt-0.5 font-semibold text-charcoal-950 truncate">{{ $trx->tipe_pesanan }}</p></div>
                             <div><p class="text-[11px] text-slate-400 font-medium">Porsi</p><p class="mt-0.5 font-semibold text-charcoal-950">{{ $trx->detail->sum('qty') }} Menu</p></div>
-                            <div><p class="text-[11px] text-slate-400 font-medium">Bayar</p><p class="mt-0.5 font-semibold {{ $trx->status_pembayaran === 'Lunas' ? 'text-emerald-600' : 'text-amber-600' }}">{{ $trx->status_pembayaran }}</p></div>
+                            <div><p class="text-[11px] text-slate-400 font-medium">Bayar</p><p class="mt-0.5 font-semibold {{ $trx->status_pembayaran === 'Lunas' ? 'text-emerald-600' : ($isBatal ? 'text-red-600' : 'text-amber-600') }}">{{ $trx->status_pembayaran }}</p></div>
                         </div>
 
                         <div class="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-t-0 border-slate-100 pt-3 sm:pt-0">
@@ -52,7 +68,7 @@
                             <div class="flex gap-1.5">
                                 <a href="{{ route('front.pesanan.detail', $trx->kode_transaksi) }}" title="Lihat detail pesanan" aria-label="Lihat detail pesanan" class="inline-flex items-center justify-center w-9 h-9 bg-charcoal-900 text-white rounded-lg hover:bg-gold-600 transition shadow-xs text-xs"><i class="fa-solid fa-eye"></i></a>
                                 <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" target="_blank" title="Lihat struk" aria-label="Lihat struk" class="inline-flex items-center justify-center w-9 h-9 bg-slate-100 text-slate-700 rounded-lg border border-slate-200/80 hover:bg-slate-200 transition shadow-xs text-xs"><i class="fa-solid fa-receipt"></i></a>
-                                @if($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran != 'Lunas')
+                                @if($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran == 'Belum Lunas' && !$isBatal && $trx->status_pesanan !== 'Selesai')
                                     <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $trx->kode_transaksi]) }}" title="Bayar Sekarang (QRIS / Transfer)" aria-label="Bayar Sekarang (QRIS / Transfer)" class="inline-flex items-center justify-center w-9 h-9 bg-gold-500 text-charcoal-950 rounded-lg hover:bg-gold-600 hover:text-white transition shadow-xs text-xs"><i class="fa-solid fa-wallet"></i></a>
                                 @endif
                             </div>
