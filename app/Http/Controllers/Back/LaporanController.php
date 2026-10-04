@@ -19,7 +19,8 @@ class LaporanController extends Controller
 
         [$dari, $sampai] = $this->resolvePeriod($validated['dari'] ?? null, $validated['sampai'] ?? null);
 
-        $query = Transaksi::where('status_pesanan', 'Selesai')
+        $query = Transaksi::where('status_pembayaran', 'Lunas')
+            ->whereNotIn('status_pesanan', ['Dibatalkan', 'Batal'])
             ->whereBetween('created_at', [$dari->copy()->startOfDay(), $sampai->copy()->endOfDay()]);
 
         $total_pendapatan = $query->sum('total_bayar');
@@ -38,7 +39,8 @@ class LaporanController extends Controller
         ]);
 
         [$dari, $sampai] = $this->resolvePeriod($validated['dari'] ?? null, $validated['sampai'] ?? null);
-        $query = Transaksi::where('status_pesanan', 'Selesai')
+        $query = Transaksi::where('status_pembayaran', 'Lunas')
+            ->whereNotIn('status_pesanan', ['Dibatalkan', 'Batal'])
             ->whereBetween('created_at', [$dari->copy()->startOfDay(), $sampai->copy()->endOfDay()]);
 
         $transaksi = $query->with(['pelanggan', 'detail.menu'])->latest()->get();

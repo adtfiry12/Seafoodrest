@@ -13,6 +13,36 @@
         </a>
     </div>
 
+    @if(session('success'))
+        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-medium flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 shrink-0"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if($transaksi->status_pembayaran !== 'Lunas' && !in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal']))
+        <div class="rounded-2xl border border-amber-300 bg-amber-50/90 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center text-xl shrink-0">
+                    <i class="fa-solid fa-cash-register"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Tagihan Kasir: Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</h3>
+                    <p class="text-xs text-amber-800/80 mt-0.5">Status saat ini: <strong class="text-amber-950">{{ $transaksi->status_pembayaran }}</strong> · Metode: <strong>{{ $transaksi->metode_pembayaran }}</strong></p>
+                </div>
+            </div>
+            <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" onsubmit="return confirm('Konfirmasi bahwa uang pembayaran sebesar Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }} telah diterima di kasir?')">
+                @csrf
+                <input type="hidden" name="status_pesanan" value="{{ $transaksi->status_pesanan }}">
+                <input type="hidden" name="status_pembayaran" value="Lunas">
+                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <span>Terima Pembayaran (Lunas)</span>
+                </button>
+            </form>
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
             <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Pelanggan</p>

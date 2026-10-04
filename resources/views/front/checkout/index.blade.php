@@ -25,6 +25,29 @@
             </a>
         </div>
 
+        @if($errors->any() || session('error'))
+            <div class="mb-6 rounded-2xl border border-rose-200/90 bg-rose-50/90 p-4 sm:p-5 text-rose-900 shadow-xs" role="alert">
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 text-sm">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="flex-1 text-xs sm:text-sm">
+                        <h4 class="font-bold text-rose-950 mb-1">Perhatian Sebelum Memproses Pesanan:</h4>
+                        @if(session('error'))
+                            <p class="leading-relaxed">{{ session('error') }}</p>
+                        @endif
+                        @if($errors->any())
+                            <ul class="list-disc list-inside space-y-0.5 leading-relaxed">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <form action="{{ route('checkout.proses') }}" method="POST" @submit.prevent="handleSubmit($event)" x-show="cart.length > 0" class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10" x-cloak>
             @csrf
 

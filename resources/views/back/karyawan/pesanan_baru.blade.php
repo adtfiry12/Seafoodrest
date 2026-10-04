@@ -120,9 +120,10 @@
                                 </button>
 
                             @else
-                                <input type="hidden" name="status_pembayaran" value="{{ $trx->metode_pembayaran == 'Tunai' ? 'Lunas' : 'Belum Lunas' }}">
-                                <button type="submit" class="w-full py-2 bg-gold-500 hover:bg-gold-600 text-charcoal-950 hover:text-white text-xs font-semibold rounded-xl transition shadow-xs">
-                                    {{ $trx->metode_pembayaran == 'Tunai' ? 'Terima & ACC' : 'ACC Dapur (COD)' }}
+                                <input type="hidden" name="status_pembayaran" value="Belum Lunas">
+                                <button type="submit" class="w-full py-2 bg-gold-500 hover:bg-gold-600 text-charcoal-950 hover:text-white text-xs font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5" title="Teruskan pesanan ke dapur">
+                                    <i class="fa-solid fa-fire-burner text-[11px]"></i>
+                                    <span>{{ $trx->metode_pembayaran == 'Tunai' ? 'ACC ke Dapur' : 'ACC Dapur (COD)' }}</span>
                                 </button>
                             @endif
                         </form>

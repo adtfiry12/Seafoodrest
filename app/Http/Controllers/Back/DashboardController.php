@@ -15,6 +15,8 @@ class DashboardController extends Controller
 {
     public function indexadmin(Request $request)
     {
+        Transaksi::batalkanSemuaQrisKedaluwarsa();
+
         $totalPendapatan = Transaksi::where('status_pembayaran', 'Lunas')->sum('total_bayar');
         $pesananBaru = Transaksi::where('status_pesanan', 'Menunggu ACC')->count();
         $totalMenu = Menu::count();
@@ -26,6 +28,9 @@ class DashboardController extends Controller
                                      ->get();
 
         $topMenus = DetailTransaksi::select('menu_id', DB::raw('SUM(qty) as total_terjual'))
+                                   ->whereHas('transaksi', function ($query) {
+                                       $query->whereNotIn('status_pesanan', ['Dibatalkan', 'Batal']);
+                                   })
                                    ->with('menu')
                                    ->groupBy('menu_id')
                                    ->orderByDesc('total_terjual')
@@ -54,15 +59,17 @@ class DashboardController extends Controller
 
     public function indexkaryawan()
     {
+        Transaksi::batalkanSemuaQrisKedaluwarsa();
+
         // Hitung semua metrik operasional realtime
         $pesananBaru = Transaksi::where('status_pesanan', 'Menunggu ACC')->count();
         $pesananDapur = Transaksi::where('status_pesanan', 'Dimasak')->count();
-        $pesananDelivery = Transaksi::where('status_pesanan', 'Diantar')->count();
+        $pesananDelivery = Transaksi::whereIn('status_pesanan', ['Siap Diantar', 'Diantar'])->count();
         $pesananSelesaiHariIni = Transaksi::where('status_pesanan', 'Selesai')->whereDate('updated_at', Carbon::today())->count();
 
         // Pesanan aktif yang sedang diproses
         $pesananAktif = Transaksi::with(['pelanggan', 'detail.menu'])
-            ->whereIn('status_pesanan', ['Menunggu ACC', 'Dimasak', 'Diantar'])
+            ->whereIn('status_pesanan', ['Menunggu ACC', 'Dimasak', 'Siap Diantar', 'Diantar'])
             ->latest()
             ->take(6)
             ->get();

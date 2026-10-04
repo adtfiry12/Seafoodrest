@@ -15,6 +15,8 @@ class KaryawanOperasionalController extends Controller
 {
     public function pesananBaru(Request $request)
     {
+        Transaksi::batalkanSemuaQrisKedaluwarsa();
+
         $query = Transaksi::with('pelanggan', 'detail.menu')
             ->whereIn('status_pesanan', ['Menunggu ACC']);
 
@@ -75,6 +77,8 @@ class KaryawanOperasionalController extends Controller
             ->where('kode_transaksi', $kode_transaksi)
             ->firstOrFail();
 
+        $transaksi->batalkanJikaKedaluwarsa();
+
         return view('back.karyawan.pesanan-detail', compact('transaksi'));
     }
 
@@ -105,7 +109,11 @@ class KaryawanOperasionalController extends Controller
             default => [],
         };
 
-        abort_unless(in_array($nextStatus, $allowedNextStatuses, true), 422, 'Perubahan status pesanan tidak diizinkan.');
+        $isPaymentSettlement = ($nextStatus === $currentStatus) &&
+            $transaksi->status_pembayaran !== 'Lunas' &&
+            ($validated['status_pembayaran'] ?? null) === 'Lunas';
+
+        abort_unless($isPaymentSettlement || in_array($nextStatus, $allowedNextStatuses, true), 422, 'Perubahan status pesanan tidak diizinkan.');
 
         $nextPaymentStatus = $validated['status_pembayaran'] ?? $transaksi->status_pembayaran;
 

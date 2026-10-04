@@ -18,6 +18,8 @@ class TransaksiController extends Controller
 {
     public function index(Request $request)
     {
+        Transaksi::batalkanSemuaQrisKedaluwarsa();
+
         $query = Transaksi::with(['pelanggan', 'karyawan'])->latest();
 
         if ($request->has('status') && $request->status !== 'Semua') {
@@ -118,6 +120,7 @@ class TransaksiController extends Controller
 
     public function show(Transaksi $transaksi)
     {
+        $transaksi->batalkanJikaKedaluwarsa();
         $transaksi->load(['pelanggan', 'karyawan', 'detail.menu', 'kurir']);
 
         return view('back.admin.transaksi.show', compact('transaksi'));

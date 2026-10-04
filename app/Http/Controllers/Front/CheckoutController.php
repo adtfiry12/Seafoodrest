@@ -85,7 +85,13 @@ class CheckoutController extends Controller
 
             foreach ($validated['items'] as $item) {
                 $menu = $menus->get($item['menu_id']);
-                abort_unless($menu && $menu->stok >= $item['qty'], 422, 'Stok menu tidak mencukupi.');
+                if (! $menu || $menu->stok < $item['qty']) {
+                    $namaMenu = $menu ? $menu->nama_menu : 'Menu';
+                    $sisaStok = $menu ? $menu->stok : 0;
+                    throw ValidationException::withMessages([
+                        'items' => "Stok hidangan '{$namaMenu}' tidak mencukupi (tersisa {$sisaStok} porsi). Silakan sesuaikan jumlah pesanan Anda.",
+                    ]);
+                }
 
                 $subtotal = $menu->harga * $item['qty'];
                 $totalBayar += $subtotal;
