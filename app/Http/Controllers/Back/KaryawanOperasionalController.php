@@ -218,7 +218,8 @@ class KaryawanOperasionalController extends Controller
             'status_pesanan' => ['required', 'in:Dimasak,Siap Diantar,Diantar,Selesai,Dibatalkan'],
             'status_pembayaran' => ['nullable', 'in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal'],
             'diterima_oleh' => ['nullable', 'string', 'max:100'],
-            'bukti_pengantaran' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'bukti_pengantaran_kamera' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'bukti_pengantaran_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
         ];
 
         if ($request->input('status_pesanan') === 'Selesai' && $transaksi->tipe_pesanan === 'Delivery') {
@@ -276,8 +277,11 @@ class KaryawanOperasionalController extends Controller
                 $updateData['waktu_sampai'] = now();
                 $updateData['diterima_oleh'] = $request->input('diterima_oleh') ?: ($transaksi->diterima_oleh ?? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan));
 
-                if ($request->hasFile('bukti_pengantaran')) {
-                    $updateData['bukti_pengantaran'] = $request->file('bukti_pengantaran')->store('bukti_pengantaran', 'public');
+                $buktiPengantaran = $request->file('bukti_pengantaran_kamera')
+                    ?? $request->file('bukti_pengantaran_file');
+
+                if ($buktiPengantaran) {
+                    $updateData['bukti_pengantaran'] = $buktiPengantaran->store('bukti_pengantaran', 'public');
                 }
             }
 

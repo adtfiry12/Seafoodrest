@@ -9,6 +9,13 @@
          penerimaNama: '',
          isCod: false,
          totalTagihan: '',
+         cameraOpen: false,
+         cameraError: '',
+         cameraStream: null,
+         cameraFileName: '',
+         selectedFileName: '',
+         cameraStatus: 'Kamera belum diaktifkan.',
+         cameraRequesting: false,
          openCompleteModal(url, kode, nama, isCod, tagihan) {
              this.actionUrl = url;
              this.kodeTrx = kode;
@@ -16,6 +23,65 @@
              this.isCod = isCod;
              this.totalTagihan = tagihan;
              this.completeModalOpen = true;
+         },
+         closeCompleteModal() {
+             this.stopCamera();
+             this.completeModalOpen = false;
+         },
+         async startCamera() {
+             this.cameraError = '';
+             this.cameraRequesting = true;
+             this.cameraStatus = 'Meminta izin kamera browser...';
+
+             if (! window.isSecureContext || ! navigator.mediaDevices?.getUserMedia) {
+                 this.cameraError = 'Izin kamera hanya tersedia melalui HTTPS atau localhost. Buka aplikasi melalui alamat yang aman.';
+                 this.cameraStatus = 'Kamera tidak tersedia.';
+                 this.cameraRequesting = false;
+                 return;
+             }
+
+             try {
+                 this.stopCamera();
+                 this.cameraStream = await navigator.mediaDevices.getUserMedia({
+                     video: { facingMode: { ideal: 'environment' } },
+                     audio: false,
+                 });
+                 this.cameraOpen = true;
+                 this.cameraStatus = 'Kamera aktif. Arahkan kamera ke bukti serah terima.';
+                 this.cameraRequesting = false;
+                 await this.$nextTick();
+                 this.$refs.cameraPreview.srcObject = this.cameraStream;
+             } catch (error) {
+                 this.cameraError = 'Izin kamera belum diberikan. Klik ikon kunci/kamera di samping alamat browser, pilih Izinkan, lalu klik Ambil Foto Kamera lagi.';
+                 this.cameraStatus = error.name === 'NotAllowedError' ? 'Akses kamera diblokir.' : 'Kamera tidak dapat dibuka.';
+                 this.cameraRequesting = false;
+             }
+         },
+         stopCamera() {
+             this.cameraStream?.getTracks().forEach((track) => track.stop());
+             this.cameraStream = null;
+             this.cameraOpen = false;
+             if (! this.cameraFileName) {
+                 this.cameraStatus = 'Kamera belum diaktifkan.';
+             }
+         },
+         capturePhoto() {
+             const video = this.$refs.cameraPreview;
+             const canvas = this.$refs.cameraCanvas;
+             canvas.width = video.videoWidth;
+             canvas.height = video.videoHeight;
+             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+             canvas.toBlob((blob) => {
+                 if (! blob) return;
+
+                 const file = new File([blob], `bukti-pengantaran-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                 const transfer = new DataTransfer();
+                 transfer.items.add(file);
+                 this.$refs.cameraInput.files = transfer.files;
+                 this.cameraFileName = file.name;
+                 this.stopCamera();
+             }, 'image/jpeg', 0.9);
          }
      }">
 
@@ -266,7 +332,7 @@
                     <h2 id="complete-modal-title" class="text-lg font-serif font-bold text-white mt-0.5">Selesaikan Pengantaran</h2>
                     <p class="text-xs text-slate-300 font-mono" x-text="kodeTrx"></p>
                 </div>
-                <button type="button" @click="completeModalOpen = false" class="text-slate-400 hover:text-white transition p-1" aria-label="Tutup modal">
+                <button type="button" @click="closeCompleteModal()" class="text-slate-400 hover:text-white transition p-1" aria-label="Tutup modal">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
@@ -307,16 +373,42 @@
                         <label class="block text-xs font-bold text-charcoal-900 uppercase tracking-wider mb-1.5">
                             Foto Bukti Serah Terima (Opsional)
                         </label>
-                        <input type="file"
-                               name="bukti_pengantaran"
-                               accept="image/*"
-                               class="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 file:mr-3 file:py-1.5 file:px-3.5 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition">
-                        <span class="text-[11px] text-slate-400 mt-1 block">Unggah foto saat pesanan diserahkan di depan rumah / pelanggan.</span>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            <button type="button" @click="startCamera()" :disabled="cameraRequesting" class="flex items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3 py-3 text-xs font-bold text-blue-700 hover:bg-blue-100 disabled:cursor-wait disabled:opacity-60 cursor-pointer transition">
+                                <i class="fa-solid fa-camera"></i>
+                                <span x-text="cameraRequesting ? 'Meminta Izin...' : 'Ambil Foto Kamera'"></span>
+                            </button>
+                            <label class="flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer transition">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <span x-text="selectedFileName || 'Pilih File Foto'"></span>
+                                <input type="file"
+                                       name="bukti_pengantaran_file"
+                                       accept="image/*"
+                                       @change="selectedFileName = $event.target.files[0]?.name || ''"
+                                       class="sr-only">
+                            </label>
+                        </div>
+                        <div x-show="cameraOpen" x-cloak class="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-slate-950 p-2">
+                            <video x-ref="cameraPreview" autoplay playsinline class="mx-auto aspect-video w-full rounded-lg object-cover"></video>
+                            <canvas x-ref="cameraCanvas" class="hidden"></canvas>
+                            <div class="mt-2 flex gap-2">
+                                <button type="button" @click="capturePhoto()" class="flex-1 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700 transition">
+                                    <i class="fa-solid fa-camera mr-1"></i> Ambil Foto
+                                </button>
+                                <button type="button" @click="stopCamera()" class="rounded-lg bg-white/10 px-3 py-2 text-xs font-bold text-white hover:bg-white/20 transition">
+                                    Tutup Kamera
+                                </button>
+                            </div>
+                        </div>
+                        <input type="file" x-ref="cameraInput" name="bukti_pengantaran_kamera" accept="image/*" class="hidden">
+                        <p x-show="cameraFileName" x-text="'Foto kamera siap: ' + cameraFileName" class="mt-1 text-[11px] font-medium text-emerald-600"></p>
+                        <p x-show="cameraError" x-text="cameraError" class="mt-1 text-[11px] font-medium text-rose-600"></p>
+                        <span class="text-[11px] text-slate-400 mt-1 block">Gunakan kamera langsung atau pilih foto dari galeri/perangkat.</span>
                     </div>
                 </div>
 
                 <div class="flex flex-col-reverse sm:flex-row sm:justify-end gap-2.5 px-6 py-4 bg-slate-50 border-t border-slate-100">
-                    <button type="button" @click="completeModalOpen = false" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-100 transition">
+                    <button type="button" @click="closeCompleteModal()" class="px-5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs sm:text-sm font-bold text-slate-600 hover:bg-slate-100 transition">
                         Batal
                     </button>
                     <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold transition shadow-xs flex items-center justify-center gap-2">
