@@ -73,6 +73,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'indexkaryawan'])->name('dashboard.karyawan');
 
         Route::controller(KaryawanOperasionalController::class)->name('karyawan.')->group(function () {
+            Route::get('/keranjang', 'posCreate')->name('keranjang');
+            Route::get('/pos', 'posCreate')->name('pos');
+            Route::post('/keranjang', 'posStore')->name('keranjang.store');
+            Route::post('/pos', 'posStore')->name('pos.store');
             Route::get('/pesanan-baru', 'pesananBaru')->name('pesanan_baru');
             Route::get('/dapur', 'dapur')->name('dapur');
             Route::get('/delivery', 'delivery')->name('delivery');

@@ -38,7 +38,22 @@
             </a>
 
             @if($isActiveOrder)
-                <div x-data="{ countdown: 25 }" x-init="setInterval(() => { if (countdown > 1) { countdown--; } else { window.location.reload(); } }, 1000)" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-md self-start sm:self-auto">
+                <div x-data="{
+                    countdown: 25,
+                    timer: null,
+                    init() {
+                        this.timer = setInterval(() => {
+                            if (this.countdown > 1) {
+                                this.countdown--;
+                            } else {
+                                window.location.reload();
+                            }
+                        }, 1000);
+                        this.$cleanup(() => {
+                            if (this.timer) clearInterval(this.timer);
+                        });
+                    }
+                }" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold backdrop-blur-md self-start sm:self-auto">
                     <span class="relative flex h-2 w-2">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>

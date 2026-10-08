@@ -5,14 +5,135 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use App\Models\Kategori;
 use App\Models\Menu;
+use App\Models\Pengguna;
 use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class KaryawanOperasionalController extends Controller
 {
+    public function posCreate(): View
+    {
+        Transaksi::batalkanSemuaQrisKedaluwarsa();
+
+        $menu = Menu::with('kategori')
+            ->where('is_active', 1)
+            ->where('stok', '>', 0)
+            ->orderBy('nama_menu')
+            ->get();
+
+        $pelanggan = Pengguna::where('role', 'pelanggan')
+            ->orderBy('nama')
+            ->get();
+
+        $kategoris = Kategori::orderBy('nama_kategori')->get();
+
+        return view('back.karyawan.pos', compact('menu', 'pelanggan', 'kategoris'));
+    }
+
+    public function posStore(Request $request)
+    {
+        $validated = $request->validate([
+            'pengguna_id' => ['nullable', 'exists:pengguna,id'],
+            'nama_pelanggan' => ['nullable', 'string', 'max:255'],
+            'no_hp_pelanggan' => ['nullable', 'string', 'max:20'],
+            'tipe_pesanan' => ['required', 'in:Dine-In,Takeaway,Delivery'],
+            'nomor_meja' => ['nullable', 'string', 'max:50'],
+            'alamat' => ['nullable', 'required_if:tipe_pesanan,Delivery', 'string', 'max:1000'],
+            'patokan_alamat' => ['nullable', 'string', 'max:255'],
+            'metode_pembayaran' => ['required', 'in:Tunai,QRIS,COD'],
+            'status_pembayaran' => ['required', 'in:Lunas,Belum Lunas'],
+            'status_pesanan' => ['required', 'in:Dimasak,Menunggu ACC'],
+            'catatan' => ['nullable', 'string', 'max:1000'],
+            'items' => ['required', 'array', 'min:1'],
+            'items.*.menu_id' => ['required', 'distinct', 'exists:menu,id'],
+            'items.*.qty' => ['required', 'integer', 'min:1', 'max:100'],
+        ]);
+
+        $transaksi = DB::transaction(function () use ($validated) {
+            $kode = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+            $subtotalBayar = 0;
+            $detailData = [];
+            $menuIds = collect($validated['items'])->pluck('menu_id');
+            $menus = Menu::whereIn('id', $menuIds)
+                ->where('is_active', true)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            foreach ($validated['items'] as $item) {
+                $m = $menus->get($item['menu_id']);
+                if (! $m || $m->stok < $item['qty']) {
+                    $namaMenu = $m ? $m->nama_menu : 'Menu';
+                    $sisaStok = $m ? $m->stok : 0;
+                    throw ValidationException::withMessages([
+                        'items' => "Stok hidangan '{$namaMenu}' tidak mencukupi (tersisa {$sisaStok} porsi).",
+                    ]);
+                }
+
+                $subtotal = $m->harga * $item['qty'];
+                $subtotalBayar += $subtotal;
+
+                $detailData[] = [
+                    'menu_id' => $m->id,
+                    'nama_menu' => $m->nama_menu,
+                    'qty' => $item['qty'],
+                    'harga_satuan' => $m->harga,
+                    'subtotal' => $subtotal,
+                ];
+
+                $m->decrement('stok', $item['qty']);
+            }
+
+            $namaPelanggan = $validated['nama_pelanggan'] ?? null;
+            $pelanggan = ! empty($validated['pengguna_id']) ? Pengguna::find($validated['pengguna_id']) : null;
+            $namaPelanggan ??= ($pelanggan?->nama ?? 'Pelanggan Walk-In');
+
+            $infoMeja = '';
+            if ($validated['tipe_pesanan'] === 'Dine-In' && ! empty($validated['nomor_meja'])) {
+                $infoMeja = '[LOKASI] Nomor Meja: ' . $validated['nomor_meja'] . "\n";
+            }
+
+            $catatanText = ! empty($validated['catatan']) ? "Catatan Dapur: {$validated['catatan']}" : '';
+            $finalCatatan = trim($infoMeja . $catatanText);
+
+            $ongkir = $validated['tipe_pesanan'] === 'Delivery' ? 15000 : 0;
+            $totalBayar = $subtotalBayar + $ongkir;
+
+            $transaksi = Transaksi::create([
+                'kode_transaksi' => $kode,
+                'pengguna_id' => $validated['pengguna_id'] ?? null,
+                'karyawan_id' => Auth::id(),
+                'nama_pelanggan' => $namaPelanggan,
+                'no_hp_pelanggan' => $validated['no_hp_pelanggan'] ?? $pelanggan?->no_hp,
+                'tipe_pesanan' => $validated['tipe_pesanan'],
+                'alamat' => $validated['tipe_pesanan'] === 'Delivery' ? $validated['alamat'] : null,
+                'patokan_alamat' => $validated['tipe_pesanan'] === 'Delivery' ? ($validated['patokan_alamat'] ?? null) : null,
+                'metode_pembayaran' => $validated['metode_pembayaran'],
+                'status_pembayaran' => $validated['status_pembayaran'],
+                'dibayar_pada' => $validated['status_pembayaran'] === 'Lunas' ? now() : null,
+                'status_pesanan' => $validated['status_pesanan'],
+                'subtotal_bayar' => $subtotalBayar,
+                'ongkos_kirim' => $ongkir,
+                'total_bayar' => $totalBayar,
+                'catatan' => $finalCatatan ?: null,
+            ]);
+
+            foreach ($detailData as $detail) {
+                $transaksi->detail()->create($detail);
+            }
+
+            return $transaksi;
+        });
+
+        return redirect()->route('karyawan.pesanan.detail', $transaksi->kode_transaksi)
+            ->with('success', 'Transaksi kasir ' . $transaksi->kode_transaksi . ' berhasil dibuat!');
+    }
+
     public function pesananBaru(Request $request)
     {
         Transaksi::batalkanSemuaQrisKedaluwarsa();

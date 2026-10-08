@@ -331,11 +331,9 @@
 </div>
 
 <script>
-    // Auto-refresh setiap 30 detik untuk memantau pesanan baru siap antar
-    setTimeout(function() {
-        if (!document.querySelector('[aria-modal="true"]:not([style*="display: none"])')) {
-            window.location.reload();
-        }
-    }, 30000);
+    // Auto-refresh setiap 30 detik untuk memantau pesanan baru siap antar secara aman
+    if (typeof window.scheduleKaryawanAutoRefresh === 'function') {
+        window.scheduleKaryawanAutoRefresh(30);
+    }
 </script>
 @endsection

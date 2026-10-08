@@ -494,6 +494,12 @@
                     const newMain = doc.getElementById('main-content');
 
                     if (newMain) {
+                        if (window.Alpine && typeof window.Alpine.destroyTree === 'function') {
+                            try {
+                                window.Alpine.destroyTree(main);
+                            } catch (e) {}
+                        }
+
                         main.innerHTML = newMain.innerHTML;
                         const newTitle = doc.querySelector('title');
                         if (newTitle) document.title = newTitle.innerText;

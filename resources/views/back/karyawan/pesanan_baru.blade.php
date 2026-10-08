@@ -24,8 +24,11 @@
                 </button>
             </form>
 
-            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
-                <span class="text-xs font-semibold text-slate-400 hidden sm:block">Auto Refresh: <span class="text-emerald-600">ON</span></span>
+            <div class="flex items-center gap-2.5 w-full sm:w-auto justify-between sm:justify-start">
+                <a href="{{ route('karyawan.keranjang') }}" class="px-4 py-2.5 bg-gold-500 hover:bg-gold-600 text-charcoal-950 font-bold rounded-xl text-xs sm:text-sm shadow-xs flex items-center gap-2 transition active:scale-95 shrink-0">
+                    <i class="fa-solid fa-cash-register text-xs"></i>
+                    <span>Kasir</span>
+                </a>
                 <button onclick="window.location.reload();" class="group px-4 py-2.5 bg-white border border-slate-200/90 hover:border-gold-300 hover:bg-gold-50/80 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 hover:text-gold-900 transition-all duration-200 shadow-2xs flex items-center gap-2 active:scale-95">
                     <i class="fa-solid fa-rotate-right text-xs text-gold-600 group-hover:rotate-180 transition-transform duration-500"></i> <span>Refresh</span>
                 </button>
@@ -148,10 +151,10 @@
 
 </div>
 
-<!-- Auto Refresh Script (Halaman otomatis ke-reload setiap 30 detik, termasuk dengan pencarian/halaman) -->
+<!-- Auto Refresh Script (Otomatis perbarui antrean setiap 30 detik secara aman) -->
 <script>
-    setTimeout(function() {
-        window.location.reload();
-    }, 30000); // 30000 ms = 30 detik
+    if (typeof window.scheduleKaryawanAutoRefresh === 'function') {
+        window.scheduleKaryawanAutoRefresh(30);
+    }
 </script>
 @endsection

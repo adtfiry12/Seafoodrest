@@ -104,8 +104,8 @@
 </div>
 
 <script>
-    setTimeout(function() {
-        window.location.reload();
-    }, 30000);
+    if (typeof window.scheduleKaryawanAutoRefresh === 'function') {
+        window.scheduleKaryawanAutoRefresh(30);
+    }
 </script>
 @endsection

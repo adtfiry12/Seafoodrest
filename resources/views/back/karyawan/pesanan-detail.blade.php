@@ -8,9 +8,14 @@
             <h1 class="mt-1 text-xl sm:text-2xl font-serif font-bold text-charcoal-900">{{ $transaksi->kode_transaksi }}</h1>
             <p class="mt-1 text-sm text-slate-500">{{ $transaksi->created_at->format('d M Y, H:i') }} · {{ $transaksi->tipe_pesanan }}</p>
         </div>
-        <a href="{{ url()->previous() }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition shadow-xs">
-            <i class="fa-solid fa-arrow-left"></i> Kembali
-        </a>
+        <div class="flex items-center gap-2.5 w-full sm:w-auto">
+            <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-charcoal-900 bg-gold-400 hover:bg-gold-500 rounded-xl transition shadow-xs">
+                <i class="fa-solid fa-print"></i> Cetak Struk
+            </a>
+            <a href="{{ url()->previous() }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 transition shadow-xs">
+                <i class="fa-solid fa-arrow-left"></i> Kembali
+            </a>
+        </div>
     </div>
 
     @if(session('success'))

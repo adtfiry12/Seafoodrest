@@ -22,7 +22,11 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-2.5 shrink-0">
+        <div class="flex items-center gap-2.5 shrink-0 flex-wrap">
+            <a href="{{ route('karyawan.keranjang') }}" class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-gold-500 hover:bg-gold-600 active:bg-gold-700 text-charcoal-950 text-xs font-bold rounded-xl shadow-xs transition-all duration-200 active:scale-95">
+                <i class="fa-solid fa-basket-shopping text-xs"></i>
+                <span>Keranjang</span>
+            </a>
             <!-- Digital Clock with WIB -->
             <div class="bg-white border border-slate-200/90 rounded-xl px-3.5 py-2 shadow-2xs text-right">
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu Layanan</p>
@@ -245,9 +249,13 @@
                     <i class="fa-solid fa-bolt text-gold-500"></i> Akses Cepat Operasional
                 </h3>
                 <div class="grid grid-cols-2 gap-2.5 text-xs font-medium">
+                    <a href="{{ route('karyawan.keranjang') }}" class="col-span-2 p-3 bg-gold-50/90 hover:bg-gold-100 hover:text-gold-950 text-gold-950 border border-gold-300 rounded-xl transition-all duration-200 flex items-center justify-center text-center gap-2 group hover:shadow-xs hover:-translate-y-0.5 active:scale-95 font-bold">
+                        <i class="fa-solid fa-basket-shopping text-base text-gold-600 group-hover:scale-110 transition-transform"></i>
+                        <span>Keranjang</span>
+                    </a>
                     <a href="{{ route('karyawan.pesanan_baru') }}" class="p-3 bg-slate-50/70 hover:bg-red-50/70 hover:text-red-700 border border-slate-200/70 hover:border-red-300 rounded-xl transition-all duration-200 flex flex-col items-center text-center gap-1.5 group hover:shadow-xs hover:-translate-y-0.5 active:scale-95">
-                        <i class="fa-solid fa-cash-register text-base text-red-500 group-hover:scale-110 transition-transform"></i>
-                        <span>Meja Kasir</span>
+                        <i class="fa-solid fa-bell-concierge text-base text-red-500 group-hover:scale-110 transition-transform"></i>
+                        <span>Antrean Kasir</span>
                     </a>
                     <a href="{{ route('karyawan.dapur') }}" class="p-3 bg-slate-50/70 hover:bg-orange-50/70 hover:text-orange-700 border border-slate-200/70 hover:border-orange-300 rounded-xl transition-all duration-200 flex flex-col items-center text-center gap-1.5 group hover:shadow-xs hover:-translate-y-0.5 active:scale-95">
                         <i class="fa-solid fa-kitchen-set text-base text-orange-500 group-hover:scale-110 transition-transform"></i>
@@ -269,10 +277,10 @@
     </div>
 </div>
 
-<!-- Auto-refresh script (setiap 30 detik agar dashboard selalu realtime) -->
+<!-- Auto-refresh script (setiap 30 detik agar dashboard selalu realtime tanpa mengganggu form) -->
 <script>
-    setTimeout(function() {
-        window.location.reload();
-    }, 30000);
+    if (typeof window.scheduleKaryawanAutoRefresh === 'function') {
+        window.scheduleKaryawanAutoRefresh(30);
+    }
 </script>
 @endsection

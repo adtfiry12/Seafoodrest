@@ -82,9 +82,14 @@
                 <li class="pt-3 mt-3 space-y-1.5 border-t border-slate-100">
                     <p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Tugas Operasional</p>
 
+                    <a href="{{ route('karyawan.keranjang') }}" class="sidebar-nav-link flex items-center px-3 py-2.5 rounded-xl group transition {{ request()->routeIs('karyawan.pos*') || request()->routeIs('karyawan.keranjang*') ? 'bg-charcoal-950 text-white shadow-xs font-medium' : 'text-slate-700 hover:bg-slate-100 hover:text-charcoal-950' }}">
+                        <i class="fa-solid fa-cash-register w-4 h-4 transition {{ request()->routeIs('karyawan.pos*') || request()->routeIs('karyawan.keranjang*') ? 'text-gold-400' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
+                        <span class="ml-3 flex-1 whitespace-nowrap">Kasir</span>
+                    </a>
+
                     <a href="{{ route('karyawan.pesanan_baru') }}" class="sidebar-nav-link flex items-center px-3 py-2.5 rounded-xl group transition {{ request()->routeIs('karyawan.pesanan_baru') ? 'bg-charcoal-950 text-white shadow-xs font-medium' : 'text-slate-700 hover:bg-slate-100 hover:text-charcoal-950' }}">
                         <i class="fa-solid fa-bell-concierge w-4 h-4 transition {{ request()->routeIs('karyawan.pesanan_baru') ? 'text-gold-400' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
-                        <span class="ml-3 flex-1 whitespace-nowrap">Pesanan Baru (Kasir)</span>
+                        <span class="ml-3 flex-1 whitespace-nowrap">Pesanan Masuk</span>
                         @if($pendingACC > 0)
                             <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-rose-600 rounded-full shadow-2xs">{{ $pendingACC }}</span>
                         @endif
@@ -229,7 +234,51 @@
                 });
             }
 
+            // --- Global Karyawan Auto-Refresh Manager ---
+            window.__karyawanAutoRefreshTimer = null;
+
+            window.stopKaryawanAutoRefresh = function() {
+                if (window.__karyawanAutoRefreshTimer) {
+                    clearTimeout(window.__karyawanAutoRefreshTimer);
+                    window.__karyawanAutoRefreshTimer = null;
+                }
+            };
+
+            window.scheduleKaryawanAutoRefresh = function(seconds = 30) {
+                window.stopKaryawanAutoRefresh();
+
+                // Pastikan TIDAK PERNAH auto-refresh di halaman Kasir / Keranjang
+                const currentPath = window.location.pathname;
+                if (currentPath.includes('/keranjang') || currentPath.includes('/pos')) {
+                    return;
+                }
+
+                window.__karyawanAutoRefreshTimer = setTimeout(function() {
+                    const path = window.location.pathname;
+                    if (path.includes('/keranjang') || path.includes('/pos')) {
+                        return;
+                    }
+
+                    // Jangan refresh jika user sedang aktif mengetik di input/textarea/select atau ada modal terbuka
+                    const activeEl = document.activeElement;
+                    const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
+                    const hasOpenModal = !!document.querySelector('[aria-modal="true"]:not([style*="display: none"])');
+
+                    if (isTyping || hasOpenModal) {
+                        window.scheduleKaryawanAutoRefresh(15);
+                        return;
+                    }
+
+                    if (typeof pjaxNavigate === 'function') {
+                        pjaxNavigate(window.location.href, false);
+                    } else {
+                        window.location.reload();
+                    }
+                }, seconds * 1000);
+            };
+
             async function pjaxNavigate(url, updateHistory = true) {
+                window.stopKaryawanAutoRefresh();
                 const main = document.getElementById('karyawan-main-content');
                 if (!main) {
                     window.location.href = url;
@@ -250,6 +299,12 @@
                     const newMain = doc.getElementById('karyawan-main-content');
 
                     if (newMain) {
+                        if (window.Alpine && typeof window.Alpine.destroyTree === 'function') {
+                            try {
+                                window.Alpine.destroyTree(main);
+                            } catch (e) {}
+                        }
+
                         main.innerHTML = newMain.innerHTML;
                         const newTitle = doc.querySelector('title');
                         if (newTitle) document.title = newTitle.innerText;
@@ -263,7 +318,11 @@
                         });
 
                         if (window.Alpine) {
-                            window.Alpine.initTree(main);
+                            try {
+                                window.Alpine.initTree(main);
+                            } catch (e) {
+                                console.error('Alpine initTree error:', e);
+                            }
                         }
 
                         if (updateHistory) {
