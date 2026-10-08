@@ -147,8 +147,8 @@
         @yield('content')
     </div>
 
-    <div x-show="actionModalOpen" x-cloak class="fixed inset-0 z-[60] flex min-h-screen items-center justify-center bg-slate-950/40 px-4 py-6 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="action-modal-title">
-        <div x-show="actionModalOpen" x-transition class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+    <div x-show="actionModalOpen" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-slate-950/50 backdrop-blur-xs overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="action-modal-title">
+        <div x-show="actionModalOpen" x-transition class="w-full max-w-md my-auto overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
             <div class="flex items-start gap-4 border-b border-slate-100 px-6 py-5">
                 <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-50 text-gold-600"><i class="fa-solid fa-circle-question"></i></div>
                 <div>

@@ -218,13 +218,9 @@ class KaryawanOperasionalController extends Controller
             'status_pesanan' => ['required', 'in:Dimasak,Siap Diantar,Diantar,Selesai,Dibatalkan'],
             'status_pembayaran' => ['nullable', 'in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal'],
             'diterima_oleh' => ['nullable', 'string', 'max:100'],
-            'bukti_pengantaran_kamera' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
-            'bukti_pengantaran_file' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:3072'],
+            'bukti_pengantaran_kamera' => ['nullable'],
+            'bukti_pengantaran_file' => ['nullable'],
         ];
-
-        if ($request->input('status_pesanan') === 'Selesai' && $transaksi->tipe_pesanan === 'Delivery') {
-            $rules['diterima_oleh'] = ['required', 'string', 'max:100'];
-        }
 
         $validated = $request->validate($rules);
         $nextStatus = $validated['status_pesanan'];
@@ -275,7 +271,7 @@ class KaryawanOperasionalController extends Controller
                 $updateData['kurir_id'] = $transaksi->kurir_id ?? Auth::id();
                 $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? ($transaksi->created_at ?? now());
                 $updateData['waktu_sampai'] = now();
-                $updateData['diterima_oleh'] = $request->input('diterima_oleh') ?: ($transaksi->diterima_oleh ?? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan));
+                $updateData['diterima_oleh'] = $request->input('diterima_oleh') ?: ($transaksi->diterima_oleh ?? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan ?? 'Pelanggan'));
 
                 $buktiPengantaran = $request->file('bukti_pengantaran_kamera')
                     ?? $request->file('bukti_pengantaran_file');
