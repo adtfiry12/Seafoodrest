@@ -21,22 +21,20 @@
             <div>
                 <label for="status_pembayaran" class="block text-sm font-semibold text-charcoal-900 mb-2">Status Pembayaran</label>
                 <select name="status_pembayaran" id="status_pembayaran" required class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 transition-all">
-                    <option value="Belum Lunas" {{ $transaksi->status_pembayaran == 'Belum Lunas' ? 'selected' : '' }}>Belum Lunas</option>
-                    <option value="Menunggu Konfirmasi" {{ $transaksi->status_pembayaran == 'Menunggu Konfirmasi' ? 'selected' : '' }}>Menunggu Konfirmasi</option>
-                    <option value="Lunas" {{ $transaksi->status_pembayaran == 'Lunas' ? 'selected' : '' }}>Lunas (Telah Dibayar)</option>
-                    <option value="Batal" {{ $transaksi->status_pembayaran == 'Batal' ? 'selected' : '' }}>Batal</option>
+                    @foreach($statusPembayaranOptions as $statusPembayaran)
+                        <option value="{{ $statusPembayaran }}" {{ $transaksi->status_pembayaran === $statusPembayaran ? 'selected' : '' }}>
+                            {{ $statusPembayaran === 'Lunas' ? 'Lunas (Telah Dibayar)' : $statusPembayaran }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
 
             <div>
                 <label for="status_pesanan" class="block text-sm font-semibold text-charcoal-900 mb-2">Progress Pesanan</label>
                 <select name="status_pesanan" id="status_pesanan" required class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 transition-all">
-                    <option value="Menunggu ACC" {{ $transaksi->status_pesanan == 'Menunggu ACC' ? 'selected' : '' }}>Menunggu ACC (Pesanan Baru)</option>
-                    <option value="Dimasak" {{ $transaksi->status_pesanan == 'Dimasak' ? 'selected' : '' }}>Dimasak di Dapur</option>
-                    <option value="Siap Diantar" {{ $transaksi->status_pesanan == 'Siap Diantar' ? 'selected' : '' }}>Siap Diantar (Dikemas / Menunggu Kurir)</option>
-                    <option value="Diantar" {{ $transaksi->status_pesanan == 'Diantar' ? 'selected' : '' }}>Diantar / Dalam Perjalanan Kurir</option>
-                    <option value="Selesai" {{ $transaksi->status_pesanan == 'Selesai' ? 'selected' : '' }}>Selesai (Diterima)</option>
-                    <option value="Dibatalkan" {{ $transaksi->status_pesanan == 'Dibatalkan' ? 'selected' : '' }}>Dibatalkan</option>
+                    @foreach($statusPesananOptions as $statusPesanan)
+                        <option value="{{ $statusPesanan }}" {{ $transaksi->status_pesanan === $statusPesanan ? 'selected' : '' }}>{{ $statusPesanan }}</option>
+                    @endforeach
                 </select>
                 <p class="text-xs text-slate-400 mt-2">Pastikan status pesanan disesuaikan dengan realita di dapur/lapangan.</p>
             </div>

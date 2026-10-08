@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class TransaksiController extends Controller
@@ -57,6 +58,12 @@ class TransaksiController extends Controller
             'alamat' => ['nullable', 'string', 'max:1000'],
             'catatan' => ['nullable', 'string', 'max:1000'],
         ]);
+
+        if ($validated['tipe_pesanan'] === 'Dine-In' && $validated['metode_pembayaran'] === 'COD') {
+            throw ValidationException::withMessages([
+                'metode_pembayaran' => 'Pembayaran COD hanya tersedia untuk pesanan delivery.',
+            ]);
+        }
 
         $transaksi = DB::transaction(function () use ($validated) {
             $kode = 'INV-'.date('Ymd').'-'.strtoupper(Str::random(5));
@@ -126,9 +133,15 @@ class TransaksiController extends Controller
         return view('back.admin.transaksi.show', compact('transaksi'));
     }
 
-    public function edit(Transaksi $transaksi)
+    public function edit(Transaksi $transaksi): View
     {
-        return view('back.admin.transaksi.edit', compact('transaksi'));
+        $statusPesananOptions = array_values(array_unique([
+            $transaksi->status_pesanan,
+            ...$this->allowedNextStatuses($transaksi),
+        ]));
+        $statusPembayaranOptions = $this->allowedPaymentStatuses($transaksi);
+
+        return view('back.admin.transaksi.edit', compact('transaksi', 'statusPesananOptions', 'statusPembayaranOptions'));
     }
 
     public function update(Request $request, Transaksi $transaksi)
@@ -138,8 +151,37 @@ class TransaksiController extends Controller
             'status_pesanan' => 'required|in:Menunggu ACC,Dimasak,Siap Diantar,Diantar,Selesai,Dibatalkan',
         ]);
 
-        if ($validated['status_pesanan'] === 'Dimasak' && $transaksi->metode_pembayaran === 'QRIS' && $validated['status_pembayaran'] !== 'Lunas') {
-            throw ValidationException::withMessages(['status_pembayaran' => 'Pembayaran QRIS harus lunas sebelum pesanan dimasak.']);
+        $allowedStatuses = array_merge(
+            [$transaksi->status_pesanan],
+            $this->allowedNextStatuses($transaksi),
+        );
+
+        abort_unless(
+            in_array($validated['status_pesanan'], $allowedStatuses, true),
+            422,
+            'Perubahan status pesanan tidak diizinkan dari status saat ini.',
+        );
+
+        abort_unless(
+            in_array($validated['status_pembayaran'], $this->allowedPaymentStatuses($transaksi), true),
+            422,
+            'Perubahan status pembayaran tidak diizinkan dari status saat ini.',
+        );
+
+        if ($validated['status_pembayaran'] === 'Menunggu Konfirmasi') {
+            abort_if($transaksi->metode_pembayaran !== 'QRIS', 422, 'Status menunggu konfirmasi hanya berlaku untuk pembayaran QRIS.');
+        }
+
+        if ($validated['status_pesanan'] !== 'Dibatalkan' && $validated['status_pembayaran'] === 'Batal') {
+            abort(422, 'Pembayaran hanya dapat berstatus batal jika pesanan dibatalkan.');
+        }
+
+        if ($validated['status_pesanan'] === 'Dimasak' && $transaksi->metode_pembayaran === 'QRIS') {
+            abort_unless(
+                $transaksi->status_pembayaran === 'Menunggu Konfirmasi' && $validated['status_pembayaran'] === 'Lunas',
+                422,
+                'Bukti pembayaran QRIS harus dikonfirmasi terlebih dahulu.',
+            );
         }
 
         if ($validated['status_pesanan'] === 'Selesai' && $transaksi->metode_pembayaran === 'COD' && $validated['status_pembayaran'] !== 'Lunas') {
@@ -180,6 +222,36 @@ class TransaksiController extends Controller
         });
 
         return redirect()->route('admin.transaksi.show', $transaksi->kode_transaksi)->with('success', 'Status transaksi berhasil diperbarui!');
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function allowedNextStatuses(Transaksi $transaksi): array
+    {
+        return match ($transaksi->status_pesanan) {
+            'Menunggu ACC' => ['Dimasak', 'Dibatalkan'],
+            'Dimasak' => $transaksi->tipe_pesanan === 'Delivery' ? ['Siap Diantar'] : ['Selesai'],
+            'Siap Diantar' => ['Diantar', 'Dibatalkan'],
+            'Diantar' => ['Selesai'],
+            default => [],
+        };
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function allowedPaymentStatuses(Transaksi $transaksi): array
+    {
+        return match ($transaksi->status_pembayaran) {
+            'Belum Lunas' => $transaksi->metode_pembayaran === 'QRIS'
+                ? ['Belum Lunas', 'Menunggu Konfirmasi', 'Lunas']
+                : ['Belum Lunas', 'Lunas'],
+            'Menunggu Konfirmasi' => ['Menunggu Konfirmasi', 'Lunas'],
+            'Lunas' => ['Lunas'],
+            'Batal' => ['Batal'],
+            default => [$transaksi->status_pembayaran],
+        };
     }
 
     public function destroy(Transaksi $transaksi)

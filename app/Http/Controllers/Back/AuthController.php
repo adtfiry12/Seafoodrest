@@ -27,6 +27,10 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Masukkan alamat email yang valid.',
+            'password.required' => 'Kata sandi wajib diisi.',
         ]);
 
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
@@ -51,6 +55,22 @@ class AuthController extends Controller
             'tanggal_lahir' => ['nullable', 'date'],
             'alamat' => ['nullable', 'string'],
             'foto' => ['nullable', 'string'],
+        ], [
+            'nama.required' => 'Nama lengkap wajib diisi.',
+            'nama.string' => 'Nama lengkap harus berupa teks.',
+            'nama.max' => 'Nama lengkap maksimal :max karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Masukkan alamat email yang valid.',
+            'email.unique' => 'Email sudah terdaftar. Silakan gunakan email lain.',
+            'password.required' => 'Kata sandi wajib diisi.',
+            'password.min' => 'Kata sandi minimal :min karakter.',
+            'password.confirmed' => 'Konfirmasi kata sandi tidak cocok.',
+            'no_hp.string' => 'Nomor HP harus berupa teks.',
+            'no_hp.max' => 'Nomor HP maksimal :max karakter.',
+            'jenis_kelamin.in' => 'Pilih jenis kelamin yang tersedia.',
+            'tanggal_lahir.date' => 'Masukkan tanggal lahir yang valid.',
+            'alamat.string' => 'Alamat harus berupa teks.',
+            'foto.string' => 'Format foto tidak valid.',
         ]);
 
         $validated['password'] = bcrypt($validated['password']);

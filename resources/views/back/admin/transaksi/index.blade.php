@@ -49,6 +49,10 @@
                class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $currentStatus == 'Selesai' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50' }}">
                 <i class="fa-solid fa-check-double mr-1 text-[10px]"></i> Selesai
             </a>
+            <a href="{{ route('admin.transaksi.index', ['status' => 'Dibatalkan', 'search' => request('search')]) }}"
+               class="px-3.5 py-1.5 text-xs font-semibold rounded-lg transition-all {{ $currentStatus == 'Dibatalkan' ? 'bg-rose-600 text-white shadow-xs' : 'bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-50' }}">
+                <i class="fa-solid fa-ban mr-1 text-[10px]"></i> Dibatalkan
+            </a>
         </div>
 
         <form action="{{ route('admin.transaksi.index') }}" method="GET" class="w-full lg:w-72 relative">

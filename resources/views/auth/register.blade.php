@@ -55,19 +55,40 @@
                             @enderror
                         </div>
 
-                        <div>
+                        <div x-data="{ showPassword: false }">
                             <label for="password" class="block text-xs font-semibold text-charcoal-900 mb-1.5">Kata Sandi</label>
-                            <input type="password" id="password" name="password" required
-                                class="block w-full px-3.5 py-2.5 border @error('password') border-rose-500 @else border-slate-200 @enderror rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
+                            <div class="relative">
+                                <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required
+                                    class="block w-full px-3.5 pr-10 py-2.5 border @error('password') border-rose-500 @else border-slate-200 @enderror rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
+                                <button type="button" @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400 hover:text-gold-600 transition"
+                                    :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+                                    :title="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'">
+                                    <i class="fa-solid fa-eye text-xs" x-show="!showPassword"></i>
+                                    <i class="fa-solid fa-eye-slash text-xs" x-show="showPassword"></i>
+                                </button>
+                            </div>
                             @error('password')
                                 <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div>
+                        <div x-data="{ showPassword: false }">
                             <label for="password_confirmation" class="block text-xs font-semibold text-charcoal-900 mb-1.5">Konfirmasi Sandi</label>
-                            <input type="password" id="password_confirmation" name="password_confirmation" required
-                                class="block w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
+                            <div class="relative">
+                                <input :type="showPassword ? 'text' : 'password'" id="password_confirmation" name="password_confirmation" required
+                                    class="block w-full px-3.5 pr-10 py-2.5 border @error('password_confirmation') border-rose-500 @else border-slate-200 @enderror rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
+                                <button type="button" @click="showPassword = !showPassword"
+                                    class="absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400 hover:text-gold-600 transition"
+                                    :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+                                    :title="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'">
+                                    <i class="fa-solid fa-eye text-xs" x-show="!showPassword"></i>
+                                    <i class="fa-solid fa-eye-slash text-xs" x-show="showPassword"></i>
+                                </button>
+                            </div>
+                            @error('password_confirmation')
+                                <p class="text-rose-500 text-xs mt-1">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div>

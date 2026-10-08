@@ -46,9 +46,19 @@
                             </button>
                             <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
                                 <div class="border-b border-slate-100 p-2 bg-slate-50/50">
-                                    <div class="relative">
-                                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
-                                        <input type="search" x-model="search" placeholder="Cari nama atau no. HP..." class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs sm:text-sm text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
+                                    <div class="relative flex items-center">
+                                        <i class="fa-solid fa-magnifying-glass absolute left-3 text-xs text-slate-400 pointer-events-none"></i>
+                                        <input type="text"
+                                               x-model="search"
+                                               placeholder="Cari nama atau no. HP..."
+                                               class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-8 text-xs sm:text-sm text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
+                                        <button type="button"
+                                                x-show="search && search.length > 0"
+                                                @click="search = ''"
+                                                class="absolute right-2.5 text-slate-400 hover:text-slate-600 p-0.5"
+                                                style="display: none;">
+                                            <i class="fa-solid fa-xmark text-xs"></i>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="max-h-56 overflow-y-auto p-1 custom-scrollbar divide-y divide-slate-50">
@@ -160,10 +170,27 @@
                 </div>
 
                 <div>
-                    <h3 class="font-bold text-charcoal-900 mb-3">Pilih Menu Seafood</h3>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3">
+                        <h3 class="font-bold text-charcoal-900">Pilih Menu Seafood</h3>
+                        <div class="relative w-full sm:w-64 flex items-center">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 text-xs text-slate-400 pointer-events-none"></i>
+                            <input type="text"
+                                   x-model="menuFilterSearch"
+                                   placeholder="Cari menu hidangan..."
+                                   class="w-full rounded-xl border border-slate-200 bg-white py-1.5 pl-8 pr-8 text-xs text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
+                            <button type="button"
+                                    x-show="menuFilterSearch && menuFilterSearch.length > 0"
+                                    @click="menuFilterSearch = ''"
+                                    class="absolute right-2.5 text-slate-400 hover:text-slate-600 p-0.5"
+                                    style="display: none;">
+                                <i class="fa-solid fa-xmark text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
                         @foreach($menu as $m)
-                            <div @click="addToCart({{ $m->id }}, '{{ addslashes($m->nama_menu) }}', {{ $m->harga }}, {{ $m->stok }})"
+                            <div x-show="!menuFilterSearch || '{{ strtolower(addslashes($m->nama_menu)) }}'.includes(menuFilterSearch.toLowerCase().trim())"
+                                 @click="addToCart({{ $m->id }}, '{{ addslashes($m->nama_menu) }}', {{ $m->harga }}, {{ $m->stok }})"
                                  class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:border-gold-500 hover:shadow-md cursor-pointer transition-all group">
                                 <div class="h-24 bg-slate-100 overflow-hidden relative">
                                     @if($m->gambar)
@@ -190,88 +217,106 @@
 </div>
 
 <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('searchablePelangganSelect', (options, initialValue = '') => ({
-            open: false,
-            search: '',
-            selected: String(initialValue || ''),
-            options,
+    (function() {
+        function registerCreateTransaksiComponents() {
+            if (!window.Alpine) return;
 
-            filteredOptions() {
-                const query = this.search.toLowerCase().trim();
-                if (!query) return this.options;
-                return this.options.filter((opt) =>
-                    opt.label.toLowerCase().includes(query) ||
-                    (opt.no_hp && opt.no_hp.toLowerCase().includes(query)) ||
-                    (opt.nama && opt.nama.toLowerCase().includes(query))
-                );
-            },
+            window.searchablePelangganSelect = function(options, initialValue = '') {
+                return {
+                    open: false,
+                    search: '',
+                    selected: String(initialValue || ''),
+                    options: options || [],
 
-            selectedLabel() {
-                const found = this.options.find((opt) => String(opt.id) === this.selected);
-                return found ? found.label : '-- Pelanggan Umum (Guest) --';
-            },
+                    filteredOptions() {
+                        const query = (this.search || '').toLowerCase().trim();
+                        if (!query) return this.options;
+                        return this.options.filter((opt) =>
+                            (opt.label && opt.label.toLowerCase().includes(query)) ||
+                            (opt.no_hp && opt.no_hp.toLowerCase().includes(query)) ||
+                            (opt.nama && opt.nama.toLowerCase().includes(query))
+                        );
+                    },
 
-            select(option) {
-                this.selected = String(option.id);
-                this.open = false;
-                this.search = '';
+                    selectedLabel() {
+                        const found = this.options.find((opt) => String(opt.id) === this.selected);
+                        return found ? found.label : '-- Pelanggan Umum (Guest) --';
+                    },
 
-                const namaInput = document.getElementById('nama_pelanggan');
-                const hpInput = document.getElementById('no_hp_pelanggan');
-                if (option.id) {
-                    if (namaInput) namaInput.value = option.nama;
-                    if (hpInput) hpInput.value = option.no_hp || '';
-                } else {
-                    if (namaInput) namaInput.value = '';
-                    if (hpInput) hpInput.value = '';
-                }
-            }
-        }));
+                    select(option) {
+                        this.selected = String(option.id || '');
+                        this.open = false;
+                        this.search = '';
 
-        Alpine.data('posSystem', (menus) => ({
-            tipePesanan: 'Dine-In',
-            cart: [],
-
-            addToCart(id, nama, harga, maxStok) {
-                let index = this.cart.findIndex(item => item.id === id);
-                if (index !== -1) {
-                    if(this.cart[index].qty < maxStok) {
-                        this.cart[index].qty++;
-                    } else {
-                        alert('Stok tidak mencukupi!');
+                        const namaInput = document.getElementById('nama_pelanggan');
+                        const hpInput = document.getElementById('no_hp_pelanggan');
+                        if (option.id) {
+                            if (namaInput) namaInput.value = option.nama || '';
+                            if (hpInput) hpInput.value = option.no_hp || '';
+                        } else {
+                            if (namaInput) namaInput.value = '';
+                            if (hpInput) hpInput.value = '';
+                        }
                     }
-                } else {
-                    this.cart.push({ id, nama, harga, qty: 1, maxStok });
-                }
-            },
+                };
+            };
 
-            tambahQty(index) {
-                if(this.cart[index].qty < this.cart[index].maxStok) {
-                    this.cart[index].qty++;
-                }
-            },
+            window.posSystem = function(menus) {
+                return {
+                    tipePesanan: 'Dine-In',
+                    cart: [],
+                    menuFilterSearch: '',
 
-            kurangiQty(index) {
-                if (this.cart[index].qty > 1) {
-                    this.cart[index].qty--;
-                } else {
-                    this.hapusItem(index);
-                }
-            },
+                    addToCart(id, nama, harga, maxStok) {
+                        let index = this.cart.findIndex(item => item.id === id);
+                        if (index !== -1) {
+                            if (this.cart[index] && this.cart[index].qty < maxStok) {
+                                this.cart[index].qty++;
+                            } else {
+                                alert('Stok tidak mencukupi!');
+                            }
+                        } else {
+                            this.cart.push({ id, nama, harga, qty: 1, maxStok });
+                        }
+                    },
 
-            hapusItem(index) {
-                this.cart.splice(index, 1);
-            },
+                    tambahQty(index) {
+                        if (this.cart[index] && this.cart[index].qty < this.cart[index].maxStok) {
+                            this.cart[index].qty++;
+                        }
+                    },
 
-            totalBelanja() {
-                return this.cart.reduce((total, item) => total + (item.harga * item.qty), 0);
-            },
+                    kurangiQty(index) {
+                        if (this.cart[index] && this.cart[index].qty > 1) {
+                            this.cart[index].qty--;
+                        } else {
+                            this.hapusItem(index);
+                        }
+                    },
 
-            formatRupiah(angka) {
-                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
-            }
-        }));
-    });
+                    hapusItem(index) {
+                        this.cart.splice(index, 1);
+                    },
+
+                    totalBelanja() {
+                        return this.cart.reduce((total, item) => total + (item.harga * item.qty), 0);
+                    },
+
+                    formatRupiah(angka) {
+                        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka || 0);
+                    }
+                };
+            };
+
+            window.Alpine.data('searchablePelangganSelect', window.searchablePelangganSelect);
+            window.Alpine.data('posSystem', window.posSystem);
+        }
+
+        if (window.Alpine) {
+            registerCreateTransaksiComponents();
+        } else {
+            document.addEventListener('alpine:init', registerCreateTransaksiComponents);
+        }
+    })();
 </script>
 @endsection

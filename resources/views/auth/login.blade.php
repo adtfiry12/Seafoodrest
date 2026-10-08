@@ -54,12 +54,19 @@
                         <div class="flex items-center justify-between mb-1.5">
                             <label for="password" class="block text-xs font-semibold text-charcoal-900">Kata Sandi</label>
                         </div>
-                        <div class="relative">
+                        <div class="relative" x-data="{ showPassword: false }">
                             <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                                 <i class="fa-solid fa-lock text-slate-400 text-xs"></i>
                             </div>
-                            <input type="password" id="password" name="password" required
-                                class="block w-full pl-9 pr-9 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
+                            <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required
+                                class="block w-full pl-9 pr-10 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-gold-500 focus:border-gold-500 transition">
+                            <button type="button" @click="showPassword = !showPassword"
+                                class="absolute inset-y-0 right-0 flex items-center px-3.5 text-slate-400 hover:text-gold-600 transition"
+                                :aria-label="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'"
+                                :title="showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'">
+                                <i class="fa-solid fa-eye text-xs" x-show="!showPassword"></i>
+                                <i class="fa-solid fa-eye-slash text-xs" x-show="showPassword"></i>
+                            </button>
                         </div>
                     </div>
 

@@ -36,9 +36,12 @@
                         </button>
                         <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
                             <div class="border-b border-slate-100 p-2">
-                                <div class="relative">
-                                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
-                                    <input type="search" x-model="search" placeholder="Cari kategori..." class="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-charcoal-900 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
+                                <div class="relative flex items-center">
+                                    <i class="fa-solid fa-magnifying-glass absolute left-3 text-xs text-slate-400 pointer-events-none"></i>
+                                    <input type="text" x-model="search" placeholder="Cari kategori..." class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-8 text-xs sm:text-sm text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
+                                    <button type="button" x-show="search && search.length > 0" @click="search = ''" class="absolute right-2.5 text-slate-400 hover:text-slate-600 p-0.5" style="display: none;">
+                                        <i class="fa-solid fa-xmark text-xs"></i>
+                                    </button>
                                 </div>
                             </div>
                             <div class="max-h-60 overflow-y-auto p-1 custom-scrollbar">
@@ -101,29 +104,17 @@
 </div>
 
 <script>
-    document.addEventListener('alpine:init', () => {
-        Alpine.data('searchableRelationSelect', (options, initialValue = '') => ({
-            open: false,
-            search: '',
-            selected: String(initialValue || ''),
-            options,
-
-            filteredOptions() {
-                const query = this.search.toLowerCase().trim();
-
-                return this.options.filter((option) => option.label.toLowerCase().includes(query));
-            },
-
-            selectedLabel() {
-                return this.options.find((option) => String(option.id) === this.selected)?.label || '';
-            },
-
-            select(option) {
-                this.selected = String(option.id);
-                this.open = false;
-                this.search = '';
-            },
-        }));
-    });
+    (function() {
+        function register() {
+            if (window.Alpine && typeof window.searchableRelationSelect === 'function') {
+                window.Alpine.data('searchableRelationSelect', window.searchableRelationSelect);
+            }
+        }
+        if (window.Alpine) {
+            register();
+        } else {
+            document.addEventListener('alpine:init', register);
+        }
+    })();
 </script>
 @endsection

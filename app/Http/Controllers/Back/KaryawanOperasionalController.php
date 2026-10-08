@@ -54,8 +54,14 @@ class KaryawanOperasionalController extends Controller
             'items.*.qty' => ['required', 'integer', 'min:1', 'max:100'],
         ]);
 
+        if ($validated['tipe_pesanan'] === 'Dine-In' && $validated['metode_pembayaran'] === 'COD') {
+            throw ValidationException::withMessages([
+                'metode_pembayaran' => 'Pembayaran COD hanya tersedia untuk pesanan delivery.',
+            ]);
+        }
+
         $transaksi = DB::transaction(function () use ($validated) {
-            $kode = 'INV-' . date('Ymd') . '-' . strtoupper(Str::random(5));
+            $kode = 'INV-'.date('Ymd').'-'.strtoupper(Str::random(5));
             $subtotalBayar = 0;
             $detailData = [];
             $menuIds = collect($validated['items'])->pluck('menu_id');
@@ -95,11 +101,11 @@ class KaryawanOperasionalController extends Controller
 
             $infoMeja = '';
             if ($validated['tipe_pesanan'] === 'Dine-In' && ! empty($validated['nomor_meja'])) {
-                $infoMeja = '[LOKASI] Nomor Meja: ' . $validated['nomor_meja'] . "\n";
+                $infoMeja = '[LOKASI] Nomor Meja: '.$validated['nomor_meja']."\n";
             }
 
             $catatanText = ! empty($validated['catatan']) ? "Catatan Dapur: {$validated['catatan']}" : '';
-            $finalCatatan = trim($infoMeja . $catatanText);
+            $finalCatatan = trim($infoMeja.$catatanText);
 
             $ongkir = $validated['tipe_pesanan'] === 'Delivery' ? 15000 : 0;
             $totalBayar = $subtotalBayar + $ongkir;
@@ -131,7 +137,7 @@ class KaryawanOperasionalController extends Controller
         });
 
         return redirect()->route('karyawan.pesanan.detail', $transaksi->kode_transaksi)
-            ->with('success', 'Transaksi kasir ' . $transaksi->kode_transaksi . ' berhasil dibuat!');
+            ->with('success', 'Transaksi kasir '.$transaksi->kode_transaksi.' berhasil dibuat!');
     }
 
     public function pesananBaru(Request $request)
@@ -176,8 +182,8 @@ class KaryawanOperasionalController extends Controller
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
                 $q->where('kode_transaksi', 'like', '%'.$request->search.'%')
-                  ->orWhere('nama_pelanggan', 'like', '%'.$request->search.'%')
-                  ->orWhere('alamat', 'like', '%'.$request->search.'%');
+                    ->orWhere('nama_pelanggan', 'like', '%'.$request->search.'%')
+                    ->orWhere('alamat', 'like', '%'.$request->search.'%');
             });
         }
 
