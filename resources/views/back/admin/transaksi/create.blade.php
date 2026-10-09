@@ -14,6 +14,27 @@
         </a>
     </div>
 
+    @if($errors->any() || session('error'))
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs sm:text-sm text-rose-900 shadow-xs">
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base mt-0.5 shrink-0"></i>
+                <div class="flex-1">
+                    <p class="font-bold text-rose-950">Gagal Memproses Transaksi:</p>
+                    @if(session('error'))
+                        <p class="mt-0.5">{{ session('error') }}</p>
+                    @endif
+                    @if($errors->any())
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     <form action="{{ route('admin.transaksi.store') }}" method="POST" id="form-transaksi">
         @csrf
 
@@ -97,11 +118,13 @@
                             <option value="Takeaway">Takeaway (Bungkus)</option>
                             <option value="Delivery">Delivery (Kirim)</option>
                         </select>
+                        @error('tipe_pesanan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div x-show="tipePesanan === 'Delivery'" x-cloak>
                         <label class="block text-sm font-semibold text-charcoal-900 mb-2">Alamat Pengiriman</label>
-                        <textarea name="alamat" rows="2" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5"></textarea>
+                        <textarea name="alamat" rows="2" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">{{ old('alamat') }}</textarea>
+                        @error('alamat') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
@@ -111,11 +134,13 @@
                             <option value="QRIS">QRIS / Transfer</option>
                             <option value="COD">Bayar di Tempat (COD)</option>
                         </select>
+                        @error('metode_pembayaran') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
                     <div>
                         <label class="block text-sm font-semibold text-charcoal-900 mb-2">Catatan Tambahan</label>
-                        <textarea name="catatan" rows="2" placeholder="Cth: Pedas, tanpa saus..." class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5"></textarea>
+                        <textarea name="catatan" rows="2" placeholder="Cth: Pedas, tanpa saus..." class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">{{ old('catatan') }}</textarea>
+                        @error('catatan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
 
@@ -131,7 +156,7 @@
                             class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-bold text-charcoal-900 bg-gold-500 rounded-xl hover:bg-gold-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                         <i class="fa-solid fa-print"></i> Proses Transaksi
                     </button>
-                    @error('items') <p class="text-xs text-red-400 mt-2 text-center">Pilih minimal 1 menu!</p> @enderror
+                    @error('items') <p class="text-xs text-rose-300 mt-2 text-center font-medium">{{ $message }}</p> @enderror
                 </div>
             </div>
 

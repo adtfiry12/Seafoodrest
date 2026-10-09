@@ -15,6 +15,10 @@ class LaporanController extends Controller
         $validated = $request->validate([
             'dari' => ['nullable', 'date_format:Y-m-d'],
             'sampai' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:dari'],
+        ], [
+            'dari.date_format' => 'Format tanggal awal tidak valid (gunakan format YYYY-MM-DD).',
+            'sampai.date_format' => 'Format tanggal akhir tidak valid (gunakan format YYYY-MM-DD).',
+            'sampai.after_or_equal' => 'Tanggal akhir harus sama dengan atau setelah tanggal awal.',
         ]);
 
         [$dari, $sampai] = $this->resolvePeriod($validated['dari'] ?? null, $validated['sampai'] ?? null);
@@ -36,6 +40,10 @@ class LaporanController extends Controller
         $validated = $request->validate([
             'dari' => ['nullable', 'date_format:Y-m-d'],
             'sampai' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:dari'],
+        ], [
+            'dari.date_format' => 'Format tanggal awal tidak valid (gunakan format YYYY-MM-DD).',
+            'sampai.date_format' => 'Format tanggal akhir tidak valid (gunakan format YYYY-MM-DD).',
+            'sampai.after_or_equal' => 'Tanggal akhir harus sama dengan atau setelah tanggal awal.',
         ]);
 
         [$dari, $sampai] = $this->resolvePeriod($validated['dari'] ?? null, $validated['sampai'] ?? null);

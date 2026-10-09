@@ -47,13 +47,29 @@ class MenuController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_menu' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategori,id',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'deskripsi' => 'nullable|string',
+        ], [
+            'nama_menu.required' => 'Nama hidangan menu wajib diisi.',
+            'nama_menu.string' => 'Nama hidangan menu harus berupa teks.',
+            'nama_menu.max' => 'Nama hidangan menu maksimal 255 karakter.',
+            'kategori_id.required' => 'Silakan pilih kategori hidangan.',
+            'kategori_id.exists' => 'Kategori yang dipilih tidak valid atau tidak ditemukan.',
+            'harga.required' => 'Harga hidangan wajib diisi.',
+            'harga.numeric' => 'Harga harus berupa angka nominal yang valid.',
+            'harga.min' => 'Harga hidangan tidak boleh kurang dari 0.',
+            'stok.required' => 'Jumlah stok awal wajib diisi.',
+            'stok.integer' => 'Jumlah stok harus berupa bilangan bulat.',
+            'stok.min' => 'Jumlah stok tidak boleh kurang dari 0.',
+            'gambar.image' => 'Berkas foto menu harus berupa file gambar.',
+            'gambar.mimes' => 'Format foto menu harus berupa JPEG, PNG, JPG, GIF, atau WebP.',
+            'gambar.max' => 'Ukuran foto menu maksimal 2 MB.',
+            'deskripsi.string' => 'Deskripsi hidangan harus berupa teks.',
         ]);
 
         $data = $request->all();
@@ -85,13 +101,29 @@ class MenuController extends Controller
 
     public function update(Request $request, Menu $menu)
     {
-        $request->validate([
+        $validated = $request->validate([
             'nama_menu' => 'required|string|max:255',
             'kategori_id' => 'required|exists:kategori,id',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'deskripsi' => 'nullable|string',
+        ], [
+            'nama_menu.required' => 'Nama hidangan menu wajib diisi.',
+            'nama_menu.string' => 'Nama hidangan menu harus berupa teks.',
+            'nama_menu.max' => 'Nama hidangan menu maksimal 255 karakter.',
+            'kategori_id.required' => 'Silakan pilih kategori hidangan.',
+            'kategori_id.exists' => 'Kategori yang dipilih tidak valid atau tidak ditemukan.',
+            'harga.required' => 'Harga hidangan wajib diisi.',
+            'harga.numeric' => 'Harga harus berupa angka nominal yang valid.',
+            'harga.min' => 'Harga hidangan tidak boleh kurang dari 0.',
+            'stok.required' => 'Jumlah stok awal wajib diisi.',
+            'stok.integer' => 'Jumlah stok harus berupa bilangan bulat.',
+            'stok.min' => 'Jumlah stok tidak boleh kurang dari 0.',
+            'gambar.image' => 'Berkas foto menu harus berupa file gambar.',
+            'gambar.mimes' => 'Format foto menu harus berupa JPEG, PNG, JPG, GIF, atau WebP.',
+            'gambar.max' => 'Ukuran foto menu maksimal 2 MB.',
+            'deskripsi.string' => 'Deskripsi hidangan harus berupa teks.',
         ]);
 
         $data = $request->all();

@@ -338,6 +338,27 @@
         </div>
     @endif
 
+    @if($errors->any() || session('error'))
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs sm:text-sm text-rose-900 shadow-xs">
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base mt-0.5 shrink-0"></i>
+                <div class="flex-1">
+                    <p class="font-bold text-rose-950">Gagal Memperbarui Pengantaran:</p>
+                    @if(session('error'))
+                        <p class="mt-0.5">{{ session('error') }}</p>
+                    @endif
+                    @if($errors->any())
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     <!-- Kanban Grid Kurir -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         @forelse($transaksi as $trx)

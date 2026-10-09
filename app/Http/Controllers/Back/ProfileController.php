@@ -34,12 +34,17 @@ class ProfileController extends Controller
             'foto'          => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ], [
             'nama.required'        => 'Nama lengkap wajib diisi.',
+            'nama.max'             => 'Nama lengkap maksimal 255 karakter.',
             'email.required'       => 'Alamat email wajib diisi.',
-            'email.email'          => 'Format email tidak valid.',
+            'email.email'          => 'Format email tidak valid. Gunakan format contoh@domain.com.',
             'email.unique'         => 'Email ini sudah digunakan oleh akun lain.',
+            'no_hp.max'            => 'Nomor HP tidak boleh melebihi 20 karakter.',
+            'jenis_kelamin.in'     => 'Pilihan jenis kelamin tidak valid.',
+            'tanggal_lahir.date'   => 'Format tanggal lahir tidak valid.',
             'tanggal_lahir.before' => 'Tanggal lahir tidak boleh di masa depan.',
+            'alamat.max'           => 'Alamat maksimal 1000 karakter.',
             'foto.image'           => 'File yang diunggah harus berupa gambar.',
-            'foto.mimes'           => 'Format foto harus jpeg, png, jpg, atau webp.',
+            'foto.mimes'           => 'Format foto harus berupa JPEG, PNG, JPG, atau WebP.',
             'foto.max'             => 'Ukuran foto maksimal 2 MB.',
         ]);
 

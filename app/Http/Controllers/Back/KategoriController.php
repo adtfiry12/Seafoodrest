@@ -25,14 +25,16 @@ class KategoriController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->merge([
-            'slug' => Str::slug((string) $request->input('nama_kategori')),
+        $validated = $request->validate([
+            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori',
+        ], [
+            'nama_kategori.required' => 'Nama kategori wajib diisi.',
+            'nama_kategori.string' => 'Nama kategori harus berupa teks.',
+            'nama_kategori.max' => 'Nama kategori maksimal 255 karakter.',
+            'nama_kategori.unique' => 'Nama kategori ini sudah terdaftar. Silakan gunakan nama lain.',
         ]);
 
-        $validated = $request->validate([
-            'nama_kategori' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:kategori,slug',
-        ]);
+        $validated['slug'] = Str::slug($validated['nama_kategori']);
 
         Kategori::create($validated);
 
@@ -53,14 +55,16 @@ class KategoriController extends Controller
 
     public function update(Request $request, Kategori $kategori): RedirectResponse
     {
-        $request->merge([
-            'slug' => Str::slug((string) $request->input('nama_kategori')),
+        $validated = $request->validate([
+            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori,'.$kategori->id,
+        ], [
+            'nama_kategori.required' => 'Nama kategori wajib diisi.',
+            'nama_kategori.string' => 'Nama kategori harus berupa teks.',
+            'nama_kategori.max' => 'Nama kategori maksimal 255 karakter.',
+            'nama_kategori.unique' => 'Nama kategori ini sudah terdaftar. Silakan gunakan nama lain.',
         ]);
 
-        $validated = $request->validate([
-            'nama_kategori' => 'required|string|max:255',
-            'slug' => 'required|string|max:255|unique:kategori,slug,'.$kategori->id,
-        ]);
+        $validated['slug'] = Str::slug($validated['nama_kategori']);
 
         $kategori->update($validated);
 

@@ -41,6 +41,17 @@ class SlideController extends Controller
             'menu_id' => 'nullable|exists:menu,id',
             'gambar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
+        ], [
+            'judul.required' => 'Judul utama banner wajib diisi.',
+            'judul.string' => 'Judul utama banner harus berupa teks.',
+            'judul.max' => 'Judul utama banner maksimal 255 karakter.',
+            'sub_judul.string' => 'Sub judul banner harus berupa teks.',
+            'sub_judul.max' => 'Sub judul banner maksimal 255 karakter.',
+            'menu_id.exists' => 'Menu yang ditautkan tidak ditemukan di dalam sistem.',
+            'gambar.required' => 'Gambar banner promosi wajib diunggah.',
+            'gambar.image' => 'Berkas banner harus berupa file gambar.',
+            'gambar.mimes' => 'Format gambar banner harus berupa JPEG, PNG, JPG, atau WebP.',
+            'gambar.max' => 'Ukuran gambar banner maksimal 2 MB.',
         ]);
 
         if ($request->hasFile('gambar')) {
@@ -71,6 +82,16 @@ class SlideController extends Controller
             'menu_id' => 'nullable|exists:menu,id',
             'gambar' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'is_active' => 'boolean',
+        ], [
+            'judul.required' => 'Judul utama banner wajib diisi.',
+            'judul.string' => 'Judul utama banner harus berupa teks.',
+            'judul.max' => 'Judul utama banner maksimal 255 karakter.',
+            'sub_judul.string' => 'Sub judul banner harus berupa teks.',
+            'sub_judul.max' => 'Sub judul banner maksimal 255 karakter.',
+            'menu_id.exists' => 'Menu yang ditautkan tidak ditemukan di dalam sistem.',
+            'gambar.image' => 'Berkas banner harus berupa file gambar.',
+            'gambar.mimes' => 'Format gambar banner harus berupa JPEG, PNG, JPG, atau WebP.',
+            'gambar.max' => 'Ukuran gambar banner maksimal 2 MB.',
         ]);
 
         if ($request->hasFile('gambar')) {

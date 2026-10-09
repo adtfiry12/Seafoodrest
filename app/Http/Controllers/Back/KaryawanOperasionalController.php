@@ -52,6 +52,31 @@ class KaryawanOperasionalController extends Controller
             'items' => ['required', 'array', 'min:1'],
             'items.*.menu_id' => ['required', 'distinct', 'exists:menu,id'],
             'items.*.qty' => ['required', 'integer', 'min:1', 'max:100'],
+        ], [
+            'tipe_pesanan.required' => 'Silakan tentukan tipe layanan pesanan.',
+            'tipe_pesanan.in' => 'Pilihan tipe pesanan tidak valid.',
+            'alamat.required_if' => 'Alamat pengantaran wajib diisi jika pesanan bertipe Delivery.',
+            'metode_pembayaran.required' => 'Metode pembayaran wajib dipilih.',
+            'metode_pembayaran.in' => 'Metode pembayaran yang dipilih tidak valid.',
+            'status_pembayaran.required' => 'Status pembayaran wajib ditentukan.',
+            'status_pembayaran.in' => 'Status pembayaran tidak valid.',
+            'status_pesanan.required' => 'Status pesanan awal wajib ditentukan.',
+            'status_pesanan.in' => 'Status pesanan tidak valid.',
+            'items.required' => 'Keranjang pesanan masih kosong. Tambahkan minimal satu menu.',
+            'items.array' => 'Daftar item pesanan tidak valid.',
+            'items.min' => 'Keranjang pesanan masih kosong. Tambahkan minimal satu menu.',
+            'items.*.menu_id.required' => 'Menu hidangan wajib dipilih.',
+            'items.*.menu_id.exists' => 'Menu yang dipilih tidak ditemukan dalam sistem.',
+            'items.*.menu_id.distinct' => 'Terdapat menu yang duplikat dalam pesanan.',
+            'items.*.qty.required' => 'Jumlah porsi wajib diisi.',
+            'items.*.qty.integer' => 'Jumlah porsi harus berupa bilangan bulat.',
+            'items.*.qty.min' => 'Jumlah porsi minimal 1.',
+            'items.*.qty.max' => 'Jumlah porsi maksimal 100 per hidangan.',
+            'nama_pelanggan.max' => 'Nama pelanggan maksimal 255 karakter.',
+            'no_hp_pelanggan.max' => 'Nomor HP pelanggan maksimal 20 karakter.',
+            'nomor_meja.max' => 'Nomor meja maksimal 50 karakter.',
+            'patokan_alamat.max' => 'Patokan alamat maksimal 255 karakter.',
+            'catatan.max' => 'Catatan pesanan maksimal 1000 karakter.',
         ]);
 
         if ($validated['tipe_pesanan'] === 'Dine-In' && $validated['metode_pembayaran'] === 'COD') {
@@ -222,7 +247,12 @@ class KaryawanOperasionalController extends Controller
             'bukti_pengantaran_file' => ['nullable'],
         ];
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'status_pesanan.required' => 'Status pesanan wajib ditentukan.',
+            'status_pesanan.in' => 'Pilihan status pesanan tidak valid.',
+            'status_pembayaran.in' => 'Pilihan status pembayaran tidak valid.',
+            'diterima_oleh.max' => 'Nama penerima maksimal 100 karakter.',
+        ]);
         $nextStatus = $validated['status_pesanan'];
 
         $allowedNextStatuses = match ($currentStatus) {
@@ -329,6 +359,10 @@ class KaryawanOperasionalController extends Controller
     {
         $request->validate([
             'stok' => 'required|integer|min:0',
+        ], [
+            'stok.required' => 'Jumlah stok wajib diisi.',
+            'stok.integer' => 'Jumlah stok harus berupa bilangan bulat.',
+            'stok.min' => 'Jumlah stok tidak boleh kurang dari 0.',
         ]);
 
         $menu = Menu::findOrFail($id);

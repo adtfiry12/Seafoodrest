@@ -41,7 +41,36 @@ class CheckoutController extends Controller
             $rules['nama'] = ['required', 'string', 'max:255'];
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, [
+            'tipe_pesanan.required' => 'Silakan pilih tipe layanan pesanan (Makan di Tempat atau Delivery).',
+            'tipe_pesanan.in' => 'Pilihan tipe pesanan tidak valid.',
+            'metode_pembayaran.required' => 'Silakan pilih metode pembayaran.',
+            'metode_pembayaran.in' => 'Metode pembayaran yang dipilih tidak valid.',
+            'items.required' => 'Keranjang belanja Anda masih kosong. Silakan pilih menu hidangan terlebih dahulu.',
+            'items.array' => 'Format daftar pesanan tidak valid.',
+            'items.min' => 'Keranjang belanja Anda masih kosong. Silakan pilih menu hidangan terlebih dahulu.',
+            'items.*.menu_id.required' => 'Menu hidangan wajib dipilih.',
+            'items.*.menu_id.exists' => 'Menu yang dipilih tidak ditemukan dalam sistem.',
+            'items.*.qty.required' => 'Jumlah porsi menu wajib diisi.',
+            'items.*.qty.integer' => 'Jumlah porsi menu harus berupa bilangan bulat.',
+            'items.*.qty.min' => 'Jumlah porsi menu minimal 1.',
+            'items.*.qty.max' => 'Jumlah porsi menu maksimal 100.',
+            'nama.required' => 'Nama lengkap pemesan wajib diisi.',
+            'nama.max' => 'Nama lengkap pemesan maksimal 255 karakter.',
+            'no_hp.required' => 'Nomor WhatsApp / HP wajib diisi.',
+            'no_hp.max' => 'Nomor WhatsApp / HP maksimal 20 karakter.',
+            'alamat.required_if' => 'Alamat pengantaran wajib diisi jika pesanan bertipe Delivery.',
+            'alamat.max' => 'Alamat pengantaran maksimal 1000 karakter.',
+            'patokan_alamat.max' => 'Patokan alamat maksimal 255 karakter.',
+            'catatan.max' => 'Catatan pesanan maksimal 1000 karakter.',
+            'opsi_dinein.required_if' => 'Silakan pilih opsi kedatangan makan di tempat (Langsung Datang atau Reservasi).',
+            'opsi_dinein.in' => 'Pilihan opsi makan di tempat tidak valid.',
+            'nomor_meja.max' => 'Nomor meja maksimal 50 karakter.',
+            'jam_kedatangan.date_format' => 'Format jam kedatangan tidak valid (contoh: 18:30).',
+            'jumlah_orang.integer' => 'Jumlah orang harus berupa bilangan bulat.',
+            'jumlah_orang.min' => 'Jumlah orang minimal 1 orang.',
+            'jumlah_orang.max' => 'Jumlah orang maksimal 100 orang.',
+        ]);
 
         if ($validated['tipe_pesanan'] === 'Delivery' && $validated['metode_pembayaran'] === 'Kasir') {
             throw ValidationException::withMessages(['metode_pembayaran' => 'Pesanan delivery tidak dapat dibayar di kasir.']);
@@ -213,6 +242,11 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:5120',
+        ], [
+            'bukti_pembayaran.required' => 'Silakan pilih foto bukti transfer/QRIS untuk diunggah.',
+            'bukti_pembayaran.image' => 'Berkas bukti pembayaran harus berupa file gambar.',
+            'bukti_pembayaran.mimes' => 'Format foto bukti pembayaran harus berupa JPEG, PNG, atau JPG.',
+            'bukti_pembayaran.max' => 'Ukuran file foto bukti pembayaran maksimal 5 MB.',
         ]);
 
         $transaksi = $this->accessibleTransaction($kode_transaksi);

@@ -57,6 +57,24 @@ class TransaksiController extends Controller
             'items.*.qty' => 'required|integer|min:1',
             'alamat' => ['nullable', 'string', 'max:1000'],
             'catatan' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'tipe_pesanan.required' => 'Silakan pilih tipe pesanan (Dine-In, Takeaway, atau Delivery).',
+            'tipe_pesanan.in' => 'Pilihan tipe pesanan tidak valid.',
+            'metode_pembayaran.required' => 'Silakan pilih metode pembayaran.',
+            'metode_pembayaran.in' => 'Pilihan metode pembayaran tidak valid.',
+            'items.required' => 'Silakan pilih minimal 1 menu hidangan ke dalam keranjang.',
+            'items.array' => 'Daftar menu pesanan tidak valid.',
+            'items.min' => 'Silakan pilih minimal 1 menu hidangan ke dalam keranjang.',
+            'items.*.menu_id.required' => 'Menu hidangan wajib dipilih.',
+            'items.*.menu_id.exists' => 'Menu yang dipilih tidak ditemukan dalam sistem.',
+            'items.*.menu_id.distinct' => 'Terdapat menu yang duplikat dalam pesanan.',
+            'items.*.qty.required' => 'Jumlah porsi wajib diisi.',
+            'items.*.qty.integer' => 'Jumlah porsi harus berupa bilangan bulat.',
+            'items.*.qty.min' => 'Jumlah porsi minimal 1.',
+            'nama_pelanggan.max' => 'Nama pemesan maksimal 255 karakter.',
+            'no_hp_pelanggan.max' => 'Nomor HP pemesan maksimal 20 karakter.',
+            'alamat.max' => 'Alamat pengantaran maksimal 1000 karakter.',
+            'catatan.max' => 'Catatan pesanan maksimal 1000 karakter.',
         ]);
 
         if ($validated['tipe_pesanan'] === 'Dine-In' && $validated['metode_pembayaran'] === 'COD') {
@@ -149,6 +167,11 @@ class TransaksiController extends Controller
         $validated = $request->validate([
             'status_pembayaran' => 'required|in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal',
             'status_pesanan' => 'required|in:Menunggu ACC,Dimasak,Siap Diantar,Diantar,Selesai,Dibatalkan',
+        ], [
+            'status_pembayaran.required' => 'Status pembayaran wajib dipilih.',
+            'status_pembayaran.in' => 'Pilihan status pembayaran tidak valid.',
+            'status_pesanan.required' => 'Status pesanan wajib dipilih.',
+            'status_pesanan.in' => 'Pilihan status pesanan tidak valid.',
         ]);
 
         $allowedStatuses = array_merge(

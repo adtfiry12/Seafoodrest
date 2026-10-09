@@ -13,6 +13,27 @@
         </div>
     </div>
 
+    @if($errors->any() || session('error'))
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs sm:text-sm text-rose-900 shadow-xs">
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base mt-0.5 shrink-0"></i>
+                <div class="flex-1">
+                    <p class="font-bold text-rose-950">Gagal Memperbarui Status:</p>
+                    @if(session('error'))
+                        <p class="mt-0.5">{{ session('error') }}</p>
+                    @endif
+                    @if($errors->any())
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="bg-white border border-slate-200 rounded-2xl p-5 sm:p-8 shadow-sm">
         <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Perubahan Status', 'Yakin ingin menyimpan perubahan status transaksi ini?')" class="space-y-6">
             @csrf
@@ -27,6 +48,9 @@
                         </option>
                     @endforeach
                 </select>
+                @error('status_pembayaran')
+                    <p class="text-xs text-rose-500 mt-2 font-medium">{{ $message }}</p>
+                @enderror
             </div>
 
             <div>
@@ -37,6 +61,9 @@
                     @endforeach
                 </select>
                 <p class="text-xs text-slate-400 mt-2">Pastikan status pesanan disesuaikan dengan realita di dapur/lapangan.</p>
+                @error('status_pesanan')
+                    <p class="text-xs text-rose-500 mt-2 font-medium">{{ $message }}</p>
+                @enderror
             </div>
 
             <div class="flex flex-col sm:flex-row items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-8">

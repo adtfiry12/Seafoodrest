@@ -147,20 +147,56 @@
         @yield('content')
     </div>
 
-    <div x-show="actionModalOpen" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-slate-950/50 backdrop-blur-xs overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="action-modal-title">
-        <div x-show="actionModalOpen" x-transition class="w-full max-w-md my-auto overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
-            <div class="flex items-start gap-4 border-b border-slate-100 px-6 py-5">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-50 text-gold-600"><i class="fa-solid fa-circle-question"></i></div>
-                <div>
-                    <h2 id="action-modal-title" class="text-lg font-bold text-charcoal-900" x-text="actionTitle"></h2>
-                    <p class="mt-1 text-sm text-slate-500">Periksa kembali sebelum melanjutkan.</p>
+    <div x-show="actionModalOpen" x-cloak class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-slate-950/60 backdrop-blur-xs overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="action-modal-title">
+        <div x-show="actionModalOpen"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 scale-100"
+             x-transition:leave-end="opacity-0 scale-95"
+             @click.outside="actionModalOpen = false"
+             class="w-full max-w-md my-auto overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div class="flex items-start gap-3.5 sm:gap-4 border-b border-slate-100 px-5 sm:px-6 py-4 sm:py-5">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                     :class="{
+                         'bg-rose-50 text-rose-600 border border-rose-200/80': actionTitle.toLowerCase().includes('batal') || actionTitle.toLowerCase().includes('hapus'),
+                         'bg-emerald-50 text-emerald-600 border border-emerald-200/80': actionTitle.toLowerCase().includes('terima') || actionTitle.toLowerCase().includes('lunas') || actionTitle.toLowerCase().includes('valid') || actionTitle.toLowerCase().includes('selesai'),
+                         'bg-gold-50 text-gold-600 border border-gold-200/80': !actionTitle.toLowerCase().includes('batal') && !actionTitle.toLowerCase().includes('hapus') && !actionTitle.toLowerCase().includes('terima') && !actionTitle.toLowerCase().includes('lunas') && !actionTitle.toLowerCase().includes('valid') && !actionTitle.toLowerCase().includes('selesai')
+                     }">
+                    <i class="text-lg"
+                       :class="{
+                           'fa-solid fa-triangle-exclamation': actionTitle.toLowerCase().includes('batal') || actionTitle.toLowerCase().includes('hapus'),
+                           'fa-solid fa-circle-check': actionTitle.toLowerCase().includes('terima') || actionTitle.toLowerCase().includes('lunas') || actionTitle.toLowerCase().includes('valid') || actionTitle.toLowerCase().includes('selesai'),
+                           'fa-solid fa-bell-concierge': !actionTitle.toLowerCase().includes('batal') && !actionTitle.toLowerCase().includes('hapus') && !actionTitle.toLowerCase().includes('terima') && !actionTitle.toLowerCase().includes('lunas') && !actionTitle.toLowerCase().includes('valid') && !actionTitle.toLowerCase().includes('selesai')
+                       }"></i>
                 </div>
-                <button type="button" @click="actionModalOpen = false" class="ml-auto text-slate-400 transition hover:text-slate-700" aria-label="Tutup modal"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <div class="flex-1 min-w-0 pr-2">
+                    <h2 id="action-modal-title" class="text-base sm:text-lg font-serif font-bold text-charcoal-950 leading-snug" x-text="actionTitle"></h2>
+                    <p class="mt-0.5 text-xs text-slate-500">Konfirmasi tindakan operasional restoran.</p>
+                </div>
+                <button type="button" @click="actionModalOpen = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition" aria-label="Tutup modal">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
             </div>
-            <div class="px-6 py-5"><p class="text-sm leading-relaxed text-slate-600" x-text="actionMessage"></p></div>
-            <div class="flex flex-col-reverse gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4 sm:flex-row sm:justify-end">
-                <button type="button" @click="actionModalOpen = false" class="rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-100">Batal</button>
-                <button type="button" @click="actionForm.submit()" class="rounded-lg bg-charcoal-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-charcoal-800 focus:outline-none focus:ring-4 focus:ring-charcoal-900/20">Lanjutkan</button>
+            <div class="px-5 sm:px-6 py-4 sm:py-5">
+                <p class="text-xs sm:text-sm leading-relaxed text-slate-600" x-text="actionMessage"></p>
+            </div>
+            <div class="flex flex-col-reverse gap-2.5 sm:gap-3 border-t border-slate-100 bg-slate-50/80 px-5 sm:px-6 py-3.5 sm:py-4 sm:flex-row sm:justify-end">
+                <button type="button" @click="actionModalOpen = false" class="w-full sm:w-auto rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-600 transition hover:bg-slate-100 hover:text-charcoal-900 shadow-2xs">
+                    Batal
+                </button>
+                <button type="button"
+                        @click="if (actionForm) { const f = actionForm; actionModalOpen = false; HTMLFormElement.prototype.submit.call(f); }"
+                        class="w-full sm:w-auto rounded-xl px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-xs transition active:scale-95 flex items-center justify-center gap-2"
+                        :class="{
+                            'bg-rose-600 hover:bg-rose-700': actionTitle.toLowerCase().includes('batal') || actionTitle.toLowerCase().includes('hapus'),
+                            'bg-emerald-600 hover:bg-emerald-700': actionTitle.toLowerCase().includes('terima') || actionTitle.toLowerCase().includes('lunas') || actionTitle.toLowerCase().includes('valid'),
+                            'bg-charcoal-950 hover:bg-charcoal-900': !actionTitle.toLowerCase().includes('batal') && !actionTitle.toLowerCase().includes('hapus') && !actionTitle.toLowerCase().includes('terima') && !actionTitle.toLowerCase().includes('lunas') && !actionTitle.toLowerCase().includes('valid')
+                        }">
+                    <span>Lanjutkan</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
             </div>
         </div>
     </div>

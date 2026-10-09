@@ -25,6 +25,99 @@
         </div>
     @endif
 
+    @if($errors->any() || session('error'))
+        <div class="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs sm:text-sm text-rose-900 shadow-xs">
+            <div class="flex items-start gap-3">
+                <i class="fa-solid fa-triangle-exclamation text-rose-600 text-base mt-0.5 shrink-0"></i>
+                <div class="flex-1">
+                    <p class="font-bold text-rose-950">Terjadi Kesalahan:</p>
+                    @if(session('error'))
+                        <p class="mt-0.5">{{ session('error') }}</p>
+                    @endif
+                    @if($errors->any())
+                        <ul class="list-disc list-inside mt-1 space-y-0.5">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            </div>
+        </div>
+    @endif
+
+    @if($transaksi->status_pesanan === 'Menunggu ACC')
+        <div class="rounded-2xl border border-gold-300 bg-gold-50/70 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-gold-500/20 text-gold-800 flex items-center justify-center text-xl shrink-0 border border-gold-300/50">
+                    <i class="fa-solid fa-bell-concierge"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Pesanan Masuk (Menunggu ACC Kasir)</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">Periksa rincian pesanan. Klik ACC untuk meneruskan ke antrean stasiun dapur.</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
+                <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pembatalan Pesanan', 'Yakin ingin membatalkan pesanan {{ $transaksi->kode_transaksi }}? Stok porsi hidangan akan otomatis dikembalikan.')">
+                    @csrf
+                    <input type="hidden" name="status_pesanan" value="Dibatalkan">
+                    <input type="hidden" name="status_pembayaran" value="Batal">
+                    <button type="submit" class="w-full sm:w-auto px-4 py-2.5 bg-white border border-rose-200 text-rose-600 hover:bg-rose-50 text-xs sm:text-sm font-semibold rounded-xl transition shadow-2xs active:scale-95 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-xmark"></i>
+                        <span>Batalkan Pesanan</span>
+                    </button>
+                </form>
+
+                @if($transaksi->metode_pembayaran == 'QRIS' && $transaksi->status_pembayaran == 'Belum Lunas')
+                    <span class="w-full sm:w-auto px-4 py-2.5 bg-slate-100 text-slate-400 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 cursor-not-allowed">
+                        <i class="fa-regular fa-clock"></i> Tunggu Bukti QRIS
+                    </span>
+                @elseif($transaksi->metode_pembayaran == 'QRIS' && $transaksi->status_pembayaran == 'Menunggu Konfirmasi')
+                    <a href="{{ route('transaksi.bukti', $transaksi) }}" target="_blank" class="w-full sm:w-auto px-4 py-2.5 bg-charcoal-900 text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-charcoal-800 transition shadow-xs flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-image"></i> Cek Bukti
+                    </a>
+                    <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi ACC & Verifikasi QRIS', 'Bukti pembayaran QRIS sudah valid? Teruskan pesanan ini ke dapur?')">
+                        @csrf
+                        <input type="hidden" name="status_pesanan" value="Dimasak">
+                        <input type="hidden" name="status_pembayaran" value="Lunas">
+                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-circle-check"></i> Valid & ACC Dapur
+                        </button>
+                    </form>
+                @else
+                    <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi ACC Pesanan', 'Teruskan pesanan {{ $transaksi->kode_transaksi }} ke dapur untuk mulai dimasak?')">
+                        @csrf
+                        <input type="hidden" name="status_pesanan" value="Dimasak">
+                        <input type="hidden" name="status_pembayaran" value="{{ $transaksi->status_pembayaran }}">
+                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-gold-500 hover:bg-gold-600 text-charcoal-950 hover:text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-fire-burner"></i> ACC ke Dapur
+                        </button>
+                    </form>
+                @endif
+            </div>
+        </div>
+    @elseif($transaksi->status_pesanan === 'Dimasak')
+        <div class="rounded-2xl border border-amber-200 bg-amber-50/60 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center text-xl shrink-0 border border-amber-300/50">
+                    <i class="fa-solid fa-fire-burner"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Sedang Dimasak di Dapur</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">Jika hidangan sudah selesai disiapkan, perbarui status pesanan.</p>
+                </div>
+            </div>
+            <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pesanan Selesai Dimasak', 'Pastikan semua hidangan telah selesai dimasak dan dikemas dengan rapi.')">
+                @csrf
+                <input type="hidden" name="status_pesanan" value="{{ $transaksi->tipe_pesanan === 'Delivery' ? 'Siap Diantar' : 'Selesai' }}">
+                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-charcoal-950 hover:text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-check"></i>
+                    <span>{{ $transaksi->tipe_pesanan === 'Delivery' ? 'Selesai Dimasak (Siap Diantar)' : 'Selesai Dimasak & Sajikan' }}</span>
+                </button>
+            </form>
+        </div>
+    @endif
+
     @if($transaksi->status_pembayaran !== 'Lunas' && !in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal']))
         <div class="rounded-2xl border border-amber-300 bg-amber-50/90 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3.5">
@@ -36,11 +129,11 @@
                     <p class="text-xs text-amber-800/80 mt-0.5">Status saat ini: <strong class="text-amber-950">{{ $transaksi->status_pembayaran }}</strong> · Metode: <strong>{{ $transaksi->metode_pembayaran }}</strong></p>
                 </div>
             </div>
-            <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" onsubmit="return confirm('Konfirmasi bahwa uang pembayaran sebesar Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }} telah diterima di kasir?')">
+            <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pembayaran', 'Konfirmasi bahwa uang pembayaran sebesar Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }} telah diterima di kasir?')">
                 @csrf
                 <input type="hidden" name="status_pesanan" value="{{ $transaksi->status_pesanan }}">
                 <input type="hidden" name="status_pembayaran" value="Lunas">
-                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2">
+                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-2 active:scale-95">
                     <i class="fa-solid fa-circle-check"></i>
                     <span>Terima Pembayaran (Lunas)</span>
                 </button>
