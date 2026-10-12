@@ -271,6 +271,10 @@ class KaryawanOperasionalController extends Controller
 
         $nextPaymentStatus = $validated['status_pembayaran'] ?? $transaksi->status_pembayaran;
 
+        if ($currentStatus === 'Menunggu ACC' && $nextStatus === 'Dimasak' && $transaksi->metode_pembayaran === 'Tunai') {
+            $nextPaymentStatus = 'Lunas';
+        }
+
         if ($nextStatus === 'Dimasak' && $transaksi->metode_pembayaran === 'QRIS') {
             abort_unless($transaksi->status_pembayaran === 'Menunggu Konfirmasi' && $nextPaymentStatus === 'Lunas', 422, 'Bukti pembayaran QRIS harus dikonfirmasi terlebih dahulu.');
         }

@@ -49,6 +49,9 @@ Route::middleware('auth')->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/sidebar-counts', [DashboardController::class, 'sidebarCounts'])
+        ->middleware('role:admin,karyawan')
+        ->name('sidebar.counts');
 
     // Pesanan
     Route::controller(CheckoutController::class)->prefix('pesanan')->name('front.')->group(function () {

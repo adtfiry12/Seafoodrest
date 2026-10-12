@@ -3,16 +3,26 @@
 namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
-use App\Models\Transaksi;
+use App\Models\DetailTransaksi;
 use App\Models\Menu;
 use App\Models\Pengguna;
-use App\Models\DetailTransaksi;
-use Illuminate\Http\Request;
+use App\Models\Transaksi;
 use Carbon\Carbon;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
+    public function sidebarCounts(): JsonResponse
+    {
+        return response()->json([
+            'pending_acc' => Transaksi::where('status_pesanan', 'Menunggu ACC')->count(),
+            'pending_dapur' => Transaksi::where('status_pesanan', 'Dimasak')->count(),
+            'pending_delivery' => Transaksi::whereIn('status_pesanan', ['Siap Diantar', 'Diantar'])->count(),
+        ]);
+    }
+
     public function indexadmin(Request $request)
     {
         Transaksi::batalkanSemuaQrisKedaluwarsa();
@@ -23,19 +33,19 @@ class DashboardController extends Controller
         $totalPelanggan = Pengguna::where('role', 'pelanggan')->count();
 
         $transaksiTerbaru = Transaksi::with(['pelanggan', 'karyawan'])
-                                     ->latest()
-                                     ->take(5)
-                                     ->get();
+            ->latest()
+            ->take(5)
+            ->get();
 
         $topMenus = DetailTransaksi::select('menu_id', DB::raw('SUM(qty) as total_terjual'))
-                                   ->whereHas('transaksi', function ($query) {
-                                       $query->whereNotIn('status_pesanan', ['Dibatalkan', 'Batal']);
-                                   })
-                                   ->with('menu')
-                                   ->groupBy('menu_id')
-                                   ->orderByDesc('total_terjual')
-                                   ->take(5)
-                                   ->get();
+            ->whereHas('transaksi', function ($query) {
+                $query->whereNotIn('status_pesanan', ['Dibatalkan', 'Batal']);
+            })
+            ->with('menu')
+            ->groupBy('menu_id')
+            ->orderByDesc('total_terjual')
+            ->take(5)
+            ->get();
 
         $chartDates = [];
         $chartTotals = [];
@@ -45,8 +55,8 @@ class DashboardController extends Controller
             $chartDates[] = $date->translatedFormat('d M');
 
             $total = Transaksi::where('status_pembayaran', 'Lunas')
-                              ->whereDate('created_at', $date->format('Y-m-d'))
-                              ->sum('total_bayar');
+                ->whereDate('created_at', $date->format('Y-m-d'))
+                ->sum('total_bayar');
 
             $chartTotals[] = $total;
         }

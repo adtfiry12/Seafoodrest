@@ -108,7 +108,9 @@
                         <span class="ml-3 flex-1 whitespace-nowrap">Transaksi</span>
                         <!-- Tampil badge merah hanya jika ada yang Menunggu ACC -->
                         @if($pendingAcc > 0)
-                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-rose-600 rounded-full shadow-2xs">{{ $notifBadge }}</span>
+                            <span id="admin-pending-acc-badge" data-sidebar-count="pending_acc" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-rose-600 rounded-full shadow-2xs">{{ $notifBadge }}</span>
+                        @else
+                            <span id="admin-pending-acc-badge" data-sidebar-count="pending_acc" class="hidden inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-rose-600 rounded-full shadow-2xs"></span>
                         @endif
                     </a>
 
@@ -413,6 +415,26 @@
                                 icon.classList.remove('text-slate-400', 'group-hover:text-gold-600', 'text-gold-500');
                                 icon.classList.add('text-gold-400');
                             }
+
+                            async function refreshSidebarCounts() {
+                                try {
+                                    const response = await fetch('{{ route('sidebar.counts') }}', {
+                                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                                        credentials: 'same-origin',
+                                    });
+
+                                    if (!response.ok) return;
+
+                                    const counts = await response.json();
+                                    document.querySelectorAll('[data-sidebar-count]').forEach((badge) => {
+                                        const count = Number(counts[badge.dataset.sidebarCount] ?? 0);
+                                        badge.textContent = count > 99 ? '99+' : count;
+                                        badge.classList.toggle('hidden', count === 0);
+                                    });
+                                } catch (error) {
+                                    console.warn('Gagal memperbarui jumlah notifikasi sidebar.', error);
+                                }
+                            }
                         } else {
                             link.classList.remove('bg-charcoal-950', 'bg-charcoal-900', 'text-white', 'shadow-xs', 'shadow-md', 'font-medium');
                             link.classList.add('text-slate-700', 'hover:bg-slate-100', 'hover:text-charcoal-950');
@@ -478,6 +500,7 @@
                         }
 
                         updateSidebarActive(new URL(url, window.location.origin).pathname);
+                        refreshSidebarCounts();
                         window.scrollTo({ top: 0, behavior: 'instant' });
                     } else {
                         window.location.href = url;
@@ -541,10 +564,16 @@
 
             // Initial sync on page load
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => updateSidebarActive(window.location.pathname));
+                document.addEventListener('DOMContentLoaded', () => {
+                    updateSidebarActive(window.location.pathname);
+                    refreshSidebarCounts();
+                });
             } else {
                 updateSidebarActive(window.location.pathname);
+                refreshSidebarCounts();
             }
+
+            setInterval(refreshSidebarCounts, 15000);
         })();
     </script>
 </body>

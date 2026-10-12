@@ -91,7 +91,9 @@
                         <i class="fa-solid fa-bell-concierge w-4 h-4 transition {{ request()->routeIs('karyawan.pesanan_baru') ? 'text-gold-400' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3 flex-1 whitespace-nowrap">Pesanan Masuk</span>
                         @if($pendingACC > 0)
-                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-rose-600 rounded-full shadow-2xs">{{ $pendingACC }}</span>
+                            <span id="karyawan-pending-acc-badge" data-sidebar-count="pending_acc" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-rose-600 rounded-full shadow-2xs">{{ $pendingACC }}</span>
+                        @else
+                            <span id="karyawan-pending-acc-badge" data-sidebar-count="pending_acc" class="hidden inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-rose-600 rounded-full shadow-2xs"></span>
                         @endif
                     </a>
 
@@ -99,7 +101,9 @@
                         <i class="fa-solid fa-fire-burner w-4 h-4 transition {{ request()->routeIs('karyawan.dapur') ? 'text-gold-400' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3 flex-1 whitespace-nowrap">Stasiun Dapur</span>
                         @if($pendingDapur > 0)
-                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-charcoal-900 bg-gold-400 rounded-full shadow-2xs">{{ $pendingDapur }}</span>
+                            <span id="karyawan-pending-dapur-badge" data-sidebar-count="pending_dapur" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-charcoal-900 bg-gold-400 rounded-full shadow-2xs">{{ $pendingDapur }}</span>
+                        @else
+                            <span id="karyawan-pending-dapur-badge" data-sidebar-count="pending_dapur" class="hidden inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-charcoal-900 bg-gold-400 rounded-full shadow-2xs"></span>
                         @endif
                     </a>
 
@@ -107,7 +111,9 @@
                         <i class="fa-solid fa-motorcycle w-4 h-4 transition {{ request()->routeIs('karyawan.delivery') ? 'text-gold-400' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
                         <span class="ml-3 flex-1 whitespace-nowrap">Pengantaran Delivery</span>
                         @if($pendingDelivery > 0)
-                            <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-sky-600 rounded-full shadow-2xs">{{ $pendingDelivery }}</span>
+                            <span id="karyawan-pending-delivery-badge" data-sidebar-count="pending_delivery" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-sky-600 rounded-full shadow-2xs">{{ $pendingDelivery }}</span>
+                        @else
+                            <span id="karyawan-pending-delivery-badge" data-sidebar-count="pending_delivery" class="hidden inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 ml-2 text-[10px] font-bold text-white bg-sky-600 rounded-full shadow-2xs"></span>
                         @endif
                     </a>
 
@@ -258,6 +264,26 @@
                                 icon.classList.remove('text-slate-400', 'group-hover:text-gold-600', 'text-gold-500');
                                 icon.classList.add('text-gold-400');
                             }
+
+                            async function refreshSidebarCounts() {
+                                try {
+                                    const response = await fetch('{{ route('sidebar.counts') }}', {
+                                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                                        credentials: 'same-origin',
+                                    });
+
+                                    if (!response.ok) return;
+
+                                    const counts = await response.json();
+                                    document.querySelectorAll('[data-sidebar-count]').forEach((badge) => {
+                                        const count = Number(counts[badge.dataset.sidebarCount] ?? 0);
+                                        badge.textContent = count > 99 ? '99+' : count;
+                                        badge.classList.toggle('hidden', count === 0);
+                                    });
+                                } catch (error) {
+                                    console.warn('Gagal memperbarui jumlah notifikasi sidebar.', error);
+                                }
+                            }
                         } else {
                             link.classList.remove('bg-charcoal-950', 'bg-charcoal-900', 'text-white', 'shadow-xs', 'shadow-md', 'font-medium');
                             link.classList.add('text-slate-700', 'hover:bg-slate-100', 'hover:text-charcoal-950');
@@ -366,6 +392,7 @@
                         }
 
                         updateSidebarActive(new URL(url, window.location.origin).pathname);
+                        refreshSidebarCounts();
                         window.scrollTo({ top: 0, behavior: 'instant' });
                     } else {
                         window.location.href = url;
@@ -429,10 +456,16 @@
 
             // Initial sync on page load
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => updateSidebarActive(window.location.pathname));
+                document.addEventListener('DOMContentLoaded', () => {
+                    updateSidebarActive(window.location.pathname);
+                    refreshSidebarCounts();
+                });
             } else {
                 updateSidebarActive(window.location.pathname);
+                refreshSidebarCounts();
             }
+
+            setInterval(refreshSidebarCounts, 15000);
         })();
     </script>
 </body>

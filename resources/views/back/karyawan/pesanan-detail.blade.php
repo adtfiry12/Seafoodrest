@@ -53,8 +53,8 @@
                     <i class="fa-solid fa-bell-concierge"></i>
                 </div>
                 <div>
-                    <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Pesanan Masuk (Menunggu ACC Kasir)</h3>
-                    <p class="text-xs text-slate-600 mt-0.5">Periksa rincian pesanan. Klik ACC untuk meneruskan ke antrean stasiun dapur.</p>
+                    <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Pesanan Masuk (Menunggu Konfirmasi)</h3>
+                    <p class="text-xs text-slate-600 mt-0.5">Periksa rincian pesanan, lalu terima pesanan untuk meneruskannya ke antrean dapur.</p>
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto justify-end">
@@ -76,21 +76,21 @@
                     <a href="{{ route('transaksi.bukti', $transaksi) }}" target="_blank" class="w-full sm:w-auto px-4 py-2.5 bg-charcoal-900 text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-charcoal-800 transition shadow-xs flex items-center justify-center gap-1.5">
                         <i class="fa-solid fa-image"></i> Cek Bukti
                     </a>
-                    <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi ACC & Verifikasi QRIS', 'Bukti pembayaran QRIS sudah valid? Teruskan pesanan ini ke dapur?')">
+                    <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pesanan & Verifikasi QRIS', 'Bukti pembayaran QRIS sudah valid? Terima pesanan ini untuk diteruskan ke dapur?')">
                         @csrf
                         <input type="hidden" name="status_pesanan" value="Dimasak">
                         <input type="hidden" name="status_pembayaran" value="Lunas">
                         <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-circle-check"></i> Valid & ACC Dapur
+                            <i class="fa-solid fa-circle-check"></i> Valid & Terima Pesanan
                         </button>
                     </form>
                 @else
-                    <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi ACC Pesanan', 'Teruskan pesanan {{ $transaksi->kode_transaksi }} ke dapur untuk mulai dimasak?')">
+                    <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pesanan', 'Terima pesanan {{ $transaksi->kode_transaksi }} untuk mulai dimasak?')">
                         @csrf
                         <input type="hidden" name="status_pesanan" value="Dimasak">
-                        <input type="hidden" name="status_pembayaran" value="{{ $transaksi->status_pembayaran }}">
+                        <input type="hidden" name="status_pembayaran" value="{{ $transaksi->metode_pembayaran === 'Tunai' ? 'Lunas' : $transaksi->status_pembayaran }}">
                         <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-gold-500 hover:bg-gold-600 text-charcoal-950 hover:text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
-                            <i class="fa-solid fa-fire-burner"></i> ACC ke Dapur
+                            <i class="fa-solid fa-fire-burner"></i> Terima Pesanan{{ $transaksi->metode_pembayaran === 'COD' ? ' (COD)' : '' }}
                         </button>
                     </form>
                 @endif
@@ -118,7 +118,7 @@
         </div>
     @endif
 
-    @if($transaksi->status_pembayaran !== 'Lunas' && !in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal']))
+    @if($transaksi->status_pesanan !== 'Menunggu ACC' && $transaksi->status_pembayaran !== 'Lunas' && !in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal']))
         <div class="rounded-2xl border border-amber-300 bg-amber-50/90 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3.5">
                 <div class="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-800 flex items-center justify-center text-xl shrink-0">

@@ -104,7 +104,7 @@
                         </form>
 
                         <!-- Tombol ACC Sesuai Kondisi -->
-                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi ACC Pesanan', 'Bukti pembayaran sudah valid? Teruskan pesanan ini ke dapur?')">
+                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pesanan', 'Bukti pembayaran sudah valid? Terima pesanan ini untuk diteruskan ke dapur?')">
                             @csrf
                             <input type="hidden" name="status_pesanan" value="Dimasak">
 
@@ -119,14 +119,14 @@
                                     <i class="fa-solid fa-image mr-1 text-[10px]"></i> Lihat Bukti
                                 </a>
                                 <button type="submit" class="w-full py-2 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 transition shadow-xs">
-                                    Valid & ACC Dapur
+                                    Valid & Terima Pesanan
                                 </button>
 
                             @else
-                                <input type="hidden" name="status_pembayaran" value="Belum Lunas">
+                                <input type="hidden" name="status_pembayaran" value="{{ $trx->metode_pembayaran == 'Tunai' ? 'Lunas' : 'Belum Lunas' }}">
                                 <button type="submit" class="w-full py-2 bg-gold-500 hover:bg-gold-600 text-charcoal-950 hover:text-white text-xs font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5" title="Teruskan pesanan ke dapur">
                                     <i class="fa-solid fa-fire-burner text-[11px]"></i>
-                                    <span>{{ $trx->metode_pembayaran == 'Tunai' ? 'ACC ke Dapur' : 'ACC Dapur (COD)' }}</span>
+                                    <span>{{ $trx->metode_pembayaran == 'Tunai' ? 'Terima Pesanan' : 'Terima Pesanan (COD)' }}</span>
                                 </button>
                             @endif
                         </form>
