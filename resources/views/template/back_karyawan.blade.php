@@ -244,6 +244,26 @@
                 }
             };
 
+            async function refreshSidebarCounts() {
+                try {
+                    const response = await fetch('{{ route('sidebar.counts') }}', {
+                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                        credentials: 'same-origin',
+                    });
+
+                    if (!response.ok) return;
+
+                    const counts = await response.json();
+                    document.querySelectorAll('[data-sidebar-count]').forEach((badge) => {
+                        const count = Number(counts[badge.dataset.sidebarCount] ?? 0);
+                        badge.textContent = count > 99 ? '99+' : count;
+                        badge.classList.toggle('hidden', count === 0);
+                    });
+                } catch (error) {
+                    console.warn('Gagal memperbarui jumlah notifikasi sidebar.', error);
+                }
+            }
+
             function updateSidebarActive(pathname) {
                 const clean = (p) => (p || '').replace(/\/$/, '') || '/';
                 const current = clean(pathname);
@@ -265,25 +285,6 @@
                                 icon.classList.add('text-gold-400');
                             }
 
-                            async function refreshSidebarCounts() {
-                                try {
-                                    const response = await fetch('{{ route('sidebar.counts') }}', {
-                                        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-                                        credentials: 'same-origin',
-                                    });
-
-                                    if (!response.ok) return;
-
-                                    const counts = await response.json();
-                                    document.querySelectorAll('[data-sidebar-count]').forEach((badge) => {
-                                        const count = Number(counts[badge.dataset.sidebarCount] ?? 0);
-                                        badge.textContent = count > 99 ? '99+' : count;
-                                        badge.classList.toggle('hidden', count === 0);
-                                    });
-                                } catch (error) {
-                                    console.warn('Gagal memperbarui jumlah notifikasi sidebar.', error);
-                                }
-                            }
                         } else {
                             link.classList.remove('bg-charcoal-950', 'bg-charcoal-900', 'text-white', 'shadow-xs', 'shadow-md', 'font-medium');
                             link.classList.add('text-slate-700', 'hover:bg-slate-100', 'hover:text-charcoal-950');
