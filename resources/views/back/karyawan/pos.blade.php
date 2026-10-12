@@ -298,7 +298,7 @@
                     </div>
 
                     <!-- List Item Keranjang -->
-                    <div class="space-y-2.5 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar" x-show="cart.length > 0">
+                    <div class="space-y-2.5 max-h-[34rem] sm:max-h-[22rem] overflow-y-auto pr-1 custom-scrollbar" x-show="cart.length > 0">
                         <template x-for="(item, index) in cart" :key="item.id">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl border border-slate-100 bg-slate-50/70 hover:bg-slate-50 transition gap-2 sm:gap-4">
                                 <input type="hidden" :name="`items[${index}][menu_id]`" :value="item.id">
@@ -416,17 +416,17 @@
                     </div>
 
                     <!-- Visual Menu Grid Cards -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 pt-1">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 pt-1 max-h-[72rem] sm:max-h-[48rem] xl:max-h-[36rem] overflow-y-auto pr-1 custom-scrollbar">
                         <template x-for="m in filteredMenus()" :key="m.id">
                             <div @click="addMenuToCart(m)"
-                                 class="group relative bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs hover:border-gold-400 hover:shadow-md cursor-pointer transition-all flex flex-col justify-between active:scale-[0.98]">
-                                <div class="h-28 bg-slate-100 overflow-hidden relative">
+                                 class="group relative h-44 bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-2xs hover:border-gold-400 hover:shadow-md cursor-pointer transition-all flex flex-col justify-between active:scale-[0.98]">
+                                <div class="h-24 bg-slate-100 overflow-hidden relative">
                                     <img :src="getMenuImage(m)" :alt="m.nama_menu" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                     <div class="absolute top-2 right-2 bg-charcoal-950/80 text-white text-[10px] font-bold px-2 py-0.5 rounded-full backdrop-blur-xs font-mono"
                                          :class="m.stok <= 5 ? 'bg-rose-900/90 text-rose-200' : ''"
                                          x-text="'Stok: ' + m.stok"></div>
                                 </div>
-                                <div class="p-3 flex flex-col justify-between flex-1">
+                                <div class="p-2.5 flex flex-col justify-between flex-1">
                                     <div>
                                         <p class="text-[10px] font-medium text-slate-400 truncate" x-text="m.kategori?.nama_kategori || 'Seafood'"></p>
                                         <h4 class="font-bold text-xs sm:text-sm text-charcoal-950 leading-tight truncate mt-0.5" x-text="m.nama_menu"></h4>
@@ -649,4 +649,3 @@
     })();
 </script>
 @endsection
-

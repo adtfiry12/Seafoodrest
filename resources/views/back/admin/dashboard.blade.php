@@ -91,8 +91,8 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div class="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div class="order-1 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3.5">
                 <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Tren Penjualan 7 Hari Terakhir</h3>
             </div>
@@ -101,7 +101,45 @@
             </div>
         </div>
 
-        <div class="lg:col-span-1 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+        <div class="order-3 bg-white border border-slate-200/80 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Transaksi Terkini</h3>
+                <a href="{{ route('admin.transaksi.index') }}" class="text-xs font-semibold text-gold-700 hover:text-gold-800 transition">Semua &rarr;</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                    <thead class="bg-slate-50/70 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
+                        <tr>
+                            <th class="px-5 py-3">Pelanggan</th>
+                            <th class="px-5 py-3">Total</th>
+                            <th class="px-5 py-3 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($transaksiTerbaru as $trx)
+                            <tr class="hover:bg-slate-50/70 transition">
+                                <td class="px-5 py-3.5">
+                                    <span class="font-medium text-charcoal-900 block truncate max-w-36">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</span>
+                                    <span class="text-[11px] text-slate-400">{{ $trx->kode_transaksi }}</span>
+                                    <span class="text-[10px] text-slate-500">{{ $trx->status_pesanan }}</span>
+                                </td>
+                                <td class="px-5 py-3.5 font-semibold text-gold-700 whitespace-nowrap">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</td>
+                                <td class="px-5 py-3.5 text-right">
+                                    <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" title="Lihat detail transaksi" aria-label="Lihat detail transaksi" class="group inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 text-xs shadow-2xs active:scale-95">
+                                        <i class="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="px-5 py-8 text-center text-slate-400">Belum ada transaksi.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="order-2 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
             <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Menu Paling Diminati</h3>
             <div class="space-y-3.5">
                 @forelse($topMenus as $top)
@@ -127,56 +165,33 @@
                     <div class="text-center py-6 text-slate-400 text-xs sm:text-sm">Belum ada data penjualan.</div>
                 @endforelse
             </div>
-        </div>
-    </div>
 
-    <div class="bg-white border border-slate-200/80 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
-        <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Transaksi Terkini</h3>
-            <a href="{{ route('admin.transaksi.index') }}" class="text-xs font-semibold text-gold-700 hover:text-gold-800 transition">Semua Transaksi &rarr;</a>
         </div>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs sm:text-sm text-slate-600">
-                <thead class="bg-slate-50/70 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                    <tr>
-                        <th class="px-5 py-3">Invoice</th>
-                        <th class="px-5 py-3">Pelanggan</th>
-                        <th class="px-5 py-3">Total</th>
-                        <th class="px-5 py-3">Status</th>
-                        <th class="px-5 py-3 text-right">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                    @forelse($transaksiTerbaru as $trx)
-                        <tr class="hover:bg-slate-50/70 transition">
-                            <td class="px-5 py-3.5 font-mono font-semibold text-charcoal-900 text-xs">{{ $trx->kode_transaksi }}</td>
-                            <td class="px-5 py-3.5">
-                                <span class="font-medium text-charcoal-900 block">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</span>
-                                <span class="text-[11px] text-slate-400">{{ $trx->tipe_pesanan }}</span>
-                            </td>
-                            <td class="px-5 py-3.5 font-semibold text-gold-700">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</td>
-                            <td class="px-5 py-3.5">
-                                @if($trx->status_pesanan == 'Menunggu ACC')
-                                    <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-rose-50 text-rose-700 border border-rose-200/60">Menunggu</span>
-                                @elseif($trx->status_pesanan == 'Selesai')
-                                    <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/60">Selesai</span>
-                                @else
-                                    <span class="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-sky-50 text-sky-700 border border-sky-200/60">{{ $trx->status_pesanan }}</span>
-                                @endif
-                            </td>
-                            <td class="px-5 py-3.5 text-right">
-                                <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" title="Lihat detail transaksi" aria-label="Lihat detail transaksi" class="group inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 text-xs shadow-2xs active:scale-95">
-                                    <i class="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-5 py-8 text-center text-slate-400">Belum ada transaksi.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+
+        <div class="order-4 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Pelanggan Paling Banyak Membeli</h3>
+            <div class="space-y-3.5">
+                @forelse($topCustomers as $topCustomer)
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-sky-50 text-sky-600 border border-sky-100 overflow-hidden shrink-0 flex items-center justify-center text-xs font-bold">
+                            @if($topCustomer->pelanggan?->foto)
+                                <img src="{{ asset('storage/' . $topCustomer->pelanggan->foto) }}" alt="{{ $topCustomer->pelanggan->nama }}" class="w-full h-full object-cover">
+                            @else
+                                {{ strtoupper(substr($topCustomer->pelanggan?->nama ?? 'P', 0, 1)) }}
+                            @endif
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-medium text-xs sm:text-sm text-charcoal-900 truncate">{{ $topCustomer->pelanggan?->nama ?? 'Pelanggan Terhapus' }}</h4>
+                            <p class="text-[11px] text-slate-500">{{ $topCustomer->total_dibeli }} Porsi Dibeli</p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <span class="text-xs font-semibold text-sky-700">Pelanggan #{{ $loop->iteration }}</span>
+                        </div>
+                    </div>
+                @empty
+                    <div class="text-center py-6 text-slate-400 text-xs sm:text-sm">Belum ada data pelanggan.</div>
+                @endforelse
+            </div>
         </div>
     </div>
 </div>

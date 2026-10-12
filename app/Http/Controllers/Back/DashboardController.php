@@ -47,6 +47,17 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        $topCustomers = Transaksi::query()
+            ->select('transaksi.pengguna_id', DB::raw('SUM(detail_transaksi.qty) as total_dibeli'))
+            ->join('detail_transaksi', 'detail_transaksi.transaksi_id', '=', 'transaksi.id')
+            ->whereNotNull('transaksi.pengguna_id')
+            ->whereNotIn('transaksi.status_pesanan', ['Dibatalkan', 'Batal'])
+            ->with('pelanggan')
+            ->groupBy('transaksi.pengguna_id')
+            ->orderByDesc('total_dibeli')
+            ->take(5)
+            ->get();
+
         $chartDates = [];
         $chartTotals = [];
 
@@ -63,7 +74,7 @@ class DashboardController extends Controller
 
         return view('back.admin.dashboard', compact(
             'totalPendapatan', 'pesananBaru', 'totalMenu', 'totalPelanggan',
-            'transaksiTerbaru', 'topMenus', 'chartDates', 'chartTotals'
+            'transaksiTerbaru', 'topMenus', 'topCustomers', 'chartDates', 'chartTotals'
         ));
     }
 
