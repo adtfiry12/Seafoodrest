@@ -41,6 +41,8 @@
                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200"><i class="fa-solid fa-shield-halved"></i> Admin</span>
                     @elseif($pengguna->role === 'karyawan')
                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200"><i class="fa-solid fa-user-tie"></i> Karyawan</span>
+                    @elseif($pengguna->role === 'kurir')
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200"><i class="fa-solid fa-motorcycle"></i> Kurir</span>
                     @else
                         <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-user"></i> Pelanggan</span>
                     @endif

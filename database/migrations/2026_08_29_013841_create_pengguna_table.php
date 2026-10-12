@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('tanggal_lahir')->nullable();
             $table->text('alamat')->nullable();
             $table->string('foto')->nullable();
-            $table->enum('role', ['admin', 'karyawan', 'pelanggan'])->default('pelanggan');
+            $table->enum('role', ['admin', 'karyawan', 'kurir', 'pelanggan'])->default('pelanggan');
             $table->rememberToken();
             $table->timestamps();
         });

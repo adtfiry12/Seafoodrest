@@ -82,8 +82,8 @@
                                     <p class="text-sm font-semibold text-charcoal-900 truncate">{{ Auth::user()->nama }}</p>
                                     <span class="inline-block px-2 py-0.5 text-[9px] font-semibold text-slate-600 bg-slate-200/80 rounded mt-0.5 uppercase tracking-wider">{{ Auth::user()->role }}</span>
                                 </div>
-                                @if(in_array(Auth::user()->role, ['admin', 'karyawan']))
-                                    <a href="{{ Auth::user()->role == 'admin' ? route('admin.dashboard') : route('dashboard.karyawan') }}" class="px-4 py-2 text-sm hover:bg-slate-50 flex items-center gap-2.5 text-slate-700"><i class="fa-solid fa-gauge-high text-gold-600 text-xs w-4"></i> Dashboard </a>
+                                @if(in_array(Auth::user()->role, ['admin', 'karyawan', 'kurir']))
+                                    <a href="{{ Auth::user()->role == 'admin' ? route('admin.dashboard') : (Auth::user()->role == 'kurir' ? route('karyawan.delivery') : route('dashboard.karyawan')) }}" class="px-4 py-2 text-sm hover:bg-slate-50 flex items-center gap-2.5 text-slate-700"><i class="fa-solid fa-gauge-high text-gold-600 text-xs w-4"></i> Dashboard </a>
                                 @endif
                                 <a href="{{ route('profile.index') }}" class="px-4 py-2 text-sm hover:bg-slate-50 flex items-center gap-2.5 text-slate-700"><i class="fa-solid fa-user text-gold-600 text-xs w-4"></i> Pengaturan Profil</a>
                                 <form method="POST" action="{{ route('logout') }}">
@@ -124,8 +124,8 @@
                 @else
                     <div class="mt-3 pt-3 border-t border-slate-100">
                         <p class="px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Akun Saya</p>
-                        @if(in_array(Auth::user()->role, ['admin', 'karyawan']))
-                            <a href="{{ Auth::user()->role == 'admin' ? route('admin.dashboard') : route('dashboard.karyawan') }}" class="block px-3 py-2 text-sm text-slate-700 font-medium rounded-lg hover:bg-slate-50">Dashboard</a>
+                        @if(in_array(Auth::user()->role, ['admin', 'karyawan', 'kurir']))
+                            <a href="{{ Auth::user()->role == 'admin' ? route('admin.dashboard') : (Auth::user()->role == 'kurir' ? route('karyawan.delivery') : route('dashboard.karyawan')) }}" class="block px-3 py-2 text-sm text-slate-700 font-medium rounded-lg hover:bg-slate-50">Dashboard</a>
                         @endif
                         <a href="{{ route('profile.index') }}" class="block px-3 py-2 text-sm text-slate-700 font-medium rounded-lg hover:bg-slate-50">Profil</a>
                         <form method="POST" action="{{ route('logout') }}">

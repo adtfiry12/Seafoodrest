@@ -158,8 +158,14 @@ class TransaksiController extends Controller
             ...$this->allowedNextStatuses($transaksi),
         ]));
         $statusPembayaranOptions = $this->allowedPaymentStatuses($transaksi);
+        $kurirList = Pengguna::where('role', 'kurir')->orderBy('nama')->get();
 
-        return view('back.admin.transaksi.edit', compact('transaksi', 'statusPesananOptions', 'statusPembayaranOptions'));
+        return view('back.admin.transaksi.edit', compact(
+            'transaksi',
+            'statusPesananOptions',
+            'statusPembayaranOptions',
+            'kurirList'
+        ));
     }
 
     public function update(Request $request, Transaksi $transaksi)
@@ -167,11 +173,13 @@ class TransaksiController extends Controller
         $validated = $request->validate([
             'status_pembayaran' => 'required|in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal',
             'status_pesanan' => 'required|in:Menunggu ACC,Dimasak,Siap Diantar,Diantar,Selesai,Dibatalkan',
+            'kurir_id' => 'nullable|exists:pengguna,id',
         ], [
             'status_pembayaran.required' => 'Status pembayaran wajib dipilih.',
             'status_pembayaran.in' => 'Pilihan status pembayaran tidak valid.',
             'status_pesanan.required' => 'Status pesanan wajib dipilih.',
             'status_pesanan.in' => 'Pilihan status pesanan tidak valid.',
+            'kurir_id.exists' => 'Kurir yang dipilih tidak ditemukan.',
         ]);
 
         $allowedStatuses = array_merge(
@@ -224,15 +232,19 @@ class TransaksiController extends Controller
             ];
 
             if ($transaksi->tipe_pesanan === 'Delivery') {
+                if (array_key_exists('kurir_id', $validated)) {
+                    $updateData['kurir_id'] = $validated['kurir_id'];
+                }
+
                 if ($validated['status_pesanan'] === 'Diantar') {
                     $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? now();
-                    $updateData['kurir_id'] = $transaksi->kurir_id ?? Auth::id();
+                    $updateData['kurir_id'] = $updateData['kurir_id'] ?? $transaksi->kurir_id ?? Auth::id();
                 }
 
                 if ($validated['status_pesanan'] === 'Selesai') {
                     $updateData['waktu_berangkat'] = $transaksi->waktu_berangkat ?? ($transaksi->created_at ?? now());
                     $updateData['waktu_sampai'] = $transaksi->waktu_sampai ?? now();
-                    $updateData['kurir_id'] = $transaksi->kurir_id ?? Auth::id();
+                    $updateData['kurir_id'] = $updateData['kurir_id'] ?? $transaksi->kurir_id ?? Auth::id();
                     $updateData['diterima_oleh'] = $transaksi->diterima_oleh ?? ($transaksi->pelanggan->nama ?? $transaksi->nama_pelanggan ?? 'Pelanggan');
                 }
             }

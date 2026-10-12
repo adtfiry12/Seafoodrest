@@ -44,15 +44,15 @@
     </div>
 
     <!-- Quick Stats Cards (Clickable Links) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
 
         <!-- Antrian Kasir (Menunggu ACC) -->
-        <a href="{{ route('karyawan.pesanan_baru') }}" class="group bg-white border {{ $pesananBaru > 0 ? 'border-red-200 ring-1 ring-red-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500">Pesanan Masuk (Kasir)</p>
-                    <h3 class="text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananBaru }}</h3>
-                    <p class="text-xs mt-1.5 {{ $pesananBaru > 0 ? 'text-red-600 font-semibold' : 'text-slate-400' }}">
+        <a href="{{ route('karyawan.pesanan_baru') }}" class="group bg-white border {{ $pesananBaru > 0 ? 'border-red-200 ring-1 ring-red-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-semibold text-slate-500 truncate">Pesanan Masuk (Kasir)</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananBaru }}</h3>
+                    <p class="text-xs mt-1.5 truncate {{ $pesananBaru > 0 ? 'text-red-600 font-semibold' : 'text-slate-400' }}">
                         {{ $pesananBaru > 0 ? 'Menunggu konfirmasi kasir' : 'Tidak ada antrean baru' }}
                     </p>
                 </div>
@@ -67,12 +67,12 @@
         </a>
 
         <!-- Antrian Dapur (Dimasak) -->
-        <a href="{{ route('karyawan.dapur') }}" class="group bg-white border {{ $pesananDapur > 0 ? 'border-amber-200 ring-1 ring-amber-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500">Proses Dapur</p>
-                    <h3 class="text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananDapur }}</h3>
-                    <p class="text-xs mt-1.5 {{ $pesananDapur > 0 ? 'text-amber-600 font-semibold' : 'text-slate-400' }}">
+        <a href="{{ route('karyawan.dapur') }}" class="group bg-white border {{ $pesananDapur > 0 ? 'border-amber-200 ring-1 ring-amber-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-semibold text-slate-500 truncate">Proses Dapur</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananDapur }}</h3>
+                    <p class="text-xs mt-1.5 truncate {{ $pesananDapur > 0 ? 'text-amber-600 font-semibold' : 'text-slate-400' }}">
                         {{ $pesananDapur > 0 ? 'Sedang dimasak chef (FIFO)' : 'Dapur siap terima order' }}
                     </p>
                 </div>
@@ -87,12 +87,12 @@
         </a>
 
         <!-- Antrian Delivery (Diantar) -->
-        <a href="{{ route('karyawan.delivery') }}" class="group bg-white border {{ $pesananDelivery > 0 ? 'border-sky-200 ring-1 ring-sky-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500">Siap Antar / Saji</p>
-                    <h3 class="text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananDelivery }}</h3>
-                    <p class="text-xs mt-1.5 {{ $pesananDelivery > 0 ? 'text-sky-600 font-semibold' : 'text-slate-400' }}">
+        <a href="{{ route('karyawan.delivery') }}" class="group bg-white border {{ $pesananDelivery > 0 ? 'border-sky-200 ring-1 ring-sky-500/10 shadow-xs' : 'border-slate-200/80' }} rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md flex flex-col justify-between">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-semibold text-slate-500 truncate">Siap Antar / Saji</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold font-serif text-charcoal-950 mt-1 tabular-nums">{{ $pesananDelivery }}</h3>
+                    <p class="text-xs mt-1.5 truncate {{ $pesananDelivery > 0 ? 'text-sky-600 font-semibold' : 'text-slate-400' }}">
                         {{ $pesananDelivery > 0 ? 'Dalam perjalanan ke tamu' : 'Semua hidangan tersaji' }}
                     </p>
                 </div>
@@ -107,12 +107,12 @@
         </a>
 
         <!-- Selesai Hari Ini -->
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs relative overflow-hidden flex flex-col justify-between">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-xs font-semibold text-slate-500">Pesanan Tuntas</p>
-                    <h3 class="text-3xl font-bold font-serif text-emerald-600 mt-1 tabular-nums">{{ $pesananSelesaiHariIni }}</h3>
-                    <p class="text-xs text-slate-400 mt-1.5">Total hidangan tersaji hari ini</p>
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs relative overflow-hidden flex flex-col justify-between">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-xs font-semibold text-slate-500 truncate">Pesanan Tuntas</p>
+                    <h3 class="text-2xl sm:text-3xl font-bold font-serif text-emerald-600 mt-1 tabular-nums">{{ $pesananSelesaiHariIni }}</h3>
+                    <p class="text-xs text-slate-400 mt-1.5 truncate">Total hidangan tersaji hari ini</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center text-lg shrink-0">
                     <i class="fa-solid fa-circle-check"></i>
@@ -127,10 +127,10 @@
     </div>
 
     <!-- Main Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
 
         <!-- Kolom Kiri: Antrean Pesanan Aktif Berjalan (2/3) -->
-        <div class="lg:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col">
+        <div class="xl:col-span-2 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-100">
                 <div class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-lg bg-gold-50 text-gold-700 border border-gold-100 flex items-center justify-center text-sm">
@@ -150,8 +150,8 @@
             <div class="divide-y divide-slate-100 flex-1">
                 @forelse($pesananAktif as $trx)
                     <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-50/70 px-2 rounded-xl transition border border-transparent hover:border-slate-100">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2">
+                        <div class="space-y-1 min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
                                 <a href="{{ route('karyawan.pesanan.detail', $trx->kode_transaksi) }}" class="font-mono font-bold text-charcoal-950 hover:text-gold-700 transition text-sm">
                                     {{ $trx->kode_transaksi }}
                                 </a>
@@ -160,13 +160,13 @@
                                     {{ $trx->tipe_pesanan }}
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-500">
+                            <p class="text-xs text-slate-500 truncate">
                                 <span class="font-medium text-charcoal-800">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Pelanggan Umum' }}</span>
                                 · {{ $trx->detail->count() }} menu pesanan
                             </p>
                         </div>
 
-                        <div class="flex items-center justify-between sm:justify-end gap-3">
+                        <div class="flex items-center justify-between sm:justify-end gap-3 shrink-0">
                             <div class="text-left sm:text-right">
                                 <span class="inline-block px-2.5 py-0.5 rounded-md text-xs font-semibold
                                     @if($trx->status_pesanan == 'Menunggu ACC') bg-red-50 text-red-700 border border-red-200/60
@@ -197,7 +197,7 @@
         </div>
 
         <!-- Kolom Kanan: Peringatan Stok & Akses Cepat (1/3) -->
-        <div class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-1 gap-6">
 
             <!-- Card Peringatan Stok -->
             <div class="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col">

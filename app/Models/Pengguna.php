@@ -44,4 +44,15 @@ class Pengguna extends Authenticatable
             default => '-',
         };
     }
+
+    public function getRoleLabelAttribute(): string
+    {
+        return match ($this->role) {
+            'admin' => 'Admin',
+            'karyawan' => 'Karyawan',
+            'kurir' => 'Kurir',
+            'pelanggan' => 'Pelanggan',
+            default => ucfirst($this->role ?? '-'),
+        };
+    }
 }

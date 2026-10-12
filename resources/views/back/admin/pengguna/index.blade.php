@@ -29,22 +29,46 @@
     <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
         <form action="{{ route('admin.pengguna.index') }}" method="GET" class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 w-full sm:w-auto">
             <div class="relative w-full sm:w-64">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama / email / HP..." class="w-full bg-white border border-slate-200 rounded-xl pl-4 pr-10 py-2.5 text-sm focus:ring-gold-500 focus:border-gold-500 text-charcoal-900 shadow-sm">
-                <button type="submit" class="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-gold-600 transition">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama / email / HP..." class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full pl-4 pr-10 py-2.5 transition-all duration-200 hover:bg-white shadow-sm">
+                <button type="submit" class="absolute right-1 top-1 w-8 h-8 flex items-center justify-center text-slate-400 hover:text-gold-600 transition" aria-label="Cari pengguna">
                     <i class="fa-solid fa-magnifying-glass text-sm"></i>
                 </button>
             </div>
 
-            <select name="role" onchange="this.form.submit()" class="bg-white border border-slate-200 text-sm rounded-xl focus:ring-gold-500 px-3.5 py-2.5 text-slate-700 shadow-sm w-full sm:w-auto">
-                <option value="">Semua Role</option>
-                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                <option value="karyawan" {{ request('role') == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
-                <option value="pelanggan" {{ request('role') == 'pelanggan' ? 'selected' : '' }}>Pelanggan</option>
-            </select>
+            @php
+                $roleFilterOptions = [
+                    ['id' => 'admin', 'label' => 'Admin'],
+                    ['id' => 'karyawan', 'label' => 'Karyawan'],
+                    ['id' => 'kurir', 'label' => 'Kurir'],
+                    ['id' => 'pelanggan', 'label' => 'Pelanggan'],
+                ];
+            @endphp
+            <div x-data="customFilterSelect(@js($roleFilterOptions), @js((string) request('role', '')), 'Semua Role')" @click.outside="open = false" class="relative w-full sm:w-52">
+                <input type="hidden" name="role" :value="selected">
+                <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20 shadow-sm">
+                    <span class="truncate flex items-center gap-2">
+                        <i class="fa-solid fa-user-shield text-xs text-slate-400"></i>
+                        <span x-text="selectedLabel()" class="font-medium text-charcoal-900"></span>
+                    </span>
+                    <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''"></i>
+                </button>
+                <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 min-w-[200px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl p-1">
+                    <button type="button" @click="select('')" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selected === '' ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
+                        <span>Semua Role</span>
+                        <i x-show="selected === ''" class="fa-solid fa-check text-gold-600"></i>
+                    </button>
+                    <template x-for="option in options" :key="option.id">
+                        <button type="button" @click="select(option.id)" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selected == String(option.id) ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
+                            <span x-text="option.label"></span>
+                            <i x-show="selected == String(option.id)" class="fa-solid fa-check text-gold-600"></i>
+                        </button>
+                    </template>
+                </div>
+            </div>
 
             @if(request('search') || request('role'))
-                <a href="{{ route('admin.pengguna.index') }}" class="px-3 py-2 text-xs font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition flex items-center gap-1">
-                    <i class="fa-solid fa-xmark"></i> Reset
+                <a href="{{ route('admin.pengguna.index') }}" class="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-semibold text-red-600 bg-red-50 hover:bg-red-100 border border-red-200/60 rounded-xl transition shadow-sm">
+                    <i class="fa-solid fa-xmark"></i> Reset Filter
                 </a>
             @endif
         </form>
@@ -87,11 +111,21 @@
                             </td>
                             <td class="px-6 py-4">
                                 @if($item->role == 'admin')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">Admin</span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
+                                        <i class="fa-solid fa-shield text-[10px]"></i> Admin
+                                    </span>
                                 @elseif($item->role == 'karyawan')
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">Karyawan</span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
+                                        <i class="fa-solid fa-user-tie text-[10px]"></i> Karyawan
+                                    </span>
+                                @elseif($item->role == 'kurir')
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                                        <i class="fa-solid fa-motorcycle text-[10px]"></i> Kurir
+                                    </span>
                                 @else
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Pelanggan</span>
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <i class="fa-solid fa-user text-[10px]"></i> Pelanggan
+                                    </span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right space-x-1">

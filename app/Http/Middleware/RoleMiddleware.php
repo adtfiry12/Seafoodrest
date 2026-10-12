@@ -24,12 +24,8 @@ class RoleMiddleware
             return $next($request);
         }
 
-        if (in_array($userRole, $roles)) {
+        if (in_array($userRole, $roles, true)) {
             return $next($request);
-        }
-
-        if ($userRole === 'karyawan') {
-            abort(404);
         }
 
         abort(404);

@@ -360,7 +360,7 @@
     @endif
 
     <!-- Kanban Grid Kurir -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5 sm:gap-6">
         @forelse($transaksi as $trx)
             @php
                 $isSiap = $trx->status_pesanan === 'Siap Diantar';
@@ -374,12 +374,12 @@
 
                 <div>
                     <!-- Header Card -->
-                    <div class="p-4 border-b border-slate-100 flex justify-between items-start bg-slate-50/70">
-                        <div>
-                            <h3 class="font-mono font-bold text-charcoal-900 text-base sm:text-lg leading-tight">{{ $trx->kode_transaksi }}</h3>
-                            <p class="text-[11px] text-slate-500 mt-0.5"><i class="fa-regular fa-clock mr-1"></i> Pesanan masuk: {{ $trx->created_at->format('H:i') }} WIB</p>
+                    <div class="p-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50/70">
+                        <div class="min-w-0 flex-1">
+                            <h3 class="font-mono font-bold text-charcoal-900 text-base sm:text-lg leading-tight truncate">{{ $trx->kode_transaksi }}</h3>
+                            <p class="text-[11px] text-slate-500 mt-0.5 truncate"><i class="fa-regular fa-clock mr-1"></i> Pesanan masuk: {{ $trx->created_at->format('H:i') }} WIB</p>
                         </div>
-                        <div class="flex flex-col items-end gap-1">
+                        <div class="flex flex-col items-end gap-1 shrink-0">
                             @if($isSiap)
                                 <span class="inline-flex items-center px-2.5 py-0.5 bg-amber-100 text-amber-800 text-[10px] font-bold rounded-lg uppercase tracking-wider">
                                     <i class="fa-solid fa-box mr-1"></i> Siap Diantar
@@ -454,12 +454,12 @@
                         @if(!$isSiap)
                             <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                                 <span class="text-slate-400 block font-semibold uppercase text-[9px] tracking-wider">Kurir Bertugas</span>
-                                <div class="flex items-center justify-between mt-1">
-                                    <strong class="text-charcoal-900 flex items-center gap-1.5">
-                                        <i class="fa-solid fa-user-tag text-gold-600 text-xs"></i>
-                                        {{ $trx->kurir->nama ?? 'Karyawan' }}
+                                <div class="flex items-center justify-between gap-2 mt-1">
+                                    <strong class="text-charcoal-900 flex items-center gap-1.5 min-w-0 truncate">
+                                        <i class="fa-solid fa-user-tag text-gold-600 text-xs shrink-0"></i>
+                                        <span class="truncate">{{ $trx->kurir->nama ?? 'Karyawan' }}</span>
                                     </strong>
-                                    <span class="text-slate-500 font-mono text-[11px]">
+                                    <span class="text-slate-500 font-mono text-[11px] shrink-0 text-right">
                                         <i class="fa-regular fa-clock mr-0.5"></i> Berangkat {{ $trx->waktu_berangkat?->format('H:i') ?? '-' }} WIB
                                         @if($trx->waktu_berangkat)
                                             <span class="text-amber-600 font-sans font-bold text-[10px] block text-right">({{ $trx->waktu_berangkat->diffForHumans(null, true) }} jalan)</span>

@@ -89,6 +89,7 @@ class AuthController extends Controller
         return match (Auth::user()->role ?? 'pelanggan') {
             'admin' => route('admin.dashboard'),
             'karyawan' => route('dashboard.karyawan'),
+            'kurir' => route('karyawan.delivery'),
             default => route('home'),
         };
     }

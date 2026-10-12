@@ -49,8 +49,9 @@ Route::middleware('auth')->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Sidebar badge counts & bukti pembayaran (Admin, Karyawan, Kurir)
     Route::get('/sidebar-counts', [DashboardController::class, 'sidebarCounts'])
-        ->middleware('role:admin,karyawan')
+        ->middleware('role:admin,karyawan,kurir')
         ->name('sidebar.counts');
 
     // Pesanan
@@ -61,33 +62,43 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/transaksi/{transaksi}/bukti-pembayaran', [TransaksiController::class, 'buktiPembayaran'])
-        ->middleware('role:admin,karyawan')
+        ->middleware('role:admin,karyawan,kurir')
         ->name('transaksi.bukti');
 
-    // profile
+    // Profile
     Route::controller(ProfileController::class)->prefix('profile')->name('profile.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::put('/', 'update')->name('update');
         Route::put('/password', 'updatePassword')->middleware('throttle:password_update')->name('password');
     });
 
-    // Karyawan
-    Route::middleware('role:karyawan')->prefix('karyawan')->group(function () {
-        Route::get('/dashboard', [DashboardController::class, 'indexkaryawan'])->name('dashboard.karyawan');
+    // Operasional Backoffice Karyawan & Kurir
+    Route::prefix('karyawan')->group(function () {
+        // Akses Bersama (Karyawan & Kurir & Admin)
+        Route::middleware('role:karyawan,kurir')->group(function () {
+            Route::get('/dashboard', [DashboardController::class, 'indexkaryawan'])->name('dashboard.karyawan');
+            Route::get('/pesanan/{kode_transaksi}', [KaryawanOperasionalController::class, 'detailPesanan'])->name('karyawan.pesanan.detail');
+            Route::post('/update-status/{kode_transaksi}', [KaryawanOperasionalController::class, 'updateStatus'])->name('karyawan.update_status');
+        });
 
-        Route::controller(KaryawanOperasionalController::class)->name('karyawan.')->group(function () {
-            Route::get('/keranjang', 'posCreate')->name('keranjang');
-            Route::get('/pos', 'posCreate')->name('pos');
-            Route::post('/keranjang', 'posStore')->name('keranjang.store');
-            Route::post('/pos', 'posStore')->name('pos.store');
-            Route::get('/pesanan-baru', 'pesananBaru')->name('pesanan_baru');
-            Route::get('/dapur', 'dapur')->name('dapur');
-            Route::get('/delivery', 'delivery')->name('delivery');
-            Route::get('/pesanan/{kode_transaksi}', 'detailPesanan')->name('pesanan.detail');
-            Route::post('/update-status/{kode_transaksi}', 'updateStatus')->name('update_status');
-            Route::get('/stok', 'stokIndex')->name('stok');
-            Route::get('/stok/menu/{menu}', 'detailMenu')->name('stok.detail');
-            Route::post('/stok/{id}', 'updateStok')->name('stok.update');
+        // Khusus Kurir (& Admin): Pengantaran Delivery
+        Route::middleware('role:kurir')->group(function () {
+            Route::get('/delivery', [KaryawanOperasionalController::class, 'delivery'])->name('karyawan.delivery');
+        });
+
+        // Khusus Karyawan Resto (& Admin): Kasir POS, Pesanan Masuk, Stasiun Dapur, Stok
+        Route::middleware('role:karyawan')->group(function () {
+            Route::controller(KaryawanOperasionalController::class)->name('karyawan.')->group(function () {
+                Route::get('/keranjang', 'posCreate')->name('keranjang');
+                Route::get('/pos', 'posCreate')->name('pos');
+                Route::post('/keranjang', 'posStore')->name('keranjang.store');
+                Route::post('/pos', 'posStore')->name('pos.store');
+                Route::get('/pesanan-baru', 'pesananBaru')->name('pesanan_baru');
+                Route::get('/dapur', 'dapur')->name('dapur');
+                Route::get('/stok', 'stokIndex')->name('stok');
+                Route::get('/stok/menu/{menu}', 'detailMenu')->name('stok.detail');
+                Route::post('/stok/{id}', 'updateStok')->name('stok.update');
+            });
         });
     });
 

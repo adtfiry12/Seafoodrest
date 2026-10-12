@@ -41,12 +41,12 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Pendapatan</p>
-                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider truncate">Total Pendapatan</p>
+                    <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums truncate">Rp {{ number_format($totalPendapatan, 0, ',', '.') }}</h3>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center text-sm shrink-0">
                     <i class="fa-solid fa-wallet"></i>
@@ -54,11 +54,14 @@
             </div>
         </div>
 
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Antrean Pesanan</p>
-                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $pesananBaru }} <span class="text-xs text-slate-500 font-normal">Perlu Konfirmasi</span></h3>
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider truncate">Antrean Pesanan</p>
+                    <div class="flex items-baseline gap-1.5 flex-wrap mt-1.5">
+                        <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-charcoal-950 tabular-nums">{{ $pesananBaru }}</h3>
+                        <span class="text-xs text-slate-500 font-normal">Perlu Konfirmasi</span>
+                    </div>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center text-sm shrink-0">
                     <i class="fa-solid fa-bell-concierge"></i>
@@ -66,11 +69,14 @@
             </div>
         </div>
 
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Menu Hidangan</p>
-                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $totalMenu }} <span class="text-xs text-slate-500 font-normal">Varian Aktif</span></h3>
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider truncate">Menu Hidangan</p>
+                    <div class="flex items-baseline gap-1.5 flex-wrap mt-1.5">
+                        <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-charcoal-950 tabular-nums">{{ $totalMenu }}</h3>
+                        <span class="text-xs text-slate-500 font-normal">Varian Aktif</span>
+                    </div>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-sm shrink-0">
                     <i class="fa-solid fa-utensils"></i>
@@ -78,11 +84,14 @@
             </div>
         </div>
 
-        <div class="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
-            <div class="flex justify-between items-start">
-                <div>
-                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Pelanggan</p>
-                    <h3 class="text-2xl font-bold tracking-tight text-charcoal-950 mt-1.5 tabular-nums">{{ $totalPelanggan }} <span class="text-xs text-slate-500 font-normal">Akun Terdaftar</span></h3>
+        <div class="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition">
+            <div class="flex justify-between items-start gap-3">
+                <div class="min-w-0 flex-1">
+                    <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider truncate">Pelanggan</p>
+                    <div class="flex items-baseline gap-1.5 flex-wrap mt-1.5">
+                        <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-charcoal-950 tabular-nums">{{ $totalPelanggan }}</h3>
+                        <span class="text-xs text-slate-500 font-normal">Akun Terdaftar</span>
+                    </div>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center text-sm shrink-0">
                     <i class="fa-solid fa-users"></i>
@@ -91,106 +100,116 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div class="order-1 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3.5">
-                <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Tren Penjualan 7 Hari Terakhir</h3>
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5 sm:gap-6">
+        <!-- Kolom Kiri: Tren Penjualan & Transaksi Terkini -->
+        <div class="space-y-5 sm:space-y-6">
+            <!-- Tren Penjualan -->
+            <div class="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-100 pb-3.5">
+                    <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Tren Penjualan 7 Hari Terakhir</h3>
+                </div>
+                <div class="relative h-72 w-full min-h-[260px]">
+                    <canvas id="salesChart"></canvas>
+                </div>
             </div>
-            <div class="relative h-72 w-full">
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
 
-        <div class="order-3 bg-white border border-slate-200/80 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
-            <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-                <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Transaksi Terkini</h3>
-                <a href="{{ route('admin.transaksi.index') }}" class="text-xs font-semibold text-gold-700 hover:text-gold-800 transition">Semua &rarr;</a>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs sm:text-sm text-slate-600">
-                    <thead class="bg-slate-50/70 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
-                        <tr>
-                            <th class="px-5 py-3">Pelanggan</th>
-                            <th class="px-5 py-3">Total</th>
-                            <th class="px-5 py-3 text-right">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        @forelse($transaksiTerbaru as $trx)
-                            <tr class="hover:bg-slate-50/70 transition">
-                                <td class="px-5 py-3.5">
-                                    <span class="font-medium text-charcoal-900 block truncate max-w-36">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</span>
-                                    <span class="text-[11px] text-slate-400">{{ $trx->kode_transaksi }}</span>
-                                    <span class="text-[10px] text-slate-500">{{ $trx->status_pesanan }}</span>
-                                </td>
-                                <td class="px-5 py-3.5 font-semibold text-gold-700 whitespace-nowrap">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</td>
-                                <td class="px-5 py-3.5 text-right">
-                                    <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" title="Lihat detail transaksi" aria-label="Lihat detail transaksi" class="group inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 text-xs shadow-2xs active:scale-95">
-                                        <i class="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        @empty
+            <!-- Transaksi Terkini -->
+            <div class="bg-white border border-slate-200/80 rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04)] overflow-hidden">
+                <div class="px-5 py-4 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base">Transaksi Terkini</h3>
+                    <a href="{{ route('admin.transaksi.index') }}" class="text-xs font-semibold text-gold-700 hover:text-gold-800 transition">Semua &rarr;</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                        <thead class="bg-slate-50/70 text-[11px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100">
                             <tr>
-                                <td colspan="3" class="px-5 py-8 text-center text-slate-400">Belum ada transaksi.</td>
+                                <th class="px-5 py-3">Pelanggan</th>
+                                <th class="px-5 py-3">Total</th>
+                                <th class="px-5 py-3 text-right">Aksi</th>
                             </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @forelse($transaksiTerbaru as $trx)
+                                <tr class="hover:bg-slate-50/70 transition">
+                                    <td class="px-5 py-3.5">
+                                        <span class="font-medium text-charcoal-900 block truncate max-w-[140px] sm:max-w-[200px] xl:max-w-xs">{{ $trx->pelanggan->nama ?? $trx->nama_pelanggan ?? 'Guest' }}</span>
+                                        <span class="text-[11px] text-slate-400">{{ $trx->kode_transaksi }}</span>
+                                        <span class="text-[10px] text-slate-500">{{ $trx->status_pesanan }}</span>
+                                    </td>
+                                    <td class="px-5 py-3.5 font-semibold text-gold-700 whitespace-nowrap">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</td>
+                                    <td class="px-5 py-3.5 text-right">
+                                        <a href="{{ route('admin.transaksi.show', $trx->kode_transaksi) }}" title="Lihat detail transaksi" aria-label="Lihat detail transaksi" class="group inline-flex items-center justify-center w-8 h-8 rounded-xl bg-slate-50 hover:bg-charcoal-950 text-slate-500 hover:text-gold-400 border border-slate-200/80 hover:border-charcoal-950 transition-all duration-200 text-xs shadow-2xs active:scale-95">
+                                            <i class="fa-solid fa-eye group-hover:scale-110 transition-transform"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-5 py-8 text-center text-slate-400">Belum ada transaksi.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-        <div class="order-2 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Menu Paling Diminati</h3>
-            <div class="space-y-3.5">
-                @forelse($topMenus as $top)
-                    <div class="flex items-center gap-3">
-                        <div class="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200/80 overflow-hidden shrink-0">
-                            @if($top->menu && $top->menu->gambar)
-                                <img src="{{ asset('storage/' . $top->menu->gambar) }}" class="w-full h-full object-cover">
-                            @else
-                                <div class="flex items-center justify-center w-full h-full text-slate-400 text-xs"><i class="fa-solid fa-image"></i></div>
-                            @endif
+
+        <!-- Kolom Kanan: Menu Favorit & Pelanggan Terbanyak -->
+        <div class="space-y-5 sm:space-y-6">
+            <!-- Menu Favorit -->
+            <div class="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+                <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Menu Paling Diminati</h3>
+                <div class="space-y-3.5">
+                    @forelse($topMenus as $top)
+                        <div class="flex items-center gap-3">
+                            <div class="w-11 h-11 rounded-xl bg-slate-100 border border-slate-200/80 overflow-hidden shrink-0">
+                                @if($top->menu && $top->menu->gambar)
+                                    <img src="{{ asset('storage/' . $top->menu->gambar) }}" class="w-full h-full object-cover">
+                                @else
+                                    <div class="flex items-center justify-center w-full h-full text-slate-400 text-xs"><i class="fa-solid fa-image"></i></div>
+                                @endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-xs sm:text-sm text-charcoal-900 truncate">{{ $top->menu->nama_menu ?? 'Menu Terhapus' }}</h4>
+                                <p class="text-[11px] text-slate-500">{{ $top->total_terjual }} Porsi Terjual</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                @if($top->menu)
+                                    <span class="text-xs font-semibold text-gold-700">Rp {{ number_format($top->menu->harga, 0, ',', '.') }}</span>
+                                @endif
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-medium text-xs sm:text-sm text-charcoal-900 truncate">{{ $top->menu->nama_menu ?? 'Menu Terhapus' }}</h4>
-                            <p class="text-[11px] text-slate-500">{{ $top->total_terjual }} Porsi Terjual</p>
-                        </div>
-                        <div class="text-right shrink-0">
-                            @if($top->menu)
-                                <span class="text-xs font-semibold text-gold-700">Rp {{ number_format($top->menu->harga, 0, ',', '.') }}</span>
-                            @endif
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-6 text-slate-400 text-xs sm:text-sm">Belum ada data penjualan.</div>
-                @endforelse
+                    @empty
+                        <div class="text-center py-6 text-slate-400 text-xs sm:text-sm">Belum ada data penjualan.</div>
+                    @endforelse
+                </div>
             </div>
 
-        </div>
-
-        <div class="order-4 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-            <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Pelanggan Paling Banyak Membeli</h3>
-            <div class="space-y-3.5">
-                @forelse($topCustomers as $topCustomer)
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-sky-50 text-sky-600 border border-sky-100 overflow-hidden shrink-0 flex items-center justify-center text-xs font-bold">
-                            @if($topCustomer->pelanggan?->foto)
-                                <img src="{{ asset('storage/' . $topCustomer->pelanggan->foto) }}" alt="{{ $topCustomer->pelanggan->nama }}" class="w-full h-full object-cover">
-                            @else
-                                {{ strtoupper(substr($topCustomer->pelanggan?->nama ?? 'P', 0, 1)) }}
-                            @endif
+            <!-- Pelanggan Paling Banyak Membeli -->
+            <div class="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+                <h3 class="font-semibold text-charcoal-900 text-sm sm:text-base border-b border-slate-100 pb-3.5 mb-4">Pelanggan Paling Banyak Membeli</h3>
+                <div class="space-y-3.5">
+                    @forelse($topCustomers as $topCustomer)
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-sky-50 text-sky-600 border border-sky-100 overflow-hidden shrink-0 flex items-center justify-center text-xs font-bold">
+                                @if($topCustomer->pelanggan?->foto)
+                                    <img src="{{ asset('storage/' . $topCustomer->pelanggan->foto) }}" alt="{{ $topCustomer->pelanggan->nama }}" class="w-full h-full object-cover">
+                                @else
+                                    {{ strtoupper(substr($topCustomer->pelanggan?->nama ?? 'P', 0, 1)) }}
+                                @endif
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 class="font-medium text-xs sm:text-sm text-charcoal-900 truncate">{{ $topCustomer->pelanggan?->nama ?? 'Pelanggan Terhapus' }}</h4>
+                                <p class="text-[11px] text-slate-500">{{ $topCustomer->total_dibeli }} Porsi Dibeli</p>
+                            </div>
+                            <div class="text-right shrink-0">
+                                <span class="text-xs font-semibold text-sky-700">Pelanggan #{{ $loop->iteration }}</span>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <h4 class="font-medium text-xs sm:text-sm text-charcoal-900 truncate">{{ $topCustomer->pelanggan?->nama ?? 'Pelanggan Terhapus' }}</h4>
-                            <p class="text-[11px] text-slate-500">{{ $topCustomer->total_dibeli }} Porsi Dibeli</p>
-                        </div>
-                        <div class="text-right shrink-0">
-                            <span class="text-xs font-semibold text-sky-700">Pelanggan #{{ $loop->iteration }}</span>
-                        </div>
-                    </div>
-                @empty
-                    <div class="text-center py-6 text-slate-400 text-xs sm:text-sm">Belum ada data pelanggan.</div>
-                @endforelse
+                    @empty
+                        <div class="text-center py-6 text-slate-400 text-xs sm:text-sm">Belum ada data pelanggan.</div>
+                    @endforelse
+                </div>
             </div>
         </div>
     </div>
@@ -241,6 +260,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    resizeDelay: 100,
                     plugins: {
                         legend: { display: false },
                         tooltip: {

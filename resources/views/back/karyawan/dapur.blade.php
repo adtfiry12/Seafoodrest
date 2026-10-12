@@ -38,21 +38,21 @@
         </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5 sm:gap-6">
         @forelse($transaksi as $trx)
             <div class="bg-white border border-amber-200/80 rounded-2xl shadow-xs overflow-hidden flex flex-col transition hover:shadow-md">
 
-                <div class="p-4 border-b border-slate-100 flex justify-between items-start bg-amber-50/30">
-                    <div>
-                        <h3 class="font-mono font-bold text-charcoal-950 text-base sm:text-lg leading-none">{{ $trx->kode_transaksi }}</h3>
+                <div class="p-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-amber-50/30">
+                    <div class="min-w-0 flex-1">
+                        <h3 class="font-mono font-bold text-charcoal-950 text-base sm:text-lg leading-none truncate">{{ $trx->kode_transaksi }}</h3>
                         <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider mt-2
                             {{ $trx->tipe_pesanan == 'Dine-In' ? 'bg-sky-50 text-sky-700 border border-sky-200/60' : ($trx->tipe_pesanan == 'Delivery' ? 'bg-purple-50 text-purple-700 border border-purple-200/60' : 'bg-amber-50 text-amber-700 border border-amber-200/60') }}">
                             {{ $trx->tipe_pesanan }}
                         </span>
                     </div>
-                    <div class="text-right">
+                    <div class="text-right shrink-0">
                         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Waktu Tunggu</p>
-                        <p class="font-semibold text-amber-700 text-xs sm:text-sm flex items-center justify-end gap-1"><i class="fa-regular fa-clock text-[10px]"></i> {{ $trx->created_at->diffForHumans() }}</p>
+                        <p class="font-semibold text-amber-700 text-xs sm:text-sm flex items-center justify-end gap-1 whitespace-nowrap"><i class="fa-regular fa-clock text-[10px]"></i> {{ $trx->created_at->diffForHumans() }}</p>
                     </div>
                 </div>
 
@@ -85,7 +85,7 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-1 md:col-span-2 xl:col-span-3 text-center py-16 bg-white rounded-2xl shadow-xs border border-slate-200/80">
+            <div class="col-span-full text-center py-16 bg-white rounded-2xl shadow-xs border border-slate-200/80">
                 <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl mx-auto mb-3 border border-amber-100">
                     <i class="fa-solid fa-kitchen-set"></i>
                 </div>

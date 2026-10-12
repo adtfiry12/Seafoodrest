@@ -267,6 +267,15 @@ class KaryawanOperasionalController extends Controller
             $transaksi->status_pembayaran !== 'Lunas' &&
             ($validated['status_pembayaran'] ?? null) === 'Lunas';
 
+        // Pembatasan aksi operasional berdasarkan Role
+        if (Auth::user()->role === 'kurir' && ! in_array($nextStatus, ['Diantar', 'Selesai'], true)) {
+            abort(403, 'Kurir hanya berwenang memperbarui status pengantaran (Diantar / Selesai).');
+        }
+
+        if (Auth::user()->role === 'karyawan' && $nextStatus === 'Diantar') {
+            abort(403, 'Pengantaran pesanan hanya dapat diambil dan diproses oleh akun Kurir.');
+        }
+
         abort_unless($isPaymentSettlement || in_array($nextStatus, $allowedNextStatuses, true), 422, 'Perubahan status pesanan tidak diizinkan.');
 
         $nextPaymentStatus = $validated['status_pembayaran'] ?? $transaksi->status_pembayaran;

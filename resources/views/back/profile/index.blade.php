@@ -37,6 +37,10 @@
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">
                             Karyawan
                         </span>
+                    @elseif($user->role === 'kurir')
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-sky-50 text-sky-700 border border-sky-200">
+                            <i class="fa-solid fa-motorcycle text-xs"></i> Kurir
+                        </span>
                     @else
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">
                             Pelanggan

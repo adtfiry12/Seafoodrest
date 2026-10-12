@@ -44,23 +44,23 @@
     @endif
 
     <!-- Kanban Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 2xl:grid-cols-3 gap-5 sm:gap-6">
         @forelse($transaksi as $trx)
             <div class="bg-white border {{ $trx->status_pembayaran == 'Menunggu Konfirmasi' ? 'border-amber-300 ring-1 ring-amber-400/20 shadow-xs' : 'border-slate-200/80' }} rounded-2xl shadow-xs overflow-hidden flex flex-col transition hover:shadow-md">
 
                 <!-- Card Header -->
-                <div class="p-4 border-b border-slate-100 flex justify-between items-start bg-slate-50/60">
-                    <div>
+                <div class="p-4 border-b border-slate-100 flex items-start justify-between gap-3 bg-slate-50/60">
+                    <div class="min-w-0 flex-1">
                         <span class="inline-block px-2.5 py-0.5 rounded-md text-[10px] font-semibold uppercase tracking-wider mb-2
                             {{ $trx->tipe_pesanan == 'Dine-In' ? 'bg-sky-50 text-sky-700 border border-sky-200/60' : ($trx->tipe_pesanan == 'Delivery' ? 'bg-purple-50 text-purple-700 border border-purple-200/60' : 'bg-amber-50 text-amber-700 border border-amber-200/60') }}">
                             {{ $trx->tipe_pesanan }}
                         </span>
-                        <h3 class="font-mono font-bold text-charcoal-950 text-base sm:text-lg leading-none">{{ $trx->kode_transaksi }}</h3>
-                        <p class="text-xs text-slate-500 mt-1.5 flex items-center gap-1"><i class="fa-regular fa-clock text-[10px]"></i> {{ $trx->created_at->diffForHumans() }}</p>
+                        <h3 class="font-mono font-bold text-charcoal-950 text-base sm:text-lg leading-none truncate">{{ $trx->kode_transaksi }}</h3>
+                        <p class="text-xs text-slate-500 mt-1.5 flex items-center gap-1 truncate"><i class="fa-regular fa-clock text-[10px]"></i> {{ $trx->created_at->diffForHumans() }}</p>
                     </div>
-                    <div class="text-right">
+                    <div class="text-right shrink-0">
                         <p class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Total</p>
-                        <p class="font-bold text-gold-600 font-serif text-lg tabular-nums">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</p>
+                        <p class="font-bold text-gold-600 font-serif text-lg tabular-nums whitespace-nowrap">Rp {{ number_format($trx->total_bayar, 0, ',', '.') }}</p>
                     </div>
                 </div>
 
@@ -134,7 +134,7 @@
                 </div>
             </div>
         @empty
-            <div class="col-span-1 md:col-span-2 xl:col-span-3 text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+            <div class="col-span-full text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
                 <i class="fa-solid fa-mug-hot text-6xl text-slate-200 mb-4"></i>
                 <h3 class="text-xl font-serif text-charcoal-900 mb-2">Belum Ada Pesanan Baru</h3>
                 <p class="text-slate-500">Santai sejenak, halaman ini akan memuat ulang secara otomatis.</p>

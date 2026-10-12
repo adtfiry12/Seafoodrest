@@ -68,6 +68,50 @@ const searchableFilterSelect = (options = [], initialValue = '') => ({
     }
 });
 
+const customSimpleSelect = (options = [], initialValue = '', placeholder = '-- Pilih --') => ({
+    open: false,
+    selected: String(initialValue ?? ''),
+    placeholder: placeholder,
+    options: options || [],
+
+    selectedOption() {
+        return this.options.find((option) => String(option.id) === this.selected);
+    },
+
+    selectedLabel() {
+        const found = this.selectedOption();
+        return found ? found.label : this.placeholder;
+    },
+
+    select(option) {
+        this.selected = String(option ? (option.id ?? '') : '');
+        this.open = false;
+    }
+});
+
+const customFilterSelect = (options = [], initialValue = '', defaultLabel = 'Semua') => ({
+    open: false,
+    selected: String(initialValue ?? ''),
+    defaultLabel: defaultLabel,
+    options: options || [],
+
+    selectedLabel() {
+        if (!this.selected) return this.defaultLabel;
+        const found = this.options.find((option) => String(option.id) === this.selected);
+        return found ? found.label : this.defaultLabel;
+    },
+
+    select(optionOrId) {
+        const id = typeof optionOrId === 'object' && optionOrId !== null ? optionOrId.id : optionOrId;
+        this.selected = String(id ?? '');
+        this.open = false;
+        this.$nextTick(() => {
+            const form = this.$refs.hiddenInput?.form || this.$root?.closest('form');
+            if (form) form.submit();
+        });
+    }
+});
+
 const searchablePelangganSelect = (options = [], initialValue = '') => ({
     open: false,
     search: '',
@@ -156,6 +200,8 @@ Alpine.data('searchableRelationSelect', searchableRelationSelect);
 Alpine.data('searchableFilterSelect', searchableFilterSelect);
 Alpine.data('searchablePelangganSelect', searchablePelangganSelect);
 Alpine.data('posSystem', posSystem);
+Alpine.data('customSimpleSelect', customSimpleSelect);
+Alpine.data('customFilterSelect', customFilterSelect);
 
 // Export to window for global access
 window.Alpine = Alpine;
@@ -163,5 +209,7 @@ window.searchableRelationSelect = searchableRelationSelect;
 window.searchableFilterSelect = searchableFilterSelect;
 window.searchablePelangganSelect = searchablePelangganSelect;
 window.posSystem = posSystem;
+window.customSimpleSelect = customSimpleSelect;
+window.customFilterSelect = customFilterSelect;
 
 Alpine.start();

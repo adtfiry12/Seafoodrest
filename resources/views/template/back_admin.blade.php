@@ -16,7 +16,9 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans antialiased" x-data="{ sidebarOpen: false, deleteModalOpen: false, deleteForm: null, deleteMessage: '', actionModalOpen: false, actionForm: null, actionTitle: '', actionMessage: '', openDeleteModal(event, message) { this.deleteForm = event.currentTarget; this.deleteMessage = message; this.deleteModalOpen = true; }, openActionModal(event, title, message) { this.actionForm = event.currentTarget; this.actionTitle = title; this.actionMessage = message; this.actionModalOpen = true; } }">
+<body class="bg-slate-50 text-slate-800 font-sans antialiased"
+      @close-sidebar.window="sidebarOpen = false"
+      x-data="{ sidebarOpen: false, deleteModalOpen: false, deleteForm: null, deleteMessage: '', actionModalOpen: false, actionForm: null, actionTitle: '', actionMessage: '', openDeleteModal(event, message) { this.deleteForm = event.currentTarget; this.deleteMessage = message; this.deleteModalOpen = true; }, openActionModal(event, title, message) { this.actionForm = event.currentTarget; this.actionTitle = title; this.actionMessage = message; this.actionModalOpen = true; } }">
     {{-- Global Progress Bar for Admin SPA Navigation --}}
     <div id="pjax-progress" class="fixed top-0 left-0 right-0 h-[2px] z-[100] transition-all duration-300 pointer-events-none opacity-0" style="background: linear-gradient(90deg, #d97706, #f59e0b); width: 0%;"></div>
 
@@ -24,7 +26,7 @@
         <div class="px-3 py-2.5 lg:px-5 lg:pl-3">
             <div class="flex items-center justify-between">
                 <div class="flex items-center justify-start">
-                    <button @click="sidebarOpen = !sidebarOpen" class="inline-flex items-center p-2 text-sm text-gold-500 rounded-xl sm:hidden hover:bg-charcoal-900 focus:outline-none">
+                    <button @click="sidebarOpen = !sidebarOpen" class="inline-flex items-center p-2 text-sm text-gold-500 rounded-xl lg:hidden hover:bg-charcoal-900 focus:outline-none" aria-label="Menu Navigasi">
                         <i class="fa-solid fa-bars text-lg"></i>
                     </button>
                     <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 ml-2 md:mr-24">
@@ -64,10 +66,18 @@
         </div>
     </nav>
 
-    <aside class="fixed top-0 left-0 z-40 w-64 h-screen pt-16 sm:pt-18 transition-transform bg-white border-r border-slate-200 sm:translate-x-0"
-           :class="sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'">
+    <aside class="fixed top-0 left-0 z-40 w-64 h-screen pt-16 sm:pt-18 transition-transform bg-white border-r border-slate-200 lg:translate-x-0"
+           :class="sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'">
         <div class="h-full px-3 pb-4 overflow-y-auto bg-white flex flex-col justify-between">
-            <ul class="space-y-1.5 font-medium text-xs sm:text-sm">
+            <div>
+                <!-- Mobile / Tablet Drawer Header -->
+                <div class="lg:hidden flex items-center justify-between px-2 pt-2 pb-2.5 border-b border-slate-100 mb-2">
+                    <span class="text-xs font-bold text-charcoal-900 uppercase tracking-wider">Navigasi Admin</span>
+                    <button type="button" @click="sidebarOpen = false" class="p-1.5 rounded-lg text-slate-400 hover:text-charcoal-950 hover:bg-slate-100 transition" aria-label="Tutup Menu">
+                        <i class="fa-solid fa-xmark text-sm"></i>
+                    </button>
+                </div>
+                <ul class="space-y-1.5 font-medium text-xs sm:text-sm">
                 <li>
                     <a href="{{ route('admin.dashboard') }}" class="sidebar-nav-link flex items-center px-3 py-2.5 rounded-xl group transition {{ request()->routeIs('admin.dashboard') ? 'bg-charcoal-950 text-white shadow-xs font-medium' : 'text-slate-700 hover:bg-slate-100 hover:text-charcoal-950' }}">
                         <i class="fa-solid fa-house w-4 h-4 transition {{ request()->routeIs('admin.dashboard') ? 'text-gold-400' : 'text-slate-400 group-hover:text-gold-600' }}"></i>
@@ -129,6 +139,7 @@
                     </a>
                 </li>
             </ul>
+            </div>
 
             <div class="mt-4 pt-3 border-t border-slate-100">
                 <a href="{{ route('home') }}" target="_blank" class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200/80 hover:bg-gold-50 hover:text-gold-800 hover:border-gold-300 transition-all duration-200">
@@ -142,10 +153,12 @@
         </div>
     </aside>
 
-    <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 z-30 bg-charcoal-950/50 sm:hidden"></div>
+    <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 z-30 bg-charcoal-950/50 backdrop-blur-xs lg:hidden"></div>
 
-    <div class="sm:ml-64 pt-16 sm:pt-18 pb-10" id="admin-main-content" style="transition: opacity 150ms ease-in-out;">
-        @yield('content')
+    <div class="lg:ml-64 pt-16 sm:pt-18 pb-10 min-h-screen" id="admin-main-content" style="transition: opacity 150ms ease-in-out;">
+        <main class="w-full max-w-[1600px] mx-auto">
+            @yield('content')
+        </main>
     </div>
 
     <div x-show="deleteModalOpen" x-cloak class="fixed inset-0 z-[60] flex min-h-screen items-center justify-center bg-slate-950/40 px-4 py-6 backdrop-blur-xs" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
@@ -346,12 +359,62 @@
                 };
             };
 
+            window.customSimpleSelect = function(options, initialValue = '', placeholder = '-- Pilih --') {
+                return {
+                    open: false,
+                    selected: String(initialValue ?? ''),
+                    placeholder: placeholder,
+                    options: options || [],
+
+                    selectedOption() {
+                        return this.options.find((option) => String(option.id) === this.selected);
+                    },
+
+                    selectedLabel() {
+                        const found = this.selectedOption();
+                        return found ? found.label : this.placeholder;
+                    },
+
+                    select(option) {
+                        this.selected = String(option ? (option.id ?? '') : '');
+                        this.open = false;
+                    }
+                };
+            };
+
+            window.customFilterSelect = function(options, initialValue = '', defaultLabel = 'Semua') {
+                return {
+                    open: false,
+                    selected: String(initialValue ?? ''),
+                    defaultLabel: defaultLabel,
+                    options: options || [],
+
+                    selectedLabel() {
+                        if (!this.selected) return this.defaultLabel;
+                        const found = this.options.find((option) => String(option.id) === this.selected);
+                        return found ? found.label : this.defaultLabel;
+                    },
+
+                    select(optionOrId) {
+                        const id = typeof optionOrId === 'object' && optionOrId !== null ? optionOrId.id : optionOrId;
+                        this.selected = String(id ?? '');
+                        this.open = false;
+                        this.$nextTick(() => {
+                            const form = this.$refs.hiddenInput?.form || this.$root?.closest('form');
+                            if (form) form.submit();
+                        });
+                    }
+                };
+            };
+
             function registerAdminAlpineComponents() {
                 if (!window.Alpine) return;
                 window.Alpine.data('searchablePelangganSelect', window.searchablePelangganSelect);
                 window.Alpine.data('posSystem', window.posSystem);
                 window.Alpine.data('searchableRelationSelect', window.searchableRelationSelect);
                 window.Alpine.data('searchableFilterSelect', window.searchableFilterSelect);
+                window.Alpine.data('customSimpleSelect', window.customSimpleSelect);
+                window.Alpine.data('customFilterSelect', window.customFilterSelect);
             }
 
             if (window.Alpine) {
@@ -502,6 +565,7 @@
 
                         updateSidebarActive(new URL(url, window.location.origin).pathname);
                         refreshSidebarCounts();
+                        window.dispatchEvent(new CustomEvent('close-sidebar'));
                         window.scrollTo({ top: 0, behavior: 'instant' });
                     } else {
                         window.location.href = url;

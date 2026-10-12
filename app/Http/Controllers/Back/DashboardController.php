@@ -10,6 +10,7 @@ use App\Models\Transaksi;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -80,6 +81,10 @@ class DashboardController extends Controller
 
     public function indexkaryawan()
     {
+        if (Auth::user()?->role === 'kurir') {
+            return redirect()->route('karyawan.delivery');
+        }
+
         Transaksi::batalkanSemuaQrisKedaluwarsa();
 
         // Hitung semua metrik operasional realtime

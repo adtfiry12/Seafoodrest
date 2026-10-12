@@ -42,11 +42,29 @@
 
                 <div>
                     <label for="role" class="block text-sm font-semibold text-charcoal-900 mb-2">Hak Akses (Role) <span class="text-red-500">*</span></label>
-                    <select name="role" id="role" required class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full px-4 py-3 transition-all duration-200 hover:bg-white">
-                        <option value="pelanggan" {{ old('role') == 'pelanggan' ? 'selected' : '' }}>Pelanggan</option>
-                        <option value="karyawan" {{ old('role') == 'karyawan' ? 'selected' : '' }}>Karyawan</option>
-                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
-                    </select>
+                    @php
+                        $roleOptions = [
+                            ['id' => 'pelanggan', 'label' => 'Pelanggan'],
+                            ['id' => 'karyawan', 'label' => 'Karyawan Operasional'],
+                            ['id' => 'kurir', 'label' => 'Kurir Pengantaran'],
+                            ['id' => 'admin', 'label' => 'Admin'],
+                        ];
+                    @endphp
+                    <div x-data="customSimpleSelect(@js($roleOptions), @js(old('role', 'pelanggan')), '-- Pilih Role --')" @click.outside="open = false" class="relative">
+                        <input type="hidden" name="role" :value="selected" required>
+                        <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20 shadow-2xs">
+                            <span x-text="selectedLabel()" class="font-medium text-charcoal-900"></span>
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-400 shrink-0 ml-2 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                        </button>
+                        <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl p-1">
+                            <template x-for="option in options" :key="option.id">
+                                <button type="button" @click="select(option)" class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm text-charcoal-900 transition-colors" :class="selected == String(option.id) ? 'bg-gold-50 text-gold-700 font-bold' : 'hover:bg-gold-50 hover:text-gold-700'">
+                                    <span x-text="option.label"></span>
+                                    <i x-show="selected == String(option.id)" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
                     @error('role') <p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p> @enderror
                 </div>
 
@@ -62,11 +80,31 @@
 
                 <div>
                     <label for="jenis_kelamin" class="block text-sm font-semibold text-charcoal-900 mb-2">Jenis Kelamin</label>
-                    <select name="jenis_kelamin" id="jenis_kelamin" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-4 focus:ring-gold-500/20 focus:border-gold-500 block w-full px-4 py-3 transition-all duration-200 hover:bg-white">
-                        <option value="">-- Pilih Jenis Kelamin --</option>
-                        <option value="L" {{ old('jenis_kelamin') == 'L' ? 'selected' : '' }}>Laki-Laki</option>
-                        <option value="P" {{ old('jenis_kelamin') == 'P' ? 'selected' : '' }}>Perempuan</option>
-                    </select>
+                    @php
+                        $genderOptions = [
+                            ['id' => 'L', 'label' => 'Laki-Laki'],
+                            ['id' => 'P', 'label' => 'Perempuan'],
+                        ];
+                    @endphp
+                    <div x-data="customSimpleSelect(@js($genderOptions), @js(old('jenis_kelamin')), '-- Pilih Jenis Kelamin --')" @click.outside="open = false" class="relative">
+                        <input type="hidden" name="jenis_kelamin" :value="selected">
+                        <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20 shadow-2xs">
+                            <span x-text="selectedLabel()" :class="selected ? 'text-charcoal-900 font-medium' : 'text-slate-400'"></span>
+                            <i class="fa-solid fa-chevron-down text-xs text-slate-400 shrink-0 ml-2 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
+                        </button>
+                        <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl p-1">
+                            <button type="button" @click="select({id: '', label: '-- Pilih Jenis Kelamin --'})" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-500 hover:bg-slate-50">
+                                <span>-- Pilih Jenis Kelamin --</span>
+                                <i x-show="!selected" class="fa-solid fa-check text-slate-400"></i>
+                            </button>
+                            <template x-for="option in options" :key="option.id">
+                                <button type="button" @click="select(option)" class="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm text-charcoal-900 transition-colors" :class="selected == String(option.id) ? 'bg-gold-50 text-gold-700 font-bold' : 'hover:bg-gold-50 hover:text-gold-700'">
+                                    <span x-text="option.label"></span>
+                                    <i x-show="selected == String(option.id)" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
                     @error('jenis_kelamin') <p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p> @enderror
                 </div>
 
