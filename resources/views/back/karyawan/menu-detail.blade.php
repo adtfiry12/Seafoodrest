@@ -18,18 +18,18 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-            <div class="h-44 bg-slate-100">
+        <div class="self-start bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div class="h-32 bg-slate-100">
                 @if($menu->gambar)
                     <img src="{{ asset('storage/' . $menu->gambar) }}" alt="{{ $menu->nama_menu }}" class="w-full h-full object-cover">
                 @else
                     <div class="flex items-center justify-center w-full h-full text-slate-300"><i class="fa-solid fa-image text-5xl"></i></div>
                 @endif
             </div>
-            <div class="p-5">
+            <div class="p-4">
                 <p class="text-xs font-bold uppercase tracking-wider text-gold-600">{{ $menu->kategori->nama_kategori ?? 'Tanpa Kategori' }}</p>
-                <h2 class="mt-1 text-lg font-bold text-charcoal-900">{{ $menu->nama_menu }}</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-500">{{ $menu->deskripsi ?: 'Belum ada deskripsi menu.' }}</p>
+                <h2 class="mt-1 text-lg font-bold leading-tight text-charcoal-900">{{ $menu->nama_menu }}</h2>
+                <p class="mt-2 line-clamp-3 text-sm leading-5 text-slate-500">{{ $menu->deskripsi ?: 'Belum ada deskripsi menu.' }}</p>
             </div>
         </div>
 

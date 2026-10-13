@@ -359,7 +359,7 @@ class KaryawanOperasionalController extends Controller
         $transaksi = Transaksi::with('pelanggan')
             ->whereHas('detail', fn ($query) => $query->where('menu_id', $menu->id))
             ->latest()
-            ->paginate(8);
+            ->paginate(5);
 
         $transaksi->getCollection()->load([
             'detail' => fn ($query) => $query->where('menu_id', $menu->id),
