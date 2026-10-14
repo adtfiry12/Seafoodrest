@@ -139,8 +139,8 @@
 
     </header>
 
-    @if(session('success'))
-        <div x-data="{ show: true }" x-show="show" x-transition class="bg-emerald-600 text-white px-4 py-2.5 shadow-xs relative z-30">
+    @if(session('success') && !request()->routeIs('checkout.sukses') && !request()->routeIs('checkout.qris'))
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition class="bg-emerald-600 text-white px-4 py-2.5 shadow-xs relative z-30">
             <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
                 <div class="flex items-center gap-2.5 text-xs sm:text-sm font-medium">
                     <i class="fa-solid fa-circle-check text-sm"></i>

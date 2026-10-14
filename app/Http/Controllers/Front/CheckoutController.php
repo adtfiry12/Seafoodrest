@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Front;
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Transaksi;
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,7 @@ class CheckoutController extends Controller
         return view('front.checkout.index');
     }
 
-    public function proses(Request $request)
+    public function proses(Request $request, MidtransService $midtrans)
     {
         $rules = [
             'tipe_pesanan' => ['required', 'in:Makan di Tempat,Delivery'],
@@ -164,30 +165,170 @@ class CheckoutController extends Controller
         session()->put('checkout_transaction_code', $transaksi->kode_transaksi);
 
         if ($enumMetodePembayaran == 'QRIS') {
+            $midtrans->createSnapToken($transaksi);
+
             return redirect()->to(URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]));
         }
 
         return redirect()->to(URL::temporarySignedRoute('checkout.sukses', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]));
     }
 
-    public function qris($kode_transaksi)
+    public function qris(string $kode_transaksi, MidtransService $midtrans)
     {
         $transaksi = $this->accessibleTransaction($kode_transaksi);
         $transaksi->batalkanJikaKedaluwarsa();
         $transaksi->load('detail.menu');
 
-        return view('front.checkout.qris', compact('transaksi'));
+        if ($transaksi->metode_pembayaran === 'QRIS' && ! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
+            if (! $transaksi->snap_token || str_starts_with($transaksi->snap_token, 'SIM-')) {
+                $midtrans->createSnapToken($transaksi);
+                $transaksi->refresh();
+            }
+            if ($transaksi->status_pembayaran !== 'Lunas') {
+                $midtrans->syncTransactionStatus($transaksi);
+                $transaksi->refresh();
+            }
+        }
+
+        $snapToken = $transaksi->snap_token;
+        $midtransConfigured = $midtrans->isConfigured();
+        $midtransClientKey = $midtrans->getClientKey();
+        $midtransSnapJsUrl = $midtrans->getSnapJsUrl();
+
+        return view('front.checkout.qris', compact(
+            'transaksi',
+            'snapToken',
+            'midtransConfigured',
+            'midtransClientKey',
+            'midtransSnapJsUrl'
+        ));
     }
 
-    public function sukses($kode_transaksi)
+    public function checkPaymentStatus(Request $request, string $kode_transaksi, MidtransService $midtrans)
+    {
+        $transaksi = $this->accessibleTransaction($kode_transaksi);
+        $transaksi->batalkanJikaKedaluwarsa();
+
+        if ($transaksi->metode_pembayaran === 'QRIS' && ! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
+            $orderIdHint = $request->query('order_id');
+            $transactionIdHint = $request->query('transaction_id');
+
+            $callbackData = $request->all();
+            if ($request->filled('va_number') && $request->filled('bank')) {
+                $callbackData['va_numbers'] = [
+                    [
+                        'bank' => $request->query('bank'),
+                        'va_number' => $request->query('va_number'),
+                    ],
+                ];
+            }
+            if ($request->filled('channel')) {
+                $requestedChannel = strtolower((string) $request->query('channel'));
+                $callbackData['channel'] = $requestedChannel;
+                if (in_array($requestedChannel, ['dana', 'gopay', 'ovo', 'shopeepay', 'qris', 'bank_transfer', 'bca_va', 'mandiri_va', 'bri_va', 'bni_va'], true)) {
+                    if (! $transaksi->payment_type || in_array($transaksi->payment_type, ['qris', 'transfer', 'bank_transfer'], true)) {
+                        $transaksi->update(['payment_type' => $requestedChannel]);
+                    }
+                }
+            }
+            if ($request->filled('issuer')) {
+                $callbackData['issuer'] = $request->query('issuer');
+            }
+            if ($request->filled('acquirer')) {
+                $callbackData['acquirer'] = $request->query('acquirer');
+            }
+
+            if (! empty($callbackData['transaction_status']) || ! empty($callbackData['payment_type']) || ! empty($callbackData['va_numbers']) || ! empty($callbackData['bill_key']) || ! empty($callbackData['channel'])) {
+                $midtrans->applyGatewayStatus($transaksi, $callbackData);
+            }
+
+            if ($transaksi->status_pembayaran !== 'Lunas' || $transaksi->payment_type === 'qris' || ! $transaksi->payment_type) {
+                $midtrans->syncTransactionStatus($transaksi, is_string($orderIdHint) ? $orderIdHint : null, is_string($transactionIdHint) ? $transactionIdHint : null);
+            }
+            $transaksi->refresh();
+        }
+
+        return response()->json([
+            'kode_transaksi' => $transaksi->kode_transaksi,
+            'status_pembayaran' => $transaksi->status_pembayaran,
+            'status_pesanan' => $transaksi->status_pesanan,
+            'is_lunas' => $transaksi->status_pembayaran === 'Lunas',
+            'is_batal' => in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true) || $transaksi->status_pembayaran === 'Batal',
+            'payment_channel' => $transaksi->payment_channel_label,
+            'payment_reference' => $transaksi->payment_reference,
+            'dibayar_pada' => $transaksi->dibayar_pada ? $transaksi->dibayar_pada->format('d M Y, H:i').' WIB' : null,
+            'sukses_url' => URL::temporarySignedRoute('checkout.sukses', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]),
+        ]);
+    }
+
+    public function midtransFinish(Request $request, MidtransService $midtrans)
+    {
+        $orderId = (string) ($request->query('order_id') ?? $request->query('transaction_id') ?? '');
+        $transactionId = (string) $request->query('transaction_id', '');
+        $transactionStatus = strtolower((string) $request->query('transaction_status', ''));
+        $statusCode = (string) $request->query('status_code', '');
+
+        if ($orderId === '') {
+            $lastKode = session('checkout_transaction_code');
+            if ($lastKode) {
+                return redirect()->to(URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $lastKode]));
+            }
+
+            return redirect()->route('home');
+        }
+
+        $baseKode = preg_replace('/^(TRX-\d{8}-[A-Z0-9]{5}).*$/', '$1', $orderId);
+        $transaksi = Transaksi::where('kode_transaksi', $orderId)
+            ->orWhere('kode_transaksi', $baseKode)
+            ->first();
+
+        if (! $transaksi) {
+            return redirect()->route('home')->with('error', 'Pesanan '.$orderId.' tidak ditemukan.');
+        }
+
+        session()->put('checkout_transaction_code', $transaksi->kode_transaksi);
+
+        if (! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
+            if (in_array($transactionStatus, ['settlement', 'capture'], true) || $statusCode === '200') {
+                $midtrans->applyGatewayStatus($transaksi, $request->all());
+            }
+
+            if ($transaksi->status_pembayaran !== 'Lunas' || $transaksi->payment_type === 'qris' || ! $transaksi->payment_type) {
+                $midtrans->syncTransactionStatus($transaksi, $orderId, $transactionId ?: null);
+            }
+            $transaksi->refresh();
+        }
+
+        if ($transaksi->status_pembayaran === 'Lunas') {
+            return redirect()->to(URL::temporarySignedRoute('checkout.sukses', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]));
+        }
+
+        return redirect()->to(URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]));
+    }
+
+    public function midtransCallback(Request $request, MidtransService $midtrans)
+    {
+        $result = $midtrans->handleWebhookNotification($request->all());
+
+        return response()->json($result, $result['success'] ? 200 : 400);
+    }
+
+    public function sukses(string $kode_transaksi, MidtransService $midtrans)
     {
         $transaksi = $this->accessibleTransaction($kode_transaksi);
         $transaksi->load('detail.menu');
 
+        if ($transaksi->metode_pembayaran === 'QRIS' && ! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
+            if ($transaksi->status_pembayaran !== 'Lunas' || $transaksi->payment_type === 'qris' || ! $transaksi->payment_type) {
+                $midtrans->syncTransactionStatus($transaksi);
+                $transaksi->refresh();
+            }
+        }
+
         return view('front.checkout.success', compact('transaksi'));
     }
 
-    public function pesanan()
+    public function pesanan(MidtransService $midtrans)
     {
         Transaksi::batalkanSemuaQrisKedaluwarsa();
 
@@ -196,10 +337,19 @@ class CheckoutController extends Controller
             ->latest()
             ->paginate(6);
 
+        if ($midtrans->isConfigured()) {
+            foreach ($transaksi as $trx) {
+                if ($trx->metode_pembayaran === 'QRIS' && ($trx->status_pembayaran === 'Belum Lunas' || $trx->payment_type === 'qris' || ! $trx->payment_type) && ! in_array($trx->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
+                    $midtrans->syncTransactionStatus($trx);
+                    $trx->refresh();
+                }
+            }
+        }
+
         return view('front.pesanan', compact('transaksi'));
     }
 
-    public function detailPesanan(string $kode_transaksi)
+    public function detailPesanan(string $kode_transaksi, MidtransService $midtrans)
     {
         $transaksi = Transaksi::with(['pelanggan', 'detail.menu', 'kurir'])
             ->where('pengguna_id', Auth::id())
@@ -207,6 +357,13 @@ class CheckoutController extends Controller
             ->firstOrFail();
 
         $transaksi->batalkanJikaKedaluwarsa();
+
+        if ($transaksi->metode_pembayaran === 'QRIS' && ! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
+            if ($transaksi->status_pembayaran !== 'Lunas' || $transaksi->payment_type === 'qris' || ! $transaksi->payment_type) {
+                $midtrans->syncTransactionStatus($transaksi);
+                $transaksi->refresh();
+            }
+        }
 
         return view('front.pesanan-detail', compact('transaksi'));
     }
@@ -227,7 +384,7 @@ class CheckoutController extends Controller
             $transaksi->restoreStockIfNeeded();
         });
 
-        return back()->with('success', 'Pesanan ' . $transaksi->kode_transaksi . ' berhasil dibatalkan.');
+        return back()->with('success', 'Pesanan '.$transaksi->kode_transaksi.' berhasil dibatalkan.');
     }
 
     public function struk($kode_transaksi)
@@ -273,7 +430,7 @@ class CheckoutController extends Controller
     {
         $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
         $user = Auth::user();
-        $isStaff = $user && in_array($user->role, ['admin', 'karyawan'], true);
+        $isStaff = $user && in_array($user->role, ['admin', 'karyawan', 'kurir'], true);
         $isOwner = $user && (int) $transaksi->pengguna_id === (int) $user->id;
         $isGuestCheckout = session('checkout_transaction_code') === $transaksi->kode_transaksi;
 
@@ -282,3 +439,4 @@ class CheckoutController extends Controller
         return $transaksi;
     }
 }
+

@@ -25,6 +25,9 @@ class Transaksi extends Model
         'patokan_alamat',
         'metode_pembayaran',
         'bukti_pembayaran',
+        'snap_token',
+        'payment_type',
+        'payment_reference',
         'status_pembayaran',
         'dibayar_pada',
         'status_pesanan',
@@ -196,4 +199,34 @@ class Transaksi extends Model
 
         return $count;
     }
+
+    public function getPaymentChannelLabelAttribute(): string
+    {
+        if (! $this->payment_type) {
+            return $this->metode_pembayaran === 'QRIS' ? 'QRIS' : ($this->metode_pembayaran ?? '-');
+        }
+
+        return match (strtolower($this->payment_type)) {
+            'qris' => 'QRIS',
+            'dana' => 'DANA',
+            'gopay' => 'GoPay',
+            'shopeepay' => 'ShopeePay',
+            'ovo' => 'OVO',
+            'linkaja' => 'LinkAja',
+            'bca_va' => 'BCA Virtual Account',
+            'bri_va' => 'BRI Virtual Account',
+            'bni_va' => 'BNI Virtual Account',
+            'echannel', 'mandiri_va' => 'Mandiri Virtual Account',
+            'permata_va' => 'Permata Virtual Account',
+            'bsi_va' => 'BSI Virtual Account',
+            'cimb_va' => 'CIMB Virtual Account',
+            'bank_transfer' => 'Transfer Bank (VA)',
+            'cstore' => 'Gerai Retail',
+            'alfamart' => 'Alfamart',
+            'indomaret' => 'Indomaret',
+            'credit_card' => 'Kartu Kredit / Debit',
+            default => strtoupper(str_replace('_', ' ', $this->payment_type)),
+        };
+    }
 }
+

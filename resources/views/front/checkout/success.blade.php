@@ -24,7 +24,9 @@
                     </div>
                     <div>
                         <p class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider mb-0.5">Status Pembayaran</p>
-                        <p class="font-medium text-charcoal-900">{{ $transaksi->status_pembayaran }}</p>
+                        <p class="font-bold {{ $transaksi->status_pembayaran === 'Lunas' ? 'text-emerald-600' : 'text-amber-600' }}">
+                            {{ $transaksi->status_pembayaran }}
+                        </p>
                     </div>
                     <div>
                         <p class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider mb-0.5">Tipe Pesanan</p>
@@ -32,7 +34,12 @@
                     </div>
                     <div class="sm:col-span-2">
                         <p class="text-slate-400 font-semibold uppercase text-[10px] tracking-wider mb-0.5">Metode Pembayaran</p>
-                        <p class="font-medium text-charcoal-900">{{ $transaksi->metode_pembayaran === 'QRIS' ? 'QRIS / Transfer Bank' : $transaksi->metode_pembayaran }}</p>
+                        <p class="font-medium text-charcoal-900">
+                            {{ $transaksi->payment_channel_label }}
+                            @if($transaksi->payment_reference)
+                                <span class="font-mono text-xs text-slate-500 ml-1">({{ $transaksi->payment_reference }})</span>
+                            @endif
+                        </p>
                     </div>
                 </div>
             </div>
@@ -60,5 +67,10 @@
 
 <script>
     localStorage.removeItem('niskala_cart');
+    localStorage.setItem('niskala_payment_settled', @js($transaksi->kode_transaksi));
+    try {
+        const channel = new BroadcastChannel('niskala_checkout');
+        channel.postMessage({ status: 'Lunas', kode: @js($transaksi->kode_transaksi) });
+    } catch (e) {}
 </script>
 @endsection

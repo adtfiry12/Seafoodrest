@@ -18,6 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->trustProxies(at: '*');
         $middleware->append(\App\Http\Middleware\SecurityHeadersMiddleware::class);
 
+        $middleware->validateCsrfTokens(except: [
+            'payment/midtrans/callback',
+        ]);
+
         $middleware->alias([
             'role' => RoleMiddleware::class,
         ]);

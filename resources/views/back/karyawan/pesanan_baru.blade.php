@@ -79,15 +79,30 @@
                 <div class="p-4 bg-slate-50/70 border-t border-slate-100 space-y-3">
 
                     <!-- Info Pembayaran -->
-                    <div class="flex justify-between items-center text-xs sm:text-sm">
-                        <span class="font-medium text-slate-700 flex items-center gap-1.5"><i class="fa-solid fa-wallet text-slate-400 text-xs"></i> {{ $trx->metode_pembayaran }}</span>
+                    <div class="bg-slate-50 rounded-xl p-2.5 border border-slate-100 space-y-1.5">
+                        <div class="flex justify-between items-center text-xs sm:text-sm">
+                            <span class="font-semibold text-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-wallet text-gold-600 text-xs"></i>
+                                {{ $trx->payment_channel_label }}
+                            </span>
 
-                        @if($trx->status_pembayaran == 'Menunggu Konfirmasi')
-                            <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold rounded-md uppercase tracking-wider">Cek Bukti</span>
-                        @elseif($trx->status_pembayaran == 'Lunas')
-                            <span class="px-2 py-0.5 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[10px] font-semibold rounded-md uppercase tracking-wider">Lunas</span>
-                        @else
-                            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-semibold rounded-md uppercase tracking-wider">Belum Lunas</span>
+                            @if($trx->status_pembayaran == 'Lunas')
+                                <span class="px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold rounded-md uppercase tracking-wider flex items-center gap-1">
+                                    <i class="fa-solid fa-check text-[9px]"></i> Lunas
+                                </span>
+                            @elseif($trx->status_pembayaran == 'Menunggu Konfirmasi')
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold rounded-md uppercase tracking-wider">Cek Bukti</span>
+                            @else
+                                <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 text-[10px] font-semibold rounded-md uppercase tracking-wider">
+                                    Belum Lunas
+                                </span>
+                            @endif
+                        </div>
+                        @if($trx->payment_reference)
+                            <div class="flex justify-between items-center text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">
+                                <span>No. Referensi:</span>
+                                <span class="font-mono font-semibold text-charcoal-900">{{ $trx->payment_reference }}</span>
+                            </div>
                         @endif
                     </div>
 
@@ -104,20 +119,29 @@
                         </form>
 
                         <!-- Tombol ACC Sesuai Kondisi -->
-                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pesanan', 'Bukti pembayaran sudah valid? Terima pesanan ini untuk diteruskan ke dapur?')">
+                        <form action="{{ route('karyawan.update_status', $trx->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pesanan', 'Terima pesanan ini untuk diteruskan ke dapur?')">
                             @csrf
                             <input type="hidden" name="status_pesanan" value="Dimasak">
 
                             @if($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran == 'Belum Lunas')
-                                <button type="button" disabled class="w-full py-2 bg-slate-200 text-slate-400 text-xs font-semibold rounded-xl cursor-not-allowed">
-                                    Tunggu Bukti
+                                <button type="button" disabled class="w-full py-2 bg-slate-100 border border-slate-200 text-slate-400 text-xs font-semibold rounded-xl cursor-not-allowed">
+                                    Menunggu Bayar
+                                </button>
+
+                            @elseif($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran == 'Lunas')
+                                <input type="hidden" name="status_pembayaran" value="Lunas">
+                                <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5">
+                                    <i class="fa-solid fa-fire-burner text-[11px]"></i>
+                                    <span>Terima Pesanan</span>
                                 </button>
 
                             @elseif($trx->metode_pembayaran == 'QRIS' && $trx->status_pembayaran == 'Menunggu Konfirmasi')
                                 <input type="hidden" name="status_pembayaran" value="Lunas">
-                                <a href="{{ route('transaksi.bukti', $trx) }}" target="_blank" class="block w-full py-1.5 mb-1.5 bg-charcoal-900 text-white text-xs font-semibold rounded-xl text-center hover:bg-charcoal-800 transition">
-                                    <i class="fa-solid fa-image mr-1 text-[10px]"></i> Lihat Bukti
-                                </a>
+                                @if($trx->bukti_pembayaran)
+                                    <a href="{{ route('transaksi.bukti', $trx) }}" target="_blank" class="block w-full py-1.5 mb-1.5 bg-charcoal-900 text-white text-xs font-semibold rounded-xl text-center hover:bg-charcoal-800 transition">
+                                        <i class="fa-solid fa-image mr-1 text-[10px]"></i> Lihat Bukti
+                                    </a>
+                                @endif
                                 <button type="submit" class="w-full py-2 bg-emerald-600 text-white text-xs font-semibold rounded-xl hover:bg-emerald-700 transition shadow-xs">
                                     Valid & Terima Pesanan
                                 </button>
@@ -151,10 +175,10 @@
 
 </div>
 
-<!-- Auto Refresh Script (Otomatis perbarui antrean setiap 30 detik secara aman) -->
+<!-- Auto Refresh Script (Otomatis perbarui antrean setiap 8 detik secara aman) -->
 <script>
     if (typeof window.scheduleKaryawanAutoRefresh === 'function') {
-        window.scheduleKaryawanAutoRefresh(30);
+        window.scheduleKaryawanAutoRefresh(8);
     }
 </script>
 @endsection

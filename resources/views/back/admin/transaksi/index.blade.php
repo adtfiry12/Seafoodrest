@@ -93,12 +93,14 @@
                             </td>
                             <td class="px-6 py-4">
                                 <p class="font-bold text-gold-600 tabular-nums">Rp {{ number_format($item->total_bayar, 0, ',', '.') }}</p>
-                                <p class="text-xs text-slate-500 mt-0.5">{{ $item->metode_pembayaran }}</p>
+                                <p class="text-xs text-slate-500 mt-0.5">{{ $item->payment_channel_label }}</p>
                             </td>
                             <td class="px-6 py-4 space-y-1">
                                 <div>
                                     @if($item->status_pembayaran == 'Lunas')
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Lunas</span>
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                            <i class="fa-solid fa-shield-halved text-[9px]"></i> Lunas
+                                        </span>
                                     @elseif($item->status_pembayaran == 'Batal')
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-red-50 text-red-700 border border-red-200">Batal</span>
                                     @else

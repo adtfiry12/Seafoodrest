@@ -71,10 +71,12 @@
             </div>
             <div class="sm:text-right">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Status Pembayaran</p>
-                <p class="font-bold text-charcoal-900 mb-1">{{ $transaksi->metode_pembayaran }}</p>
+                <p class="font-bold text-charcoal-900 mb-1">{{ $transaksi->payment_channel_label }}</p>
 
                 @if($transaksi->status_pembayaran == 'Lunas')
-                    <span class="inline-flex px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">LUNAS</span>
+                    <span class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
+                        <i class="fa-solid fa-shield-halved text-[10px]"></i> LUNAS
+                    </span>
                 @else
                     <span class="inline-flex px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">{{ strtoupper($transaksi->status_pembayaran) }}</span>
                 @endif
@@ -152,46 +154,62 @@
             </div>
         @endif
 
-        <!-- INI BAGIAN BUKTI PEMBAYARAN (MUNCUL JIKA QRIS) -->
+        <!-- INFORMASI PEMBAYARAN DIGITAL -->
         @if($transaksi->metode_pembayaran == 'QRIS')
             <div class="px-6 sm:px-8 py-6 border-b border-slate-100 bg-slate-50/50">
-                <h4 class="text-sm font-bold text-charcoal-900 uppercase tracking-wider mb-4 border-l-4 border-gold-500 pl-3">Bukti Pembayaran QRIS</h4>
+                <h4 class="text-sm font-bold text-charcoal-900 uppercase tracking-wider mb-4 border-l-4 border-gold-500 pl-3">
+                    Rincian Pembayaran
+                </h4>
 
-                @if($transaksi->bukti_pembayaran)
+                @if($transaksi->status_pembayaran === 'Lunas')
+                    <div class="p-5 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div class="flex items-start sm:items-center gap-4">
+                            <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 text-lg">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                            <div class="space-y-1 text-xs sm:text-sm">
+                                <p class="font-bold text-emerald-950 text-base">Pembayaran Lunas</p>
+                                <p class="text-emerald-800">
+                                    Metode: <strong>{{ $transaksi->payment_channel_label }}</strong>
+                                    @if($transaksi->payment_reference)
+                                        · No. Referensi: <span class="font-mono font-bold bg-white px-2 py-0.5 rounded border border-emerald-200">{{ $transaksi->payment_reference }}</span>
+                                    @endif
+                                </p>
+                                @if($transaksi->dibayar_pada)
+                                    <p class="text-xs text-emerald-700"><i class="fa-regular fa-clock mr-1"></i> Waktu Pembayaran: {{ $transaksi->dibayar_pada->format('d F Y, H:i') }} WIB</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        @if($transaksi->status_pesanan === 'Menunggu ACC')
+                            <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Terima Pesanan', 'Teruskan pesanan ini ke dapur?')" class="shrink-0">
+                                @csrf
+                                @method('PUT')
+                                <input type="hidden" name="status_pembayaran" value="Lunas">
+                                <input type="hidden" name="status_pesanan" value="Dimasak">
+                                <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:bg-emerald-700 shadow-xs transition flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-fire-burner"></i> Terima Pesanan
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                @elseif($transaksi->bukti_pembayaran)
                     <div class="flex flex-col sm:flex-row gap-6 items-start">
                         <a href="{{ route('transaksi.bukti', $transaksi) }}" target="_blank" class="block w-full sm:w-48 shrink-0 overflow-hidden rounded-xl border-2 border-slate-200 shadow-sm hover:opacity-80 transition group relative">
                             <img src="{{ route('transaksi.bukti', $transaksi) }}" alt="Bukti Transfer" class="w-full h-auto sm:h-64 object-cover">
-                            <div class="absolute inset-0 bg-charcoal-900/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fa-solid fa-magnifying-glass-plus text-white text-3xl"></i>
-                            </div>
                         </a>
                         <div class="flex-1 space-y-3">
-                            <p class="text-sm text-charcoal-900 font-medium">Pelanggan telah mengunggah bukti pembayaran.</p>
-                            <p class="text-xs text-slate-500 mb-4"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Klik gambar di samping untuk melihat struk lebih jelas (zoom).</p>
-
-                            <!-- Tombol Shortcut ACC Khusus Pembayaran -->
-                            @if($transaksi->status_pembayaran == 'Menunggu Konfirmasi')
-                                <form action="{{ route('admin.transaksi.update', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Pembayaran', 'Tandai pembayaran lunas dan teruskan pesanan ke dapur?')" class="mt-4 p-4 bg-white border border-slate-200 rounded-xl">
-                                    @csrf
-                                    @method('PUT')
-                                    <p class="text-xs text-slate-500 mb-2 font-bold">Aksi Cepat:</p>
-                                    <input type="hidden" name="status_pembayaran" value="Lunas">
-                                    <input type="hidden" name="status_pesanan" value="Dimasak">
-                                    <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-500 text-white text-sm font-bold rounded-lg hover:bg-emerald-600 shadow-md transition-all active:scale-95 flex items-center justify-center gap-2">
-                                        <i class="fa-solid fa-check-double"></i> Tandai Lunas & Masak
-                                    </button>
-                                </form>
-                            @endif
+                            <p class="text-sm text-charcoal-900 font-medium">Bukti pembayaran terlampir.</p>
                         </div>
                     </div>
                 @else
-                    <div class="p-4 bg-orange-50 text-orange-700 rounded-xl text-sm border border-orange-200 flex flex-col sm:flex-row items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center shrink-0 text-xl">
-                            <i class="fa-solid fa-hourglass-half animate-pulse"></i>
+                    <div class="p-4 bg-amber-50 text-amber-800 rounded-xl text-sm border border-amber-200 flex flex-col sm:flex-row items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-lg">
+                            <i class="fa-regular fa-clock"></i>
                         </div>
                         <div>
-                            <p class="font-bold">Menunggu Upload</p>
-                            <p class="text-xs">Pelanggan belum mengunggah foto bukti pembayaran. Harap tunggu.</p>
+                            <p class="font-bold">Menunggu Pembayaran</p>
+                            <p class="text-xs">Pelanggan belum menyelesaikan pembayaran untuk pesanan ini.</p>
                         </div>
                     </div>
                 @endif

@@ -116,8 +116,14 @@
             </div>
             <div class="flex justify-between">
                 <span>Metode</span>
-                <span>{{ $transaksi->metode_pembayaran }}</span>
+                <span>{{ $transaksi->payment_channel_label }}</span>
             </div>
+            @if($transaksi->payment_reference)
+                <div class="flex justify-between text-[10px]">
+                    <span>Ref ID</span>
+                    <span>{{ $transaksi->payment_reference }}</span>
+                </div>
+            @endif
             @if($transaksi->ongkos_kirim > 0)
                 <div class="flex justify-between">
                     <span>Ongkos kirim</span>
@@ -126,7 +132,7 @@
             @endif
             <div class="flex justify-between">
                 <span>Status</span>
-                <span class="{{ $transaksi->status_pembayaran == 'Lunas' ? '' : 'font-bold' }}">
+                <span class="{{ $transaksi->status_pembayaran == 'Lunas' ? 'font-bold' : 'font-bold' }}">
                     {{ strtoupper($transaksi->status_pembayaran) }}
                 </span>
             </div>

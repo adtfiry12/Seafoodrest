@@ -179,9 +179,9 @@
                         <label class="flex items-center p-3.5 border rounded-xl cursor-pointer transition-all"
                                :class="metodePembayaran === 'QRIS' ? 'border-gold-500 bg-gold-50/40 ring-1 ring-gold-500/25' : 'border-slate-200/80 bg-white hover:bg-slate-50/60'">
                             <input type="radio" name="metode_pembayaran" value="QRIS" x-model="metodePembayaran" class="text-gold-600 focus:ring-gold-500">
-                            <div class="ml-3.5">
-                                <span class="block text-sm font-semibold text-charcoal-950">QRIS / Transfer Bank</span>
-                                <span class="block text-xs text-slate-500 mt-0.5">Scan QRIS (E-Wallet & M-Banking) atau Transfer langsung ke BCA & BSI.</span>
+                            <div class="ml-3.5 flex-1">
+                                <span class="block text-sm font-semibold text-charcoal-950">Pembayaran Digital (QRIS / Transfer Bank)</span>
+                                <span class="block text-xs text-slate-500 mt-0.5">Bayar otomatis via QRIS, E-Wallet, atau Transfer Virtual Account melalui Midtrans.</span>
                             </div>
                         </label>
 

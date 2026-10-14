@@ -69,13 +69,24 @@
                 </form>
 
                 @if($transaksi->metode_pembayaran == 'QRIS' && $transaksi->status_pembayaran == 'Belum Lunas')
-                    <span class="w-full sm:w-auto px-4 py-2.5 bg-slate-100 text-slate-400 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200 flex items-center justify-center gap-1.5 cursor-not-allowed">
-                        <i class="fa-regular fa-clock"></i> Tunggu Bukti QRIS
+                    <span class="w-full sm:w-auto px-4 py-2.5 bg-amber-50 text-amber-800 text-xs sm:text-sm font-semibold rounded-xl border border-amber-200 flex items-center justify-center gap-1.5 cursor-not-allowed">
+                        <i class="fa-regular fa-clock"></i> Menunggu Pembayaran
                     </span>
+                @elseif($transaksi->metode_pembayaran == 'QRIS' && $transaksi->status_pembayaran == 'Lunas')
+                    <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pesanan', 'Terima pesanan {{ $transaksi->kode_transaksi }} dan teruskan ke dapur?')">
+                        @csrf
+                        <input type="hidden" name="status_pesanan" value="Dimasak">
+                        <input type="hidden" name="status_pembayaran" value="Lunas">
+                        <button type="submit" class="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-semibold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 active:scale-95">
+                            <i class="fa-solid fa-fire-burner"></i> Terima Pesanan
+                        </button>
+                    </form>
                 @elseif($transaksi->metode_pembayaran == 'QRIS' && $transaksi->status_pembayaran == 'Menunggu Konfirmasi')
-                    <a href="{{ route('transaksi.bukti', $transaksi) }}" target="_blank" class="w-full sm:w-auto px-4 py-2.5 bg-charcoal-900 text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-charcoal-800 transition shadow-xs flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-image"></i> Cek Bukti
-                    </a>
+                    @if($transaksi->bukti_pembayaran)
+                        <a href="{{ route('transaksi.bukti', $transaksi) }}" target="_blank" class="w-full sm:w-auto px-4 py-2.5 bg-charcoal-900 text-white text-xs sm:text-sm font-semibold rounded-xl hover:bg-charcoal-800 transition shadow-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-image"></i> Cek Bukti
+                        </a>
+                    @endif
                     <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pesanan & Verifikasi QRIS', 'Bukti pembayaran QRIS sudah valid? Terima pesanan ini untuk diteruskan ke dapur?')">
                         @csrf
                         <input type="hidden" name="status_pesanan" value="Dimasak">
@@ -126,7 +137,7 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Tagihan Kasir: Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</h3>
-                    <p class="text-xs text-amber-800/80 mt-0.5">Status saat ini: <strong class="text-amber-950">{{ $transaksi->status_pembayaran }}</strong> · Metode: <strong>{{ $transaksi->metode_pembayaran }}</strong></p>
+                    <p class="text-xs text-amber-800/80 mt-0.5">Status saat ini: <strong class="text-amber-950">{{ $transaksi->status_pembayaran }}</strong> · Metode: <strong>{{ $transaksi->payment_channel_label }}</strong></p>
                 </div>
             </div>
             <form action="{{ route('karyawan.update_status', $transaksi->kode_transaksi) }}" method="POST" @submit.prevent="openActionModal($event, 'Konfirmasi Terima Pembayaran', 'Konfirmasi bahwa uang pembayaran sebesar Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }} telah diterima di kasir?')">
@@ -148,8 +159,25 @@
             <p class="mt-1 text-sm text-slate-500">{{ $transaksi->pelanggan->no_hp ?? $transaksi->no_hp_pelanggan ?? 'Nomor HP tidak tersedia' }}</p>
             <div class="mt-5 pt-5 border-t border-slate-100 space-y-3 text-sm">
                 <div class="flex justify-between gap-4"><span class="text-slate-400">Tipe</span><strong class="text-charcoal-900">{{ $transaksi->tipe_pesanan }}</strong></div>
-                <div class="flex justify-between gap-4"><span class="text-slate-400">Pembayaran</span><strong class="text-charcoal-900">{{ $transaksi->metode_pembayaran }}</strong></div>
-                <div class="flex justify-between gap-4"><span class="text-slate-400">Status bayar</span><strong class="text-charcoal-900">{{ $transaksi->status_pembayaran }}</strong></div>
+                <div class="flex justify-between gap-4"><span class="text-slate-400">Pembayaran</span><strong class="text-charcoal-900 text-right">{{ $transaksi->payment_channel_label }}</strong></div>
+                <div class="flex justify-between items-center gap-4">
+                    <span class="text-slate-400">Status Bayar</span>
+                    @if($transaksi->status_pembayaran === 'Lunas')
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold text-xs">
+                            Lunas
+                        </span>
+                    @else
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200 font-bold text-xs">
+                            {{ $transaksi->status_pembayaran }}
+                        </span>
+                    @endif
+                </div>
+                @if($transaksi->payment_reference)
+                    <div class="flex justify-between gap-4">
+                        <span class="text-slate-400">No. Referensi</span>
+                        <span class="font-mono font-semibold text-xs text-charcoal-900">{{ $transaksi->payment_reference }}</span>
+                    </div>
+                @endif
                 @if($transaksi->alamat)
                     <div class="pt-3 border-t border-slate-100">
                         <p class="text-xs text-slate-400">Alamat Pengantaran</p>

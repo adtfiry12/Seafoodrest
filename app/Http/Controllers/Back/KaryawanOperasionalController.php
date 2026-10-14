@@ -165,7 +165,7 @@ class KaryawanOperasionalController extends Controller
             ->with('success', 'Transaksi kasir '.$transaksi->kode_transaksi.' berhasil dibuat!');
     }
 
-    public function pesananBaru(Request $request)
+    public function pesananBaru(Request $request, \App\Services\MidtransService $midtrans)
     {
         Transaksi::batalkanSemuaQrisKedaluwarsa();
 
@@ -177,6 +177,15 @@ class KaryawanOperasionalController extends Controller
         }
 
         $transaksi = $query->latest()->paginate(6)->withQueryString();
+
+        if ($midtrans->isConfigured()) {
+            foreach ($transaksi as $trx) {
+                if ($trx->metode_pembayaran === 'QRIS' && ($trx->status_pembayaran === 'Belum Lunas' || $trx->payment_type === 'qris' || ! $trx->payment_type)) {
+                    $midtrans->syncTransactionStatus($trx);
+                    $trx->refresh();
+                }
+            }
+        }
 
         return view('back.karyawan.pesanan_baru', compact('transaksi'));
     }
@@ -223,13 +232,20 @@ class KaryawanOperasionalController extends Controller
         return view('back.karyawan.delivery', compact('transaksi', 'countSiap', 'countDiantar'));
     }
 
-    public function detailPesanan(string $kode_transaksi): View
+    public function detailPesanan(string $kode_transaksi, \App\Services\MidtransService $midtrans): View
     {
         $transaksi = Transaksi::with(['pelanggan', 'karyawan', 'kurir', 'detail.menu'])
             ->where('kode_transaksi', $kode_transaksi)
             ->firstOrFail();
 
         $transaksi->batalkanJikaKedaluwarsa();
+
+        if ($transaksi->metode_pembayaran === 'QRIS' && ! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
+            if ($transaksi->status_pembayaran === 'Belum Lunas' || $transaksi->payment_type === 'qris' || ! $transaksi->payment_type) {
+                $midtrans->syncTransactionStatus($transaksi);
+                $transaksi->refresh();
+            }
+        }
 
         return view('back.karyawan.pesanan-detail', compact('transaksi'));
     }
@@ -285,7 +301,16 @@ class KaryawanOperasionalController extends Controller
         }
 
         if ($nextStatus === 'Dimasak' && $transaksi->metode_pembayaran === 'QRIS') {
-            abort_unless($transaksi->status_pembayaran === 'Menunggu Konfirmasi' && $nextPaymentStatus === 'Lunas', 422, 'Bukti pembayaran QRIS harus dikonfirmasi terlebih dahulu.');
+            if ($transaksi->status_pembayaran === 'Belum Lunas') {
+                app(\App\Services\MidtransService::class)->syncTransactionStatus($transaksi);
+                $transaksi->refresh();
+            }
+
+            $isPaid = $transaksi->status_pembayaran === 'Lunas';
+            $isManualConfirm = $transaksi->status_pembayaran === 'Menunggu Konfirmasi' && $nextPaymentStatus === 'Lunas';
+
+            abort_unless($isPaid || $isManualConfirm, 422, 'Pembayaran belum lunas. Pesanan belum dapat diteruskan ke dapur.');
+            $nextPaymentStatus = 'Lunas';
         }
 
         if ($nextStatus === 'Selesai' && $transaksi->metode_pembayaran === 'COD') {

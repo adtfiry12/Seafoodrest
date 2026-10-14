@@ -39,16 +39,33 @@
 
             @if($isActiveOrder)
                 <div x-data="{
-                    countdown: 25,
+                    currentPayment: @js($transaksi->status_pembayaran),
+                    currentOrder: @js($transaksi->status_pesanan),
+                    statusUrl: @js(route('checkout.qris.status', ['kode_transaksi' => $transaksi->kode_transaksi])),
+                    checking: false,
                     timer: null,
                     init() {
-                        this.timer = setInterval(() => {
-                            if (this.countdown > 1) {
-                                this.countdown--;
-                            } else {
-                                window.location.reload();
+                        const checkUpdate = async () => {
+                            if (this.checking) return;
+                            this.checking = true;
+                            try {
+                                const res = await fetch(this.statusUrl, {
+                                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                                    cache: 'no-store'
+                                });
+                                if (res.ok) {
+                                    const data = await res.json();
+                                    if (data.status_pembayaran !== this.currentPayment || data.status_pesanan !== this.currentOrder) {
+                                        window.location.reload();
+                                    }
+                                }
+                            } catch (e) {
+                            } finally {
+                                this.checking = false;
                             }
-                        }, 1000);
+                        };
+                        this.timer = setInterval(checkUpdate, 4000);
+                        window.addEventListener('focus', checkUpdate);
                         this.$cleanup(() => {
                             if (this.timer) clearInterval(this.timer);
                         });
@@ -58,7 +75,7 @@
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span>Live Tracking · Pembaruan <strong x-text="countdown" class="font-mono tabular-nums">25</strong>s</span>
+                    <span>Live Tracking Aktif</span>
                 </div>
             @endif
         </div>
@@ -374,6 +391,53 @@
             </div>
         @endif
 
+        <!-- Banner Status Pembayaran -->
+        @if(!$isCancelled)
+            @if($transaksi->status_pembayaran === 'Lunas')
+                <div class="rounded-2xl border border-emerald-200 bg-emerald-50/50 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start sm:items-center gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Pembayaran Lunas</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">
+                                Metode: <strong>{{ $transaksi->payment_channel_label }}</strong>
+                                @if($transaksi->payment_reference)
+                                    · Ref: <span class="font-mono font-semibold text-charcoal-900">{{ $transaksi->payment_reference }}</span>
+                                @endif
+                                @if($transaksi->dibayar_pada)
+                                    · {{ $transaksi->dibayar_pada->format('d M Y, H:i') }} WIB
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                    <a href="{{ URL::temporarySignedRoute('front.struk', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" target="_blank" class="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-emerald-200 text-emerald-800 hover:bg-emerald-50 text-xs font-semibold transition shrink-0">
+                        <i class="fa-solid fa-receipt"></i>
+                        <span>Cetak Struk</span>
+                    </a>
+                </div>
+            @elseif($transaksi->metode_pembayaran === 'QRIS' && $transaksi->status_pembayaran === 'Belum Lunas')
+                <div class="rounded-2xl border border-amber-200 bg-amber-50/60 p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-start sm:items-center gap-3.5">
+                        <div class="w-10 h-10 rounded-xl bg-amber-500 text-charcoal-950 flex items-center justify-center text-base shrink-0">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm sm:text-base text-charcoal-950">Menunggu Pembayaran</h3>
+                            <p class="text-xs text-slate-600 mt-0.5">
+                                Silakan selesaikan pembayaran sebesar <strong>Rp {{ number_format($transaksi->total_bayar, 0, ',', '.') }}</strong> sebelum batas waktu berakhir.
+                            </p>
+                        </div>
+                    </div>
+                    <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gold-500 hover:bg-gold-600 text-charcoal-950 hover:text-white text-xs sm:text-sm font-bold transition shadow-xs shrink-0">
+                        <i class="fa-solid fa-wallet"></i>
+                        <span>Bayar Sekarang</span>
+                    </a>
+                </div>
+            @endif
+        @endif
+
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs">
                 <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Status Pesanan</p>
@@ -382,7 +446,7 @@
                 </p>
             </div>
             <div class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs">
-                <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Pembayaran</p>
+                <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Status Pembayaran</p>
                 <p class="mt-1.5 font-semibold text-sm sm:text-base {{ $transaksi->status_pembayaran === 'Lunas' ? 'text-emerald-600' : ($isCancelled ? 'text-red-600' : 'text-amber-600') }} flex items-center gap-2">
                     <i class="fa-solid {{ $transaksi->status_pembayaran === 'Lunas' ? 'fa-circle-check' : ($isCancelled ? 'fa-circle-xmark' : 'fa-clock') }}"></i>
                     {{ $transaksi->status_pembayaran }}
@@ -391,7 +455,7 @@
             <div class="rounded-2xl border border-slate-200/80 bg-white p-4 sm:p-5 shadow-xs">
                 <p class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Metode Bayar</p>
                 <p class="mt-1.5 font-semibold text-charcoal-950 text-sm sm:text-base flex items-center gap-2">
-                    <i class="fa-solid fa-wallet text-gold-500"></i> {{ $transaksi->metode_pembayaran === 'QRIS' ? 'QRIS / Transfer' : $transaksi->metode_pembayaran }}
+                    <i class="fa-solid fa-wallet text-gold-500"></i> {{ $transaksi->payment_channel_label }}
                 </p>
             </div>
         </div>

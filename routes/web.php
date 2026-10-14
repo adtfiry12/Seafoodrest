@@ -27,10 +27,15 @@ Route::controller(HomeController::class)->group(function () {
 Route::controller(CheckoutController::class)->prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', 'index')->name('index');
     Route::post('/proses', 'proses')->middleware('throttle:checkout')->name('proses');
+    Route::get('/finish', 'midtransFinish')->name('midtrans.finish');
     Route::get('/qris/{kode_transaksi}', 'qris')->middleware('signed')->name('qris');
+    Route::get('/qris/{kode_transaksi}/status', 'checkPaymentStatus')->name('qris.status');
     Route::post('/qris/{kode_transaksi}/upload', 'uploadBukti')->middleware(['signed', 'throttle:uploads'])->name('qris.upload');
     Route::get('/sukses/{kode_transaksi}', 'sukses')->middleware('signed')->name('sukses');
 });
+
+Route::post('/payment/midtrans/callback', [CheckoutController::class, 'midtransCallback'])
+    ->name('payment.midtrans.callback');
 
 Route::get('/pesanan/struk/{kode_transaksi}', [CheckoutController::class, 'struk'])
     ->middleware('signed')
