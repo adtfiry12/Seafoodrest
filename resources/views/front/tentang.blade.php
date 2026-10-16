@@ -4,8 +4,8 @@
 
 <section class="relative h-[320px] sm:h-[420px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0">
-        <img src="{{ asset('image/seafood.webp') }}" alt="Suasana Restoran Niskala Samudra" class="w-full h-full object-cover object-center opacity-45">
-        <div class="absolute inset-0 bg-charcoal-950/80"></div>
+        <img src="{{ asset('image/seafood.webp') }}" alt="Suasana Restoran Niskala Samudra" class="w-full h-full object-cover object-center opacity-50">
+        <div class="absolute inset-0 bg-gradient-to-r from-charcoal-950 via-charcoal-950/85 to-charcoal-950/70"></div>
     </div>
 
     <div class="relative z-10 text-center px-4 max-w-3xl mx-auto">
