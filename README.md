@@ -1,228 +1,268 @@
 <p align="center">
-  <img src="public/image/niskala sammudra.png" alt="Niskala Samudra Logo" width="220" style="border-radius: 16px;">
+  <img src="public/image/niskala sammudra.png" alt="Logo Niskala Samudra" width="220">
 </p>
 
-<h1 align="center">🌊 Niskala Samudra</h1>
-<p align="center">
-  <strong>Sistem Informasi Restoran & Pemesanan Kuliner Seafood Terintegrasi</strong><br>
-  <em>Solusi Manajemen Restoran Modern: Dari Reservasi Meja, Dapur, hingga Pengantaran Kurir Real-Time</em>
-</p>
+<h1 align="center">Niskala Samudra</h1>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel">
-  <img src="https://img.shields.io/badge/PHP-8.2+-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP">
-  <img src="https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS">
-  <img src="https://img.shields.io/badge/Alpine.js-3.x-8BC0D0?style=for-the-badge&logo=alpine.js&logoColor=white" alt="Alpine.js">
-  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
-  <img src="https://img.shields.io/badge/License-MIT-gold?style=for-the-badge" alt="License">
+  Sistem informasi restoran seafood untuk katalog menu, pemesanan, pembayaran,
+  dan operasional restoran dalam satu aplikasi.
 </p>
 
----
+<p align="center">
+  <img src="https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=flat-square&logo=php&logoColor=white" alt="PHP 8.3+">
+  <img src="https://img.shields.io/badge/Laravel-13-FF2D20?style=flat-square&logo=laravel&logoColor=white" alt="Laravel 13">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white" alt="Tailwind CSS 4">
+  <img src="https://img.shields.io/badge/Alpine.js-3-8BC0D0?style=flat-square&logo=alpinedotjs&logoColor=white" alt="Alpine.js 3">
+</p>
 
-## 📌 Tentang Aplikasi
+## Tentang proyek
 
-**Niskala Samudra** adalah platform web aplikasi manajemen restoran dan pemesanan makanan laut (_seafood_) terpadu yang dirancang untuk memberikan pengalaman bersantap eksklusif bagi pelanggan sekaligus mengoptimalkan efisiensi operasional staf restoran.
+Niskala Samudra adalah aplikasi web restoran yang menghubungkan pengalaman pelanggan
+dengan kebutuhan operasional di belakang layar. Pelanggan dapat melihat menu,
+membuat pesanan makan di tempat atau delivery, membayar, dan memantau perkembangan
+pesanan. Admin, karyawan, dan kurir memiliki ruang kerja masing-masing untuk
+memproses pesanan sampai selesai.
 
-Aplikasi ini mengintegrasikan seluruh alur bisnis kuliner dari hulu ke hilir:
+Aplikasi ini menggunakan Bahasa Indonesia dan zona waktu `Asia/Jakarta` sebagai
+konfigurasi default.
 
-- **Pelanggan:** Memilih menu, memesan makanan baik makan di tempat (_Dine-In_) maupun pesan antar (_Delivery_), melakukan pembayaran via QRIS/COD, dan memantau status pesanan secara _live tracking_.
-- **Dapur (_Kitchen Display_):** Menerima dan memproses antrean pesanan secara langsung dengan sistem notifikasi pintar.
-- **Kurir (_Delivery Fleet_):** Mengelola penugasan pengantaran, rute otomatis via Google Maps, chat pelanggan via WhatsApp, pencatatan waktu tempuh akurat (WIB), hingga konfirmasi serah terima _Proof of Delivery_ (POD).
-- **Administrator:** Mengelola inventori menu, memantau laporan pendapatan, mengatur akun staf, serta menganalisis performa penjualan restoran.
+## Fitur
 
----
+### Pelanggan dan pengunjung
 
-## ✨ Fitur-Fitur Utama
+- Halaman beranda dengan slide promosi dan menu pilihan.
+- Halaman tentang restoran dan kontak, termasuk tautan WhatsApp serta lokasi.
+- Katalog menu aktif dengan:
+  - pencarian berdasarkan nama menu;
+  - filter berdasarkan kategori;
+  - pagination;
+  - halaman detail dan menu terkait.
+- Keranjang belanja berbasis Alpine.js dengan kontrol jumlah dan batas stok.
+- Checkout sebagai tamu untuk pesanan non-COD.
+- Pilihan layanan:
+  - **Makan di Tempat** dengan pilihan datang sekarang atau mengisi informasi
+    reservasi berupa jam kedatangan dan jumlah orang;
+  - **Delivery** dengan alamat dan patokan alamat.
+- Pilihan pembayaran sesuai jenis layanan:
+  - tunai di kasir untuk makan di tempat;
+  - QRIS dan kanal pembayaran Midtrans;
+  - COD untuk delivery dan pelanggan yang sudah login.
+- Halaman pembayaran QRIS dengan timer kedaluwarsa, pengecekan status berkala,
+  callback Midtrans, dan unggah bukti pembayaran.
+- Riwayat dan detail pesanan untuk pelanggan yang login.
+- Pembatalan pesanan pada status yang masih memenuhi syarat.
+- Status pesanan, status pembayaran, estimasi pengantaran, dan struk digital
+  bertanda tangan.
 
-### 1. 🍽️ Pengalaman Pelanggan (_Customer Experience_)
+### Operasional karyawan
 
-- **Hero Carousel & Showcase:** Banner promosi beranda yang dinamis dan elegan dengan navigasi responsif.
-- **Katalog Menu Interaktif:** Filter kategori hidangan (Kepiting, Udang, Cumi, Ikan, Lobster, Minuman) dan pencarian _live search_.
-- **Keranjang Belanja (_Slide-over Cart Drawer_):** Manajemen keranjang pesanan _real-time_ berbasis Alpine.js dengan kontrol porsi dan pengecekan stok otomatis.
-- **Fleksibilitas Layanan Pemesanan:**
-    - **Makan di Tempat (_Dine-In_):** Reservasi langsung dengan pemilihan nomor meja.
-    - **Pesan Antar (_Delivery_):** Pengisian alamat lengkap dengan **Patokan Alamat** (_landmark_) untuk memudahkan kurir.
-- **Pilihan Metode Pembayaran:**
-    - **QRIS Otomatis:** Dilengkapi instruksi pembayaran, timer kedaluwarsa, dan fitur unggah foto bukti transfer.
-    - **Bayar di Tempat (_Cash on Delivery / COD_):** Pembayaran tunai saat hidangan diserahkan oleh kurir.
-- **Pelacakan Langsung (_Live Order Tracking_):**
-    - Stepper alur dinamis 5 tahap khusus _Delivery_ (`Diterima` $\rightarrow$ `Dapur` $\rightarrow$ `Dikemas` $\rightarrow$ `Perjalanan` $\rightarrow$ `Tiba`) dan 3 tahap untuk _Dine-In_.
-    - Kartu kurir bertugas, waktu berangkat, estimasi waktu tiba (ETA), durasi perjalanan, dan bukti foto serah terima.
-- **Struk Digital (_Digital Receipt_):** Struk transaksi terverifikasi dengan rincian biaya, ongkos kirim, dan catatan pesanan.
+- Dashboard operasional dengan ringkasan pesanan aktif dan stok menipis.
+- POS/kasir untuk membuat pesanan:
+  - dine-in;
+  - takeaway;
+  - delivery.
+- Pencarian pelanggan terdaftar atau input pelanggan walk-in.
+- Antrean pesanan baru dengan sinkronisasi status pembayaran Midtrans.
+- Tampilan antrean dapur untuk pesanan yang sedang dimasak.
+- Perubahan status pesanan dari diterima, dimasak, siap diantar, sampai selesai.
+- Pengelolaan stok menu dan pembaruan jumlah stok.
+- Notifikasi jumlah antrean pada navigasi yang diperbarui secara berkala.
 
-### 2. 👨‍🍳 Operasional Dapur (_Kitchen Display System_)
+### Operasional kurir
 
-- **Antrean Masak Real-Time:** Menampilkan daftar pesanan yang perlu dimasak dengan _auto-refresh_ berkala.
-- **Transisi Status Cerdas:** Tombol otomatis membedakan _"Selesai Dimasak & Sajikan"_ untuk Dine-In dan _"Selesai Dimasak (Siap Diantar)"_ untuk pesanan Delivery.
-- **Instruksi Khusus:** Penanda visual khusus jika pelanggan menyertakan catatan alergi atau permintaan racikan khusus.
+- Dashboard dan antrean delivery.
+- Melihat pesanan yang siap diantar atau sedang diantar.
+- Mengambil pesanan dan mencatat waktu keberangkatan.
+- Mencatat waktu sampai, nama penerima, dan bukti pengantaran.
+- Validasi bahwa pembayaran COD sudah diterima sebelum delivery diselesaikan.
 
-### 3. 🛵 Pusat Kendali Kurir & Pengantaran (_Delivery Dispatch_)
+### Panel admin
 
-- **Tab Status Kurir:** Filter antrean pesanan dalam tab _Semua_, _Siap Diantar_, dan _Sedang Jalan_.
-- **Alat Operasional Cepat:**
-    - **Rute Google Maps:** Tombol pintas navigasi rute langsung ke koordinat/alamat pemesan.
-    - **WhatsApp Direct Chat:** Kirim pesan konfirmasi pengantaran ke nomor pelanggan dengan _prefilled message_.
-- **Penugasan Mandiri (_Self-Assignment_):** Kurir dapat mengklaim pesanan via tombol _"Ambil & Mulai Antar"_ yang otomatis mencatat ID kurir dan waktu berangkat.
-- **Serah Terima Berfoto (_Proof of Delivery / POD_):**
-    - Input nama penerima langsung di lokasi.
-    - Unggah foto dokumentasi serah terima makanan.
-    - Peringatan wajib tagih tunai untuk pesanan COD sebelum diselesaikan.
-- **Pencatatan Waktu Akurat:** Menggunakan zona waktu Indonesia (**WIB / Asia/Jakarta**) lengkap dengan durasi tempuh riil.
+- Dashboard statistik pendapatan, pesanan baru, menu, pelanggan, menu terlaris,
+  dan pelanggan dengan pembelian terbanyak.
+- CRUD kategori menu.
+- CRUD menu, termasuk harga, deskripsi, gambar, stok, dan status aktif.
+- CRUD slide promosi di halaman beranda.
+- CRUD pengguna dan pengaturan peran.
+- Pengelolaan transaksi, perubahan status, detail pembayaran, dan cetak struk.
+- Laporan penjualan berdasarkan rentang tanggal.
+- Cetak laporan penjualan.
 
-### 4. 👑 Panel Manajemen Admin (_Backoffice_)
+### Perilaku transaksi dan pembayaran
 
-- **Dashboard Statistik:** Ringkasan pendapatan harian/bulanan, jumlah pesanan aktif, total menu, dan staf.
-- **Kelola Menu & Kategori:** CRUD menu lengkap dengan foto, deskripsi, harga, dan kuota stok yang otomatis berkurang saat dipesan serta kembali jika dibatalkan (_auto stock restore_).
-- **Kelola Transaksi:** Audit seluruh transaksi masuk, verifikasi bukti transfer QRIS, dan kontrol status manual.
-- **Kelola Pengguna:** Manajemen data pengguna dan pembagian peran (_role-based access control_).
-- **Kelola Banner Promosi:** Pengaturan slider gambar dan promosi pada halaman utama.
-- **Laporan Penjualan:** Rekapitulasi laporan pendapatan berbasis rentang tanggal dengan fitur cetak struk/laporan bersih.
+- Stok dikunci dan dikurangi dalam transaksi database saat pesanan dibuat.
+- Stok dikembalikan ketika pesanan dibatalkan.
+- Pesanan QRIS yang belum lunas dibatalkan otomatis setelah satu jam dan stoknya
+  dikembalikan.
+- Delivery menggunakan ongkos kirim tetap sebesar **Rp15.000**.
+- Midtrans mendukung kanal pembayaran yang tersedia pada konfigurasi akun,
+  seperti QRIS, e-wallet, virtual account, transfer bank, kartu, dan gerai retail.
 
----
+> **Catatan:** pelacakan delivery pada aplikasi berupa status, waktu berangkat,
+> waktu tiba, estimasi, dan bukti pengantaran. Aplikasi belum menyediakan pelacakan
+> GPS atau posisi kurir secara langsung di peta.
 
-## 🛠️ Arsitektur & Teknologi
+## Peran pengguna
 
-| Komponen                  | Teknologi yang Digunakan                                                 |
-| :------------------------ | :----------------------------------------------------------------------- |
-| **Backend Framework**     | [Laravel 11.x](https://laravel.com)                                      |
-| **Bahasa Pemrograman**    | PHP 8.2+                                                                 |
-| **Database**              | MySQL 8.0 / MariaDB                                                      |
-| **Frontend Styling**      | [Tailwind CSS 3.x](https://tailwindcss.com) & [Vite](https://vitejs.dev) |
-| **Clientside Reactivity** | [Alpine.js 3.x](https://alpinejs.dev)                                    |
-| **Iconography**           | [FontAwesome 6 Pro/Free](https://fontawesome.com)                        |
-| **Typography**            | Cinzel (Serif) & Instrument Sans (Modern Web Typography)                 |
-| **Testing & Automation**  | Python 3 + Playwright _(Auto-Capture Documentation)_                     |
+| Peran | Akses utama |
+| --- | --- |
+| Pengunjung | Melihat katalog, mendaftar, login, dan membuat pesanan non-COD |
+| Pelanggan | Checkout, pembayaran, riwayat pesanan, pembatalan, profil, dan struk |
+| Karyawan | POS, pesanan baru, dapur, stok, dan pemrosesan status pesanan |
+| Kurir | Antrean delivery, mulai pengantaran, dan konfirmasi serah terima |
+| Admin | Dashboard, seluruh pengelolaan data, laporan, serta akses operasional |
 
----
+## Teknologi
 
-## 🚀 Panduan Instalasi Lokal
+| Area | Teknologi |
+| --- | --- |
+| Backend | PHP 8.3+ dan Laravel 13 |
+| Database default | SQLite |
+| Database alternatif | MySQL atau MariaDB melalui konfigurasi Laravel |
+| Frontend | Blade, Tailwind CSS 4, Alpine.js 3, dan Vite |
+| Pembayaran | Midtrans Snap dan callback/webhook Midtrans |
+| Penyimpanan file | Laravel filesystem dengan private storage untuk bukti pembayaran |
+| Testing | Pest dan PHPUnit |
 
-Ikuti langkah-langkah berikut untuk menjalankan aplikasi Niskala Samudra di komputer lokal Anda:
+## Menjalankan secara lokal
 
-### 1. Prasyarat Sistem
+### Prasyarat
 
-- PHP $\ge$ 8.2 (dengan ekstensi `pdo_mysql`, `mbstring`, `fileinfo`, `gd`, `openssl`)
-- Composer $\ge$ 2.x
-- Node.js $\ge$ 18.x & NPM
-- Server MySQL / MariaDB (misal: XAMPP, Laragon, atau native service)
+- PHP 8.3 atau lebih baru dengan ekstensi umum Laravel, termasuk `pdo`,
+  `mbstring`, `fileinfo`, dan `openssl`;
+- Composer 2 atau lebih baru;
+- Node.js dan npm.
 
-### 2. Kloning Repository
+### Instalasi
+
+1. Kloning repository dan masuk ke folder proyek:
+
+   ```bash
+   git clone https://github.com/adtfiry12/Seafoodrest.git
+   cd Seafoodrest
+   ```
+
+2. Pasang dependency PHP dan JavaScript:
+
+   ```bash
+   composer install
+   npm install
+   ```
+
+3. Siapkan file environment dan application key:
+
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+
+4. Jalankan migrasi dan seeder:
+
+   ```bash
+   php artisan migrate --seed
+   ```
+
+   Konfigurasi bawaan menggunakan SQLite. Untuk MySQL atau MariaDB, ubah
+   `DB_CONNECTION` dan variabel `DB_*` di `.env` sebelum menjalankan migrasi.
+
+5. Siapkan akses file upload:
+
+   ```bash
+   php artisan storage:link
+   ```
+
+6. Build aset frontend:
+
+   ```bash
+   npm run build
+   ```
+
+7. Jalankan aplikasi:
+
+   ```bash
+   php artisan serve
+   ```
+
+   Buka `http://127.0.0.1:8000` di browser.
+
+Untuk pengembangan frontend dengan hot reload, gunakan `npm run dev` sebagai
+pengganti `npm run build`.
+
+### Setup satu perintah
+
+Composer menyediakan script setup yang memasang dependency, membuat `.env`,
+menghasilkan application key, menjalankan migrasi, memasang dependency npm, dan
+membangun aset:
 
 ```bash
-git clone https://github.com/username/Seafoodrest.git
-cd Seafoodrest
-```
-
-### 3. Instalasi Dependensi PHP & Node.js
-
-```bash
-composer install
-npm install
-```
-
-### 4. Konfigurasi Lingkungan (_Environment_)
-
-Salin file `.env.example` menjadi `.env`:
-
-```bash
-cp .env.example .env
-```
-
-Buka file `.env` dan sesuaikan koneksi database Anda:
-
-```env
-APP_NAME="Niskala Samudra"
-APP_TIMEZONE=Asia/Jakarta
-APP_LOCALE=id
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=SeafoodRest
-DB_USERNAME=root
-DB_PASSWORD=
-```
-
-### 5. Generate Application Key & Storage Link
-
-```bash
-php artisan key:generate
+composer run setup
 php artisan storage:link
 ```
 
-### 6. Migrasi Database & Seeder
+## Konfigurasi Midtrans
 
-Pastikan database dengan nama yang ditentukan di `.env` sudah dibuat di MySQL, lalu jalankan:
+Pembayaran digital memerlukan kredensial Midtrans. Isi variabel berikut di `.env`:
 
-```bash
-php artisan migrate --seed
+```env
+MIDTRANS_MERCHANT_ID=
+MIDTRANS_CLIENT_KEY=
+MIDTRANS_SERVER_KEY=
+MIDTRANS_IS_PRODUCTION=false
+MIDTRANS_IS_SANITIZED=true
+MIDTRANS_IS_3DS=true
 ```
 
-### 7. Kompilasi Aset Frontend
+Gunakan `MIDTRANS_IS_PRODUCTION=false` untuk lingkungan sandbox. Jangan commit
+nilai `MIDTRANS_SERVER_KEY` atau kredensial lain ke repository.
+
+Tanpa kredensial Midtrans, fitur katalog, akun, POS, dan alur pesanan non-digital
+tetap dapat dikembangkan, tetapi pembayaran Midtrans tidak akan berfungsi.
+
+## Akun awal
+
+Seeder membuat satu akun admin untuk lingkungan lokal:
+
+| Peran | Email | Kata sandi |
+| --- | --- | --- |
+| Admin | `admin@gmail.com` | `admin123` |
+
+Segera ganti kata sandi tersebut pada lingkungan yang digunakan bersama atau
+lingkungan produksi. Pelanggan dapat membuat akun melalui halaman registrasi,
+sedangkan akun karyawan dan kurir dikelola dari panel admin.
+
+## Perintah pengembangan
 
 ```bash
-npm run build
-# Atau untuk mode pengembangan (hot-reload):
-# npm run dev
+# Menjalankan test
+php artisan test --compact
+
+# Memformat kode PHP yang berubah
+vendor/bin/pint --dirty --format agent
+
+# Menjalankan server Vite
+npm run dev
 ```
 
-### 8. Jalankan Server Aplikasi
+## Struktur fitur utama
 
-```bash
-php artisan serve
+```text
+app/
+├── Http/Controllers/
+│   ├── Back/       # autentikasi, admin, POS, dapur, kurir, laporan
+│   └── Front/      # halaman publik, checkout, pembayaran, pesanan
+├── Models/         # pengguna, menu, kategori, transaksi, dan detail transaksi
+└── Services/       # integrasi pembayaran Midtrans
+database/
+├── migrations/     # struktur tabel dan perubahan skema
+└── seeders/        # akun admin, menu, dan slide awal
+resources/
+├── css/            # Tailwind CSS
+├── js/             # komponen Alpine.js
+└── views/          # Blade untuk halaman publik dan backoffice
 ```
 
-Akses aplikasi melalui peramban web di: **`http://127.0.0.1:8000`**
+## Pengembang
 
----
-
-## 🔑 Akun Bawaan (_Default Credentials_)
-
-Setelah proses seeding selesai, Anda dapat menggunakan akun bawaan berikut untuk pengujian:
-
-| Role / Peran        | Email                        | Kata Sandi | Hak Akses Utama                                                |
-| :------------------ | :--------------------------- | :--------- | :------------------------------------------------------------- |
-| **Administrator**   | `admin@gmail.com`            | `admin123` | Akses penuh: Panel Admin, Laporan, CRUD Menu, Dapur, & Kurir   |
-| **Karyawan / Staf** | _(Didaftarkan via Admin)_    | -          | Akses Operasional: Kasir, Dapur Masak, Pengantaran Kurir, Stok |
-| **Pelanggan**       | _(Bebas Registrasi via Web)_ | -          | Pemesanan Menu, Riwayat Transaksi, Live Tracking               |
-
----
-
-## 📸 Dokumentasi & Auto-Capture Tool
-
-Proyek ini telah dilengkapi dengan tool otomatisasi tangkapan layar (**Auto-Capture Generator**) berbasis **Python & Playwright** untuk keperluan penyusunan laporan, skripsi, atau proposal tugas akhir.
-
-Tool ini dapat menangkap lebih dari 30 halaman sistem secara otomatis (termasuk alur klik menu, isi checkout delivery, dapur, kurir, hingga laporan admin).
-
-Untuk menjalankannya:
-
-```bash
-# Pastikan server Laravel aktif di terminal pertama (php artisan serve)
-# Pada terminal kedua:
-cd auto_capture
-./run.sh        # Untuk pengguna Linux / macOS
-run.bat         # Untuk pengguna Windows (atau cukup Double-Click run.bat)
-```
-
-Semua hasil tangkapan layar beresolusi tinggi akan tersimpan rapi dan terkategori di dalam folder `auto_capture/screenshots/`.
-
----
-
-## 👨‍💻 Pengembang Proyek
-
-Proyek ini dikembangkan oleh:
-
-- **Nama:** Aditya Mukti Firmansyah
-- **Institusi:** SMK Wikrama 1 Jepara
-- **Spesialisasi:** Web Development & Full-Stack Engineering
-
----
-
-## 📄 Lisensi
-
-Aplikasi web **Niskala Samudra** dirilis di bawah lisensi [MIT License](LICENSE).
-Semua orang diperbolehkan menggunakan, memodifikasi, dan mengembangkan kode ini untuk keperluan edukasi maupun komersial.
-
-<p align="center">
-  <sub>Dibuat dengan ❤️ dan dedikasi untuk industri kuliner nusantara.</sub>
-</p>
+**Aditya Mukti Firmansyah**
+SMK Wikrama 1 Jepara
