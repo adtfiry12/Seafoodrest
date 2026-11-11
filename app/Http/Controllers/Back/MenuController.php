@@ -25,7 +25,11 @@ class MenuController extends Controller
             $query->where('kategori_id', $request->kategori_id);
         }
 
-        $menu = $query->latest()->paginate(10)->withQueryString();
+        $menu = $query
+            ->orderByDesc('is_active')
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
         $kategoris = Kategori::all();
 
         return view('back.admin.menu.index', compact('menu', 'kategoris'));
