@@ -89,32 +89,41 @@
 
                     <!-- Searchable Pelanggan Select -->
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 mb-1.5">Pelanggan Terdaftar</label>
+                        <label class="block text-sm font-semibold text-charcoal-900 mb-2">Pelanggan Terdaftar</label>
                         <div @click.outside="pelangganDropdownOpen = false" class="relative">
                             <input type="hidden" name="pengguna_id" :value="selectedPelanggan">
                             <button type="button" @click="pelangganDropdownOpen = !pelangganDropdownOpen"
-                                    class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 text-left text-xs sm:text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
-                                <span class="truncate" x-text="selectedPelangganLabel() || '-- Pelanggan Umum (Guest / Walk-In) --'"
-                                      :class="selectedPelanggan ? 'text-charcoal-950 font-semibold' : 'text-slate-500'"></span>
+                                    class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20 shadow-sm">
+                                <span class="truncate flex items-center gap-2" :class="selectedPelanggan ? 'text-charcoal-950 font-semibold' : 'text-slate-500'">
+                                    <i class="fa-solid fa-user text-xs text-slate-400"></i>
+                                    <span x-text="selectedPelangganLabel() || '-- Pelanggan Umum (Guest / Walk-In) --'"></span>
+                                </span>
                                 <i class="fa-solid fa-chevron-down text-xs text-slate-400 shrink-0 ml-2 transition-transform duration-200" :class="{ 'rotate-180': pelangganDropdownOpen }"></i>
                             </button>
 
-                            <div x-show="pelangganDropdownOpen" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
-                                <div class="border-b border-slate-100 p-2 bg-slate-50/70">
-                                    <div class="relative">
-                                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400"></i>
-                                        <input type="search" x-model="pelangganSearch" placeholder="Ketik nama atau no. HP..." class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-3 text-xs text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
+                            <div x-show="pelangganDropdownOpen" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 min-w-60 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                <div class="border-b border-slate-100 p-2">
+                                    <div class="relative flex items-center">
+                                        <i class="fa-solid fa-magnifying-glass absolute left-3 text-xs text-slate-400 pointer-events-none"></i>
+                                        <input type="search" x-model="pelangganSearch" placeholder="Cari nama atau no. HP..." class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-8 text-xs sm:text-sm text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
+                                        <button type="button" x-show="pelangganSearch" @click="pelangganSearch = ''" class="absolute right-2.5 text-slate-400 hover:text-slate-600 p-0.5" aria-label="Hapus pencarian pelanggan">
+                                            <i class="fa-solid fa-xmark text-xs"></i>
+                                        </button>
                                     </div>
                                 </div>
-                                <div class="max-h-48 overflow-y-auto p-1 custom-scrollbar divide-y divide-slate-50">
-                                    <button type="button" x-show="filteredPelanggan().length === 0" class="w-full px-3 py-2.5 text-center text-xs text-slate-400" disabled>Tidak ada pelanggan cocok.</button>
+                                <div class="max-h-60 overflow-y-auto p-1 custom-scrollbar">
+                                    <button type="button" @click="selectPelanggan(pelangganOptions[0])" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selectedPelanggan === '' ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
+                                        <span>-- Pelanggan Umum (Guest / Walk-In) --</span>
+                                        <i x-show="selectedPelanggan === ''" class="fa-solid fa-check text-gold-600"></i>
+                                    </button>
+                                    <button type="button" x-show="filteredPelanggan().length === 0" class="w-full px-3 py-3 text-center text-sm text-slate-400" disabled>Tidak ada pelanggan ditemukan.</button>
                                     <template x-for="p in filteredPelanggan()" :key="p.id">
-                                        <button type="button" @click="selectPelanggan(p)" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs text-charcoal-900 hover:bg-gold-50 hover:text-gold-900 transition">
+                                        <button type="button" x-show="p.id" @click="selectPelanggan(p)" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selectedPelanggan == String(p.id) ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
                                             <div class="truncate">
-                                                <span class="font-semibold" x-text="p.nama || p.label"></span>
-                                                <span x-show="p.no_hp" class="text-[11px] text-slate-400 ml-1.5" x-text="'(' + p.no_hp + ')'"></span>
+                                                <span x-text="p.nama || p.label"></span>
+                                                <span x-show="p.no_hp" class="text-xs text-slate-400 ml-1.5" x-text="'(' + p.no_hp + ')'" ></span>
                                             </div>
-                                            <i x-show="selectedPelanggan == String(p.id)" class="fa-solid fa-check text-gold-600 shrink-0 ml-2 text-xs"></i>
+                                            <i x-show="selectedPelanggan == String(p.id)" class="fa-solid fa-check text-gold-600 shrink-0 ml-2"></i>
                                         </button>
                                     </template>
                                 </div>
