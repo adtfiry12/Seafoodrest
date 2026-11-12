@@ -113,11 +113,13 @@
                     @if($transaksi->refund_status === 'completed')
                         <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana sudah diproses. Silakan cek rekening atau metode pembayaran yang digunakan.</p>
                     @elseif($transaksi->refund_status === 'requested')
-                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana sedang diproses oleh Midtrans. Jika dana belum masuk setelah beberapa waktu, <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-800">hubungi kami melalui WhatsApp</a>.</p>
+                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana sedang diproses oleh sistem pembayaran. Jika dana belum masuk setelah beberapa waktu, <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-800">hubungi kami melalui WhatsApp</a>.</p>
+                    @elseif($transaksi->refund_status === 'failed')
+                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana belum berhasil diproses oleh sistem pembayaran. Silakan <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-800">hubungi kami melalui WhatsApp</a> dan sertakan kode pesanan ini.</p>
                     @elseif($transaksi->metode_pembayaran === 'QRIS' && $transaksi->status_pembayaran === 'Batal')
                         <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana belum tercatat. Jika Anda sudah melakukan pembayaran, <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-800">hubungi kami melalui WhatsApp</a> dan sertakan kode pesanan ini.</p>
                     @else
-                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pesanan ini dibatalkan tanpa pembayaran online, sehingga tidak ada dana yang perlu dikembalikan melalui Midtrans.</p>
+                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pesanan ini dibatalkan tanpa pembayaran online, sehingga tidak ada dana yang perlu dikembalikan melalui sistem pembayaran.</p>
                     @endif
                 </div>
             </div>
@@ -516,7 +518,7 @@
             @if($transaksi->metode_pembayaran === 'QRIS' && $transaksi->status_pembayaran === 'Belum Lunas' && !$isCancelled && $transaksi->status_pesanan !== 'Selesai')
                 <a href="{{ URL::temporarySignedRoute('checkout.qris', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]) }}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-5 py-2.5 text-xs sm:text-sm font-semibold text-charcoal-950 hover:bg-gold-600 hover:text-white transition shadow-xs"><i class="fa-solid fa-wallet"></i> Lanjutkan Pembayaran</a>
             @endif
-            @if($transaksi->status_pesanan === 'Menunggu ACC' && $transaksi->status_pembayaran === 'Belum Lunas' && !$isCancelled)
+            @if($transaksi->status_pesanan === 'Menunggu ACC' && in_array($transaksi->status_pembayaran, ['Belum Lunas', 'Lunas'], true) && !$isCancelled)
                 <form action="{{ route('front.pesanan.batal', $transaksi->kode_transaksi) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pesanan ini?')" class="w-full sm:w-auto">
                     @csrf
                     <button type="submit" class="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 px-5 py-2.5 text-xs sm:text-sm font-semibold transition shadow-xs">

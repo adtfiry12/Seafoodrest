@@ -110,7 +110,6 @@ class MidtransService
             $transaksi->update([
                 'refund_status' => 'requested',
                 'refund_reference' => substr((string) $refundReference, 0, 150),
-                'refunded_at' => now(),
             ]);
         } catch (ValidationException $exception) {
             throw $exception;
@@ -125,6 +124,110 @@ class MidtransService
                 'status_pesanan' => 'Refund Midtrans tidak dapat dihubungi. Pesanan belum dibatalkan.',
             ]);
         }
+    }
+
+    /**
+     * Synchronize a requested refund with Midtrans.
+     */
+    public function syncRefundStatus(Transaksi $transaksi): bool
+    {
+        if (! $this->isConfigured() || $transaksi->refund_status !== 'requested') {
+            return false;
+        }
+
+        $orderId = str_starts_with((string) $transaksi->payment_reference, $transaksi->kode_transaksi)
+            ? $transaksi->payment_reference
+            : $transaksi->kode_transaksi;
+
+        try {
+            $response = Http::withBasicAuth($this->serverKey, '')
+                ->acceptJson()
+                ->timeout(10)
+                ->withOptions([
+                    'connect_timeout' => 4,
+                    CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+                ])
+                ->get($this->getCoreApiBaseUrl().'/'.urlencode($orderId).'/status');
+
+            if ($response->status() === 404) {
+                return false;
+            }
+
+            if (! $response->successful()) {
+                Log::warning('Midtrans refund status check failed', [
+                    'kode_transaksi' => $transaksi->kode_transaksi,
+                    'order_id' => $orderId,
+                    'status' => $response->status(),
+                    'body' => $response->json(),
+                ]);
+
+                return false;
+            }
+
+            $data = $response->json();
+            $refund = $this->extractRefundData(is_array($data) ? $data : [], $transaksi->refund_reference);
+            $refundStatus = $this->getRefundStatus(is_array($data) ? $data : [], $refund);
+
+            $normalizedStatus = match ($refundStatus) {
+                'completed', 'success', 'successful' => 'completed',
+                'failed', 'failure', 'rejected', 'cancelled', 'canceled' => 'failed',
+                'pending', 'processing', 'requested' => 'requested',
+                default => null,
+            };
+
+            if (! $normalizedStatus) {
+                return false;
+            }
+
+            $updateData = ['refund_status' => $normalizedStatus];
+            $refundReference = $refund['refund_key'] ?? $refund['refund_id'] ?? null;
+            if ($refundReference && ! $transaksi->refund_reference) {
+                $updateData['refund_reference'] = substr((string) $refundReference, 0, 150);
+            }
+            if ($normalizedStatus === 'completed' && ! $transaksi->refunded_at) {
+                $updateData['refunded_at'] = now();
+            }
+
+            $transaksi->update($updateData);
+
+            return true;
+        } catch (\Throwable $exception) {
+            Log::warning('Midtrans refund status sync error', [
+                'kode_transaksi' => $transaksi->kode_transaksi,
+                'order_id' => $orderId,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return false;
+        }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function extractRefundData(array $data, ?string $refundReference): array
+    {
+        $refunds = $data['refunds'] ?? [];
+        if (is_array($refunds)) {
+            foreach ($refunds as $refund) {
+                if (! is_array($refund)) {
+                    continue;
+                }
+
+                $reference = $refund['refund_key'] ?? $refund['refund_id'] ?? null;
+                if ($refundReference && $reference === $refundReference) {
+                    return $refund;
+                }
+            }
+
+            $latestRefund = end($refunds);
+
+            if (is_array($latestRefund)) {
+                return $latestRefund;
+            }
+        }
+
+        return isset($data['refund_status']) || isset($data['status']) ? $data : [];
     }
 
     /**
@@ -313,6 +416,7 @@ class MidtransService
                 'status_pembayaran' => $transaksi->status_pembayaran,
                 'payment_channel' => $transaksi->payment_channel_label,
                 'payment_reference' => $transaksi->payment_reference,
+                'refund_status' => $transaksi->refund_status,
                 'dibayar_pada' => $transaksi->dibayar_pada?->format('d M Y, H:i'),
             ];
         }
@@ -345,6 +449,10 @@ class MidtransService
                 if ($response->successful()) {
                     $data = $response->json();
                     if (is_array($data) && isset($data['transaction_status']) && ($data['status_code'] ?? '') !== '404') {
+                        if ($transaksi->refund_status === 'requested') {
+                            $this->applyRefundStatus($transaksi, $data);
+                        }
+
                         $this->applyGatewayStatus($transaksi, $data);
                         $transaksi->refresh();
                         if ($transaksi->status_pembayaran === 'Lunas') {
@@ -365,8 +473,62 @@ class MidtransService
             'status_pembayaran' => $transaksi->status_pembayaran,
             'payment_channel' => $transaksi->payment_channel_label,
             'payment_reference' => $transaksi->payment_reference,
+            'refund_status' => $transaksi->refund_status,
             'dibayar_pada' => $transaksi->dibayar_pada?->format('d M Y, H:i'),
         ];
+    }
+
+    /**
+     * Apply the latest refund entry from a transaction status response.
+     */
+    protected function applyRefundStatus(Transaksi $transaksi, array $data): void
+    {
+        if (
+            (! isset($data['refunds']) || ! is_array($data['refunds']))
+            && ! in_array(strtolower((string) ($data['transaction_status'] ?? '')), ['refund', 'partial_refund'], true)
+        ) {
+            return;
+        }
+
+        $refund = $this->extractRefundData($data, $transaksi->refund_reference);
+        $refundStatus = $this->getRefundStatus($data, $refund);
+        $normalizedStatus = match ($refundStatus) {
+            'completed', 'success', 'successful' => 'completed',
+            'failed', 'failure', 'rejected', 'cancelled', 'canceled' => 'failed',
+            'pending', 'processing', 'requested' => 'requested',
+            default => null,
+        };
+
+        if (! $normalizedStatus) {
+            return;
+        }
+
+        $updateData = ['refund_status' => $normalizedStatus];
+        if ($normalizedStatus === 'completed' && ! $transaksi->refunded_at) {
+            $updateData['refunded_at'] = now();
+        }
+
+        $transaksi->update($updateData);
+    }
+
+    /**
+     * Normalize refund status values returned by the transaction status API.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  array<string, mixed>  $refund
+     */
+    protected function getRefundStatus(array $data, array $refund): string
+    {
+        $transactionStatus = strtolower((string) ($data['transaction_status'] ?? ''));
+        if ($transactionStatus === 'refund') {
+            return 'completed';
+        }
+
+        if ($transactionStatus === 'partial_refund') {
+            return 'requested';
+        }
+
+        return strtolower((string) ($refund['status'] ?? $refund['refund_status'] ?? ''));
     }
 
     /**
@@ -498,6 +660,15 @@ class MidtransService
             $reference = (string) $data['payment_reference'];
         } else {
             $reference = $transaksi->payment_reference;
+        }
+
+        if ($transactionStatus === 'refund') {
+            $transaksi->update([
+                'refund_status' => 'completed',
+                'refunded_at' => $transaksi->refunded_at ?? now(),
+            ]);
+
+            return;
         }
 
         $isPaid = ($transactionStatus === 'settlement') ||

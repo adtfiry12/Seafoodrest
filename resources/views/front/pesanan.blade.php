@@ -75,14 +75,17 @@
                                         <p class="font-bold">Pengembalian dana sudah diproses.</p>
                                         <p class="mt-0.5">Silakan cek rekening atau metode pembayaran yang digunakan.</p>
                                     @elseif($trx->refund_status === 'requested')
-                                        <p class="font-bold">Pengembalian dana sedang diproses oleh Midtrans.</p>
+                                        <p class="font-bold">Pengembalian dana sedang diproses oleh sistem pembayaran.</p>
                                         <p class="mt-0.5">Jika dana belum masuk setelah beberapa waktu, silakan <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-700">hubungi kami melalui WhatsApp</a>.</p>
+                                    @elseif($trx->refund_status === 'failed')
+                                        <p class="font-bold">Pengembalian dana belum berhasil diproses oleh sistem pembayaran.</p>
+                                        <p class="mt-0.5">Silakan <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-700">hubungi kami melalui WhatsApp</a> dan sertakan kode pesanan ini.</p>
                                     @elseif($trx->metode_pembayaran === 'QRIS' && $trx->status_pembayaran === 'Batal')
                                         <p class="font-bold">Pengembalian dana belum tercatat.</p>
                                         <p class="mt-0.5">Jika Anda sudah melakukan pembayaran, silakan <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-700">hubungi kami melalui WhatsApp</a> dan sertakan kode pesanan ini.</p>
                                     @else
                                         <p class="font-bold">Pesanan dibatalkan tanpa pembayaran online.</p>
-                                        <p class="mt-0.5">Tidak ada dana yang perlu dikembalikan melalui Midtrans.</p>
+                                        <p class="mt-0.5">Tidak ada dana yang perlu dikembalikan melalui sistem pembayaran.</p>
                                     @endif
                                 </div>
                             </div>

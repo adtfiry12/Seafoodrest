@@ -181,7 +181,7 @@
                             <input type="radio" name="metode_pembayaran" value="QRIS" x-model="metodePembayaran" class="text-gold-600 focus:ring-gold-500">
                             <div class="ml-3.5 flex-1">
                                 <span class="block text-sm font-semibold text-charcoal-950">Pembayaran Digital (QRIS / Transfer Bank)</span>
-                                <span class="block text-xs text-slate-500 mt-0.5">Bayar otomatis via QRIS, E-Wallet, atau Transfer Virtual Account melalui Midtrans.</span>
+                                <span class="block text-xs text-slate-500 mt-0.5">Bayar otomatis via QRIS, E-Wallet, atau Transfer Virtual Account melalui sistem pembayaran.</span>
                             </div>
                         </label>
 

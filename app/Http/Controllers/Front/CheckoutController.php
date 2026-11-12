@@ -209,6 +209,11 @@ class CheckoutController extends Controller
         $transaksi = $this->accessibleTransaction($kode_transaksi);
         $transaksi->batalkanJikaKedaluwarsa();
 
+        if ($transaksi->refund_status === 'requested') {
+            $midtrans->syncRefundStatus($transaksi);
+            $transaksi->refresh();
+        }
+
         if ($transaksi->metode_pembayaran === 'QRIS' && ! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
             $orderIdHint = $request->query('order_id');
             $transactionIdHint = $request->query('transaction_id');
@@ -256,6 +261,7 @@ class CheckoutController extends Controller
             'is_batal' => in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true) || $transaksi->status_pembayaran === 'Batal',
             'payment_channel' => $transaksi->payment_channel_label,
             'payment_reference' => $transaksi->payment_reference,
+            'refund_status' => $transaksi->refund_status,
             'dibayar_pada' => $transaksi->dibayar_pada ? $transaksi->dibayar_pada->format('d M Y, H:i').' WIB' : null,
             'sukses_url' => URL::temporarySignedRoute('checkout.sukses', now()->addHours(2), ['kode_transaksi' => $transaksi->kode_transaksi]),
         ]);
@@ -339,6 +345,11 @@ class CheckoutController extends Controller
 
         if ($midtrans->isConfigured()) {
             foreach ($transaksi as $trx) {
+                if ($trx->refund_status === 'requested') {
+                    $midtrans->syncRefundStatus($trx);
+                    $trx->refresh();
+                }
+
                 if ($trx->metode_pembayaran === 'QRIS' && ($trx->status_pembayaran === 'Belum Lunas' || $trx->payment_type === 'qris' || ! $trx->payment_type) && ! in_array($trx->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
                     $midtrans->syncTransactionStatus($trx);
                     $trx->refresh();
@@ -358,6 +369,11 @@ class CheckoutController extends Controller
 
         $transaksi->batalkanJikaKedaluwarsa();
 
+        if ($transaksi->refund_status === 'requested') {
+            $midtrans->syncRefundStatus($transaksi);
+            $transaksi->refresh();
+        }
+
         if ($transaksi->metode_pembayaran === 'QRIS' && ! in_array($transaksi->status_pesanan, ['Dibatalkan', 'Batal'], true)) {
             if ($transaksi->status_pembayaran !== 'Lunas' || $transaksi->payment_type === 'qris' || ! $transaksi->payment_type) {
                 $midtrans->syncTransactionStatus($transaksi);
@@ -368,12 +384,20 @@ class CheckoutController extends Controller
         return view('front.pesanan-detail', compact('transaksi'));
     }
 
-    public function batalkanPesanan(string $kode_transaksi)
+    public function batalkanPesanan(string $kode_transaksi, MidtransService $midtrans)
     {
         $transaksi = $this->accessibleTransaction($kode_transaksi);
 
-        if (! in_array($transaksi->status_pesanan, ['Menunggu ACC'], true) || $transaksi->status_pembayaran === 'Lunas') {
-            return back()->with('error', 'Pesanan yang sedang diproses atau sudah lunas tidak dapat dibatalkan.');
+        if (! in_array($transaksi->status_pesanan, ['Menunggu ACC'], true)) {
+            return back()->with('error', 'Pesanan yang sedang diproses tidak dapat dibatalkan.');
+        }
+
+        if ($transaksi->status_pembayaran === 'Lunas' && $transaksi->metode_pembayaran !== 'QRIS') {
+            return back()->with('error', 'Pesanan dengan pembayaran ini tidak dapat dibatalkan setelah lunas.');
+        }
+
+        if ($transaksi->metode_pembayaran === 'QRIS' && $transaksi->status_pembayaran === 'Lunas') {
+            $midtrans->refundIfNeeded($transaksi);
         }
 
         DB::transaction(function () use ($transaksi) {
@@ -439,4 +463,3 @@ class CheckoutController extends Controller
         return $transaksi;
     }
 }
-
