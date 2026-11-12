@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Pengguna;
 use App\Models\Transaksi;
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -168,7 +169,7 @@ class TransaksiController extends Controller
         ));
     }
 
-    public function update(Request $request, Transaksi $transaksi)
+    public function update(Request $request, Transaksi $transaksi, MidtransService $midtrans)
     {
         $validated = $request->validate([
             'status_pembayaran' => 'required|in:Belum Lunas,Menunggu Konfirmasi,Lunas,Batal',
@@ -222,6 +223,10 @@ class TransaksiController extends Controller
         $statusPembayaran = $validated['status_pesanan'] === 'Dibatalkan'
             ? 'Batal'
             : $validated['status_pembayaran'];
+
+        if ($validated['status_pesanan'] === 'Dibatalkan') {
+            $midtrans->refundIfNeeded($transaksi);
+        }
 
         DB::transaction(function () use ($validated, $statusPembayaran, $transaksi) {
             $updateData = [
@@ -289,8 +294,10 @@ class TransaksiController extends Controller
         };
     }
 
-    public function destroy(Transaksi $transaksi)
+    public function destroy(Transaksi $transaksi, MidtransService $midtrans)
     {
+        $midtrans->refundIfNeeded($transaksi);
+
         DB::transaction(function () use ($transaksi) {
             $transaksi->restoreStockIfNeeded();
             $transaksi->delete();

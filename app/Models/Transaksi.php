@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\DB;
 
 class Transaksi extends Model
 {
@@ -28,8 +30,11 @@ class Transaksi extends Model
         'snap_token',
         'payment_type',
         'payment_reference',
+        'refund_status',
+        'refund_reference',
         'status_pembayaran',
         'dibayar_pada',
+        'refunded_at',
         'status_pesanan',
         'waktu_berangkat',
         'waktu_sampai',
@@ -46,6 +51,7 @@ class Transaksi extends Model
     {
         return [
             'dibayar_pada' => 'datetime',
+            'refunded_at' => 'datetime',
             'waktu_berangkat' => 'datetime',
             'waktu_sampai' => 'datetime',
             'stok_dikembalikan' => 'boolean',
@@ -81,12 +87,14 @@ class Transaksi extends Model
     {
         if ($this->waktu_berangkat && $this->waktu_sampai) {
             $menit = max(1, (int) $this->waktu_berangkat->diffInMinutes($this->waktu_sampai));
-            return $menit . ' menit';
+
+            return $menit.' menit';
         }
 
         if ($this->waktu_berangkat && $this->status_pesanan === 'Diantar') {
             $menit = max(1, (int) $this->waktu_berangkat->diffInMinutes(now()));
-            return $menit . ' menit di perjalanan';
+
+            return $menit.' menit di perjalanan';
         }
 
         return null;
@@ -95,12 +103,13 @@ class Transaksi extends Model
     public function getEstimasiSampaiAttribute(): ?string
     {
         if ($this->waktu_sampai) {
-            return $this->waktu_sampai->format('H:i') . ' WIB';
+            return $this->waktu_sampai->format('H:i').' WIB';
         }
 
         if ($this->waktu_berangkat) {
             $estMulai = $this->waktu_berangkat->copy()->addMinutes(20)->format('H:i');
             $estAkhir = $this->waktu_berangkat->copy()->addMinutes(35)->format('H:i');
+
             return "{$estMulai} - {$estAkhir} WIB (±25 mnt)";
         }
 
@@ -141,7 +150,7 @@ class Transaksi extends Model
         return $this->created_at ? $this->created_at->addHour()->isPast() : false;
     }
 
-    public function getQrisBatasWaktuAttribute(): ?\Carbon\Carbon
+    public function getQrisBatasWaktuAttribute(): ?Carbon
     {
         if ($this->metode_pembayaran !== 'QRIS' || ! $this->created_at) {
             return null;
@@ -162,7 +171,7 @@ class Transaksi extends Model
     public function batalkanJikaKedaluwarsa(): bool
     {
         if ($this->isQrisExpired()) {
-            \Illuminate\Support\Facades\DB::transaction(function () {
+            DB::transaction(function () {
                 $this->update([
                     'status_pesanan' => 'Dibatalkan',
                     'status_pembayaran' => 'Batal',
@@ -187,7 +196,7 @@ class Transaksi extends Model
 
         $count = 0;
         foreach ($expiredTransactions as $trx) {
-            \Illuminate\Support\Facades\DB::transaction(function () use ($trx) {
+            DB::transaction(function () use ($trx) {
                 $trx->update([
                     'status_pesanan' => 'Dibatalkan',
                     'status_pembayaran' => 'Batal',
@@ -229,4 +238,3 @@ class Transaksi extends Model
         };
     }
 }
-

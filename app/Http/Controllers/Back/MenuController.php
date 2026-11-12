@@ -18,7 +18,7 @@ class MenuController extends Controller
 
         if ($request->filled('search')) {
             $search = mb_substr(trim((string) $request->search), 0, 100);
-            $query->where('nama_menu', 'like', '%' . $search . '%');
+            $query->where('nama_menu', 'like', '%'.$search.'%');
         }
 
         if ($request->filled('kategori_id')) {
@@ -26,7 +26,7 @@ class MenuController extends Controller
         }
 
         $menu = $query
-            ->orderByDesc('is_active')
+            ->orderBy('is_active')
             ->latest()
             ->paginate(10)
             ->withQueryString();

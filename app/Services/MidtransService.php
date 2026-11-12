@@ -6,6 +6,7 @@ use App\Models\Transaksi;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class MidtransService
 {
@@ -51,6 +52,79 @@ class MidtransService
         return $this->isProduction
             ? 'https://api.midtrans.com/v2'
             : 'https://api.sandbox.midtrans.com/v2';
+    }
+
+    public function refundIfNeeded(Transaksi $transaksi): void
+    {
+        if ($transaksi->metode_pembayaran !== 'QRIS' || $transaksi->status_pembayaran !== 'Lunas') {
+            return;
+        }
+
+        if (in_array($transaksi->refund_status, ['requested', 'completed'], true)) {
+            return;
+        }
+
+        if (! $this->isConfigured()) {
+            throw ValidationException::withMessages([
+                'status_pesanan' => 'Refund belum dapat diproses karena konfigurasi Midtrans belum tersedia.',
+            ]);
+        }
+
+        $orderId = str_starts_with((string) $transaksi->payment_reference, $transaksi->kode_transaksi)
+            ? $transaksi->payment_reference
+            : $transaksi->kode_transaksi;
+        $refundKey = 'REFUND-'.$transaksi->kode_transaksi;
+
+        try {
+            $response = Http::withBasicAuth($this->serverKey, '')
+                ->acceptJson()
+                ->asJson()
+                ->timeout(10)
+                ->withOptions([
+                    'connect_timeout' => 4,
+                    CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+                ])
+                ->post($this->getCoreApiBaseUrl().'/'.urlencode($orderId).'/refund', [
+                    'refund_key' => $refundKey,
+                    'amount' => (int) $transaksi->total_bayar,
+                    'reason' => 'Pesanan dibatalkan',
+                ]);
+
+            if (! $response->successful()) {
+                Log::warning('Midtrans refund failed', [
+                    'kode_transaksi' => $transaksi->kode_transaksi,
+                    'order_id' => $orderId,
+                    'status' => $response->status(),
+                    'body' => $response->json(),
+                ]);
+
+                throw ValidationException::withMessages([
+                    'status_pesanan' => 'Refund Midtrans gagal diproses. Pesanan belum dibatalkan.',
+                ]);
+            }
+
+            $refundReference = $response->json('refund_key')
+                ?? $response->json('refund_id')
+                ?? $refundKey;
+
+            $transaksi->update([
+                'refund_status' => 'requested',
+                'refund_reference' => substr((string) $refundReference, 0, 150),
+                'refunded_at' => now(),
+            ]);
+        } catch (ValidationException $exception) {
+            throw $exception;
+        } catch (\Throwable $exception) {
+            Log::error('Midtrans refund exception', [
+                'kode_transaksi' => $transaksi->kode_transaksi,
+                'order_id' => $orderId,
+                'message' => $exception->getMessage(),
+            ]);
+
+            throw ValidationException::withMessages([
+                'status_pesanan' => 'Refund Midtrans tidak dapat dihubungi. Pesanan belum dibatalkan.',
+            ]);
+        }
     }
 
     /**

@@ -278,11 +278,18 @@
                                                             </div>
                                                             <p class="text-[11px] text-slate-500 mt-0.5" x-text="'Rp ' + formatRupiah(item.harga) + ' / porsi'"></p>
                                                         </div>
-                                                        <div class="flex items-center justify-between pt-2">
-                                                            <div class="flex items-center border border-slate-200 rounded-lg bg-slate-50/50">
-                                                                <button @click="kurangiQty(index)" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-gold-700 transition" aria-label="Kurangi porsi"><i class="fa-solid fa-minus text-[9px]"></i></button>
-                                                                <span class="w-6 text-center text-xs font-bold text-charcoal-900" x-text="item.qty"></span>
-                                                                <button @click="tambahQty(index)" class="w-6 h-6 flex items-center justify-center text-slate-500 hover:text-gold-700 transition" aria-label="Tambah porsi"><i class="fa-solid fa-plus text-[9px]"></i></button>
+                                                            <div class="flex items-center justify-between pt-2">
+                                                            <div class="flex items-center border border-slate-200 rounded-lg bg-slate-50/50 overflow-hidden">
+                                                                <button type="button" @click="kurangiQty(index)" class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-gold-700 transition" aria-label="Kurangi porsi"><i class="fa-solid fa-minus text-[9px]"></i></button>
+                                                                <input type="number"
+                                                                       :value="item.qty"
+                                                                       @change="setQty(index, $event.target.value)"
+                                                                       @keydown.enter="$event.target.blur()"
+                                                                       min="1"
+                                                                       :max="item.maxStok"
+                                                                       :aria-label="'Jumlah ' + item.nama"
+                                                                       class="w-10 h-7 border-x border-slate-200 bg-white p-0 text-center text-xs font-bold text-charcoal-900 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none">
+                                                                <button type="button" @click="tambahQty(index)" class="w-7 h-7 flex items-center justify-center text-slate-500 hover:text-gold-700 transition" aria-label="Tambah porsi"><i class="fa-solid fa-plus text-[9px]"></i></button>
                                                             </div>
                                                             <button @click="hapusItem(index)" type="button" class="text-[11px] font-medium text-slate-400 hover:text-rose-600 transition">Hapus</button>
                                                         </div>
@@ -325,13 +332,11 @@
                     if (index !== -1) {
                         if(this.cart[index].qty < maxStok) {
                             this.cart[index].qty++;
-                            this.isCartOpen = true;
                         } else {
                             alert('Stok menu ini sudah mencapai batas maksimal yang tersedia (' + maxStok + ' porsi).');
                         }
                     } else {
                         this.cart.push({ id, nama, harga, image, qty: 1, maxStok });
-                        this.isCartOpen = true;
                     }
                 },
                 tambahQty(index) {
@@ -340,6 +345,15 @@
                     } else {
                         alert('Stok menu ini sudah mencapai batas maksimal yang tersedia (' + this.cart[index].maxStok + ' porsi).');
                     }
+                },
+                setQty(index, quantity) {
+                    const item = this.cart[index];
+                    if (!item) return;
+
+                    const parsedQuantity = Number.parseInt(quantity, 10);
+                    item.qty = Number.isFinite(parsedQuantity)
+                        ? Math.min(Math.max(parsedQuantity, 1), item.maxStok)
+                        : 1;
                 },
                 kurangiQty(index) { if (this.cart[index].qty > 1) this.cart[index].qty--; else this.hapusItem(index); },
                 hapusItem(index) { this.cart.splice(index, 1); },
@@ -397,7 +411,7 @@
                     if (!href) return;
                     try {
                         const linkPath = clean(new URL(href, window.location.origin).pathname);
-                        const isMatch = (linkPath === '/' && currentPath === '/') || 
+                        const isMatch = (linkPath === '/' && currentPath === '/') ||
                                         (linkPath !== '/' && (currentPath === linkPath || currentPath.startsWith(linkPath + '/')));
 
                         if (isMatch) {
@@ -416,7 +430,7 @@
                     if (!href) return;
                     try {
                         const linkPath = clean(new URL(href, window.location.origin).pathname);
-                        const isMatch = (linkPath === '/' && currentPath === '/') || 
+                        const isMatch = (linkPath === '/' && currentPath === '/') ||
                                         (linkPath !== '/' && (currentPath === linkPath || currentPath.startsWith(linkPath + '/')));
 
                         if (isMatch) {

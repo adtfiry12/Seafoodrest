@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str; // WAJIB TAMBAH INI
 
 class Menu extends Model
@@ -13,7 +14,7 @@ class Menu extends Model
     protected $table = 'menu';
 
     protected $fillable = [
-        'kategori_id', 'nama_menu', 'slug', 'deskripsi', 'harga', 'gambar', 'stok', 'is_active'
+        'kategori_id', 'nama_menu', 'slug', 'deskripsi', 'harga', 'gambar', 'stok', 'is_active',
     ];
 
     public function getRouteKeyName()
@@ -34,5 +35,10 @@ class Menu extends Model
     public function kategori()
     {
         return $this->belongsTo(Kategori::class, 'kategori_id');
+    }
+
+    public function detailTransaksi(): HasMany
+    {
+        return $this->hasMany(DetailTransaksi::class, 'menu_id');
     }
 }

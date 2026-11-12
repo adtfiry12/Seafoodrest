@@ -110,7 +110,15 @@
                 </div>
                 <div>
                     <h3 class="font-bold text-base">Pesanan Telah Dibatalkan</h3>
-                    <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pesanan ini telah dibatalkan oleh pihak restoran atau sistem (melebihi batas waktu pembayaran). Hubungi kami jika terdapat kendala.</p>
+                    @if($transaksi->refund_status === 'completed')
+                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana sudah diproses. Silakan cek rekening atau metode pembayaran yang digunakan.</p>
+                    @elseif($transaksi->refund_status === 'requested')
+                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana sedang diproses oleh Midtrans. Jika dana belum masuk setelah beberapa waktu, <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-800">hubungi kami melalui WhatsApp</a>.</p>
+                    @elseif($transaksi->metode_pembayaran === 'QRIS' && $transaksi->status_pembayaran === 'Batal')
+                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pengembalian dana belum tercatat. Jika Anda sudah melakukan pembayaran, <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-800">hubungi kami melalui WhatsApp</a> dan sertakan kode pesanan ini.</p>
+                    @else
+                        <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Pesanan ini dibatalkan tanpa pembayaran online, sehingga tidak ada dana yang perlu dikembalikan melalui Midtrans.</p>
+                    @endif
                 </div>
             </div>
         @else

@@ -66,6 +66,29 @@
                         </div>
                     </div>
 
+                    @if($isBatal)
+                        <div class="mx-4 mt-4 rounded-xl border {{ $trx->refund_status ? 'border-amber-200 bg-amber-50 text-amber-900' : 'border-slate-200 bg-slate-50 text-slate-700' }} p-3.5 text-xs sm:text-sm">
+                            <div class="flex items-start gap-2.5">
+                                <i class="fa-solid {{ $trx->refund_status ? 'fa-clock text-amber-600' : 'fa-circle-info text-slate-500' }} mt-0.5"></i>
+                                <div>
+                                    @if($trx->refund_status === 'completed')
+                                        <p class="font-bold">Pengembalian dana sudah diproses.</p>
+                                        <p class="mt-0.5">Silakan cek rekening atau metode pembayaran yang digunakan.</p>
+                                    @elseif($trx->refund_status === 'requested')
+                                        <p class="font-bold">Pengembalian dana sedang diproses oleh Midtrans.</p>
+                                        <p class="mt-0.5">Jika dana belum masuk setelah beberapa waktu, silakan <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-700">hubungi kami melalui WhatsApp</a>.</p>
+                                    @elseif($trx->metode_pembayaran === 'QRIS' && $trx->status_pembayaran === 'Batal')
+                                        <p class="font-bold">Pengembalian dana belum tercatat.</p>
+                                        <p class="mt-0.5">Jika Anda sudah melakukan pembayaran, silakan <a href="https://wa.me/6285191194059" target="_blank" rel="noopener" class="font-semibold underline hover:text-gold-700">hubungi kami melalui WhatsApp</a> dan sertakan kode pesanan ini.</p>
+                                    @else
+                                        <p class="font-bold">Pesanan dibatalkan tanpa pembayaran online.</p>
+                                        <p class="mt-0.5">Tidak ada dana yang perlu dikembalikan melalui Midtrans.</p>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-6 text-xs sm:text-sm">
                             <div><p class="text-[11px] text-slate-400 font-medium">Layanan</p><p class="mt-0.5 font-semibold text-charcoal-950 truncate">{{ $trx->tipe_pesanan }}</p></div>

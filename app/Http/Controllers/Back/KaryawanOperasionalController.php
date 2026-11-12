@@ -7,6 +7,7 @@ use App\Models\Kategori;
 use App\Models\Menu;
 use App\Models\Pengguna;
 use App\Models\Transaksi;
+use App\Services\MidtransService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -165,7 +166,7 @@ class KaryawanOperasionalController extends Controller
             ->with('success', 'Transaksi kasir '.$transaksi->kode_transaksi.' berhasil dibuat!');
     }
 
-    public function pesananBaru(Request $request, \App\Services\MidtransService $midtrans)
+    public function pesananBaru(Request $request, MidtransService $midtrans)
     {
         Transaksi::batalkanSemuaQrisKedaluwarsa();
 
@@ -232,7 +233,7 @@ class KaryawanOperasionalController extends Controller
         return view('back.karyawan.delivery', compact('transaksi', 'countSiap', 'countDiantar'));
     }
 
-    public function detailPesanan(string $kode_transaksi, \App\Services\MidtransService $midtrans): View
+    public function detailPesanan(string $kode_transaksi, MidtransService $midtrans): View
     {
         $transaksi = Transaksi::with(['pelanggan', 'karyawan', 'kurir', 'detail.menu'])
             ->where('kode_transaksi', $kode_transaksi)
@@ -250,7 +251,7 @@ class KaryawanOperasionalController extends Controller
         return view('back.karyawan.pesanan-detail', compact('transaksi'));
     }
 
-    public function updateStatus(Request $request, $kode_transaksi)
+    public function updateStatus(Request $request, $kode_transaksi, MidtransService $midtrans)
     {
         $transaksi = Transaksi::where('kode_transaksi', $kode_transaksi)->firstOrFail();
         $currentStatus = $transaksi->status_pesanan;
@@ -302,7 +303,7 @@ class KaryawanOperasionalController extends Controller
 
         if ($nextStatus === 'Dimasak' && $transaksi->metode_pembayaran === 'QRIS') {
             if ($transaksi->status_pembayaran === 'Belum Lunas') {
-                app(\App\Services\MidtransService::class)->syncTransactionStatus($transaksi);
+                app(MidtransService::class)->syncTransactionStatus($transaksi);
                 $transaksi->refresh();
             }
 
@@ -315,6 +316,10 @@ class KaryawanOperasionalController extends Controller
 
         if ($nextStatus === 'Selesai' && $transaksi->metode_pembayaran === 'COD') {
             abort_unless($nextPaymentStatus === 'Lunas', 422, 'Pembayaran COD harus lunas saat pesanan selesai diserahkan.');
+        }
+
+        if ($nextStatus === 'Dibatalkan') {
+            $midtrans->refundIfNeeded($transaksi);
         }
 
         DB::transaction(function () use ($transaksi, $nextStatus, $nextPaymentStatus, $request) {
