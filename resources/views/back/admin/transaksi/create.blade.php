@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="space-y-6 w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6"
-     x-data="posSystem({{ $menu->toJson() }})">
+     x-data="posSystem(@js($menu), @js(old('tipe_pesanan', 'Dine-In')), @js(old('metode_pembayaran', 'Tunai')))">
 
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
@@ -58,18 +58,21 @@
                     @endphp
 
                     <div>
-                        <label class="block text-sm font-semibold text-charcoal-900 mb-2">Pelanggan</label>
+                        <label class="block text-sm font-semibold text-charcoal-900 mb-2">Pelanggan Terdaftar</label>
                         <div x-data="searchablePelangganSelect(@js($pelangganOptions), @js((string) old('pengguna_id')))" @click.outside="open = false" class="relative">
                             <input type="hidden" name="pengguna_id" :value="selected">
-                            <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
-                                <span class="truncate" x-text="selectedLabel() || '-- Pelanggan Umum (Guest) --'" :class="selected ? 'text-charcoal-900 font-medium' : 'text-slate-500'"></span>
+                            <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20 shadow-sm">
+                                <span class="truncate flex items-center gap-2" :class="selected ? 'text-charcoal-950 font-semibold' : 'text-slate-500'">
+                                    <i class="fa-solid fa-user text-xs text-slate-400"></i>
+                                    <span x-text="selectedLabel() || '-- Pelanggan Umum (Guest / Walk-In) --'"></span>
+                                </span>
                                 <i class="fa-solid fa-chevron-down text-xs text-slate-400 shrink-0 ml-2 transition-transform duration-200" :class="{ 'rotate-180': open }"></i>
                             </button>
-                            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
-                                <div class="border-b border-slate-100 p-2 bg-slate-50/50">
+                            <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-100" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-75" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute left-0 right-0 z-40 mt-1.5 min-w-60 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                <div class="border-b border-slate-100 p-2">
                                     <div class="relative flex items-center">
                                         <i class="fa-solid fa-magnifying-glass absolute left-3 text-xs text-slate-400 pointer-events-none"></i>
-                                        <input type="text"
+                                        <input type="search"
                                                x-model="search"
                                                placeholder="Cari nama atau no. HP..."
                                                class="w-full rounded-lg border border-slate-200 bg-white py-1.5 pl-8 pr-8 text-xs sm:text-sm text-charcoal-900 placeholder:text-slate-400 focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 outline-none">
@@ -82,10 +85,10 @@
                                         </button>
                                     </div>
                                 </div>
-                                <div class="max-h-56 overflow-y-auto p-1 custom-scrollbar divide-y divide-slate-50">
-                                    <button type="button" x-show="filteredOptions().length === 0" class="w-full px-3 py-3 text-center text-xs text-slate-400" disabled>Tidak ada data pelanggan ditemukan.</button>
+                                <div class="max-h-60 overflow-y-auto p-1 custom-scrollbar">
+                                    <button type="button" x-show="filteredOptions().length === 0" class="w-full px-3 py-3 text-center text-sm text-slate-400" disabled>Tidak ada pelanggan ditemukan.</button>
                                     <template x-for="option in filteredOptions()" :key="option.id">
-                                        <button type="button" @click="select(option)" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm text-charcoal-900 hover:bg-gold-50 hover:text-gold-700 transition">
+                                        <button type="button" @click="select(option)" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm transition-all" :class="selected == String(option.id) ? 'bg-gold-50 text-gold-700 font-bold' : 'text-charcoal-900 hover:bg-gold-50 hover:text-gold-700'">
                                             <div class="truncate">
                                                 <span class="font-medium" x-text="option.nama || option.label"></span>
                                                 <span x-show="option.no_hp" class="text-xs text-slate-400 ml-1.5" x-text="'(' + option.no_hp + ')'"></span>
@@ -113,11 +116,27 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-charcoal-900 mb-2">Tipe Pesanan <span class="text-red-500">*</span></label>
-                        <select name="tipe_pesanan" required x-model="tipePesanan" class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
-                            <option value="Dine-In">Dine-In (Makan di Tempat)</option>
-                            <option value="Takeaway">Takeaway (Bungkus)</option>
-                            <option value="Delivery">Delivery (Kirim)</option>
-                        </select>
+                        <input type="hidden" name="tipe_pesanan" :value="tipePesanan">
+                        <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+                            <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20">
+                                <span x-text="tipePesanan === 'Takeaway' ? 'Takeaway (Bungkus)' : (tipePesanan === 'Delivery' ? 'Delivery (Kirim)' : 'Dine-In (Makan di Tempat)')"></span>
+                                <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform" :class="{ 'rotate-180': open }"></i>
+                            </button>
+                            <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
+                                <button type="button" @click="tipePesanan = 'Dine-In'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-charcoal-900 transition hover:bg-gold-50 hover:text-gold-700">
+                                    <span>Dine-In (Makan di Tempat)</span>
+                                    <i x-show="tipePesanan === 'Dine-In'" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                                <button type="button" @click="tipePesanan = 'Takeaway'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-charcoal-900 transition hover:bg-gold-50 hover:text-gold-700">
+                                    <span>Takeaway (Bungkus)</span>
+                                    <i x-show="tipePesanan === 'Takeaway'" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                                <button type="button" @click="tipePesanan = 'Delivery'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-charcoal-900 transition hover:bg-gold-50 hover:text-gold-700">
+                                    <span>Delivery (Kirim)</span>
+                                    <i x-show="tipePesanan === 'Delivery'" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                            </div>
+                        </div>
                         @error('tipe_pesanan') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -129,11 +148,27 @@
 
                     <div>
                         <label class="block text-sm font-semibold text-charcoal-900 mb-2">Metode Pembayaran <span class="text-red-500">*</span></label>
-                        <select name="metode_pembayaran" required class="bg-slate-50 border border-slate-200 text-charcoal-900 text-sm rounded-xl focus:ring-gold-500 block w-full p-2.5">
-                            <option value="Tunai">Tunai / Cash</option>
-                            <option value="QRIS">QRIS / Transfer</option>
-                            <option value="COD">Bayar di Tempat (COD)</option>
-                        </select>
+                        <input type="hidden" name="metode_pembayaran" :value="metodePembayaran">
+                        <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+                            <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-left text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20">
+                                <span x-text="metodePembayaran === 'QRIS' ? 'QRIS / Transfer' : (metodePembayaran === 'COD' ? 'Bayar di Tempat (COD)' : 'Tunai / Cash')"></span>
+                                <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform" :class="{ 'rotate-180': open }"></i>
+                            </button>
+                            <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
+                                <button type="button" @click="metodePembayaran = 'Tunai'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-charcoal-900 transition hover:bg-gold-50 hover:text-gold-700">
+                                    <span>Tunai / Cash</span>
+                                    <i x-show="metodePembayaran === 'Tunai'" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                                <button type="button" @click="metodePembayaran = 'QRIS'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-charcoal-900 transition hover:bg-gold-50 hover:text-gold-700">
+                                    <span>QRIS / Transfer</span>
+                                    <i x-show="metodePembayaran === 'QRIS'" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                                <button type="button" @click="metodePembayaran = 'COD'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-charcoal-900 transition hover:bg-gold-50 hover:text-gold-700">
+                                    <span>Bayar di Tempat (COD)</span>
+                                    <i x-show="metodePembayaran === 'COD'" class="fa-solid fa-check text-gold-600"></i>
+                                </button>
+                            </div>
+                        </div>
                         @error('metode_pembayaran') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
                     </div>
 
@@ -169,7 +204,7 @@
                         Keranjang masih kosong. Klik menu di bawah untuk menambahkan.
                     </div>
 
-                    <div class="space-y-3">
+                    <div class="space-y-3 max-h-[34rem] sm:max-h-[22rem] overflow-y-auto pr-1 custom-scrollbar" x-show="cart.length > 0">
                         <template x-for="(item, index) in cart" :key="item.id">
                             <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl gap-2.5 sm:gap-3">
                                 <input type="hidden" :name="`items[${index}][menu_id]`" :value="item.id">
@@ -212,7 +247,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 pt-1 max-h-[72rem] sm:max-h-[48rem] xl:max-h-[36rem] overflow-y-auto pr-1 custom-scrollbar">
                         @foreach($menu as $m)
                             <div x-show="!menuFilterSearch || '{{ strtolower(addslashes($m->nama_menu)) }}'.includes(menuFilterSearch.toLowerCase().trim())"
                                  @click="addToCart({{ $m->id }}, '{{ addslashes($m->nama_menu) }}', {{ $m->harga }}, {{ $m->stok }})"
@@ -286,9 +321,10 @@
                 };
             };
 
-            window.posSystem = function(menus) {
+            window.posSystem = function(menus, initialTipePesanan = 'Dine-In', initialMetodePembayaran = 'Tunai') {
                 return {
-                    tipePesanan: 'Dine-In',
+                    tipePesanan: initialTipePesanan,
+                    metodePembayaran: initialMetodePembayaran,
                     cart: [],
                     menuFilterSearch: '',
 

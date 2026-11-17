@@ -30,7 +30,7 @@
         </div>
 
         <div class="flex items-center gap-2.5">
-            <button type="button" @click="resetCart()" x-show="cart.length > 0" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl hover:bg-rose-100 transition shadow-2xs active:scale-95">
+            <button type="button" @click="openResetCartModal()" x-show="cart.length > 0" class="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl hover:bg-rose-100 transition shadow-2xs active:scale-95">
                 <i class="fa-solid fa-trash-can text-xs"></i>
                 <span>Kosongkan Keranjang</span>
             </button>
@@ -64,6 +64,35 @@
                             @endforeach
                         </ul>
                     @endif
+                </div>
+            </div>
+
+            <div x-show="feedbackModalOpen" x-cloak
+                 class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/60 p-3 sm:p-4 backdrop-blur-xs"
+                 role="dialog" aria-modal="true" aria-labelledby="feedback-modal-title">
+                <div x-show="feedbackModalOpen" x-transition
+                     @click.outside="feedbackModalOpen = false"
+                     class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+                    <div class="flex items-start gap-3.5 border-b border-slate-100 px-5 py-4 sm:px-6 sm:py-5">
+                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-200/80 bg-amber-50 text-amber-600">
+                            <i class="fa-solid fa-circle-info text-lg"></i>
+                        </div>
+                        <div class="min-w-0 flex-1 pr-2">
+                            <h2 id="feedback-modal-title" class="font-serif text-base font-bold leading-snug text-charcoal-950 sm:text-lg" x-text="feedbackTitle"></h2>
+                            <p class="mt-0.5 text-xs text-slate-500">Informasi kasir.</p>
+                        </div>
+                        <button type="button" @click="feedbackModalOpen = false" class="rounded-lg p-1 text-slate-400 transition hover:text-slate-600" aria-label="Tutup modal">
+                            <i class="fa-solid fa-xmark text-base"></i>
+                        </button>
+                    </div>
+                    <div class="px-5 py-4 sm:px-6 sm:py-5">
+                        <p class="text-xs leading-relaxed text-slate-600 sm:text-sm" x-text="feedbackMessage"></p>
+                    </div>
+                    <div class="flex justify-end border-t border-slate-100 bg-slate-50/80 px-5 py-3.5 sm:px-6 sm:py-4">
+                        <button type="button" @click="feedbackModalOpen = false" class="w-full rounded-xl bg-charcoal-950 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-charcoal-900 sm:w-auto sm:text-sm">
+                            Mengerti
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -204,21 +233,50 @@
                         <!-- Metode Bayar -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Metode Bayar</label>
-                            <select name="metode_pembayaran" x-model="metodePembayaran" class="w-full bg-slate-50/70 border border-slate-200 text-charcoal-900 text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:bg-white focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20">
-                                <option value="Tunai">Tunai (Bayar di Kasir)</option>
-                                <option value="QRIS">QRIS / Transfer Bank</option>
-                                <option value="COD" x-show="tipePesanan === 'Delivery'">Bayar di Tempat (COD)</option>
-                            </select>
+                            <input type="hidden" name="metode_pembayaran" :value="metodePembayaran">
+                            <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+                                <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 px-3.5 py-2.5 text-left text-xs sm:text-sm text-charcoal-900 transition-all hover:bg-white focus:border-gold-500 focus:ring-4 focus:ring-gold-500/20">
+                                    <span x-text="metodePembayaran === 'QRIS' ? 'QRIS / Transfer Bank' : (metodePembayaran === 'COD' ? 'Bayar di Tempat (COD)' : 'Tunai (Bayar di Kasir)')"></span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform" :class="{ 'rotate-180': open }"></i>
+                                </button>
+                                <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
+                                    <button type="button" @click="metodePembayaran = 'Tunai'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm text-charcoal-900 hover:bg-gold-50 hover:text-gold-700 transition">
+                                        <span>Tunai (Bayar di Kasir)</span>
+                                        <i x-show="metodePembayaran === 'Tunai'" class="fa-solid fa-check text-gold-600"></i>
+                                    </button>
+                                    <button type="button" @click="metodePembayaran = 'QRIS'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm text-charcoal-900 hover:bg-gold-50 hover:text-gold-700 transition">
+                                        <span>QRIS / Transfer Bank</span>
+                                        <i x-show="metodePembayaran === 'QRIS'" class="fa-solid fa-check text-gold-600"></i>
+                                    </button>
+                                    <button type="button" x-show="tipePesanan === 'Delivery'" @click="metodePembayaran = 'COD'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm text-charcoal-900 hover:bg-gold-50 hover:text-gold-700 transition">
+                                        <span>Bayar di Tempat (COD)</span>
+                                        <i x-show="metodePembayaran === 'COD'" class="fa-solid fa-check text-gold-600"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Status Bayar -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Status Pembayaran</label>
-                            <select name="status_pembayaran" x-model="statusPembayaran" class="w-full bg-slate-50/70 border border-slate-200 text-charcoal-900 text-xs sm:text-sm rounded-xl px-3 py-2.5 focus:bg-white focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20"
-                                    :class="statusPembayaran === 'Lunas' ? 'border-emerald-300 text-emerald-800 font-semibold' : 'border-amber-300 text-amber-800 font-semibold'">
-                                <option value="Lunas">Lunas (Sudah Bayar)</option>
-                                <option value="Belum Lunas">Belum Lunas (Bayar Nanti)</option>
-                            </select>
+                            <input type="hidden" name="status_pembayaran" :value="statusPembayaran">
+                            <div x-data="{ open: false }" @click.outside="open = false" class="relative">
+                                <button type="button" @click="open = !open" class="flex w-full items-center justify-between rounded-xl border bg-slate-50/70 px-3.5 py-2.5 text-left text-xs sm:text-sm transition-all hover:bg-white focus:ring-4 focus:ring-gold-500/20"
+                                        :class="statusPembayaran === 'Lunas' ? 'border-emerald-300 text-emerald-800 font-semibold focus:border-emerald-400' : 'border-amber-300 text-amber-800 font-semibold focus:border-amber-400'">
+                                    <span x-text="statusPembayaran === 'Lunas' ? 'Lunas (Sudah Bayar)' : 'Belum Lunas (Bayar Nanti)'"></span>
+                                    <i class="fa-solid fa-chevron-down text-[10px] text-slate-400 transition-transform" :class="{ 'rotate-180': open }"></i>
+                                </button>
+                                <div x-show="open" x-cloak x-transition class="absolute left-0 right-0 z-40 mt-1.5 overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-xl">
+                                    <button type="button" @click="statusPembayaran = 'Lunas'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm text-charcoal-900 hover:bg-emerald-50 hover:text-emerald-700 transition">
+                                        <span>Lunas (Sudah Bayar)</span>
+                                        <i x-show="statusPembayaran === 'Lunas'" class="fa-solid fa-check text-emerald-600"></i>
+                                    </button>
+                                    <button type="button" @click="statusPembayaran = 'Belum Lunas'; open = false" class="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs sm:text-sm text-charcoal-900 hover:bg-amber-50 hover:text-amber-700 transition">
+                                        <span>Belum Lunas (Bayar Nanti)</span>
+                                        <i x-show="statusPembayaran === 'Belum Lunas'" class="fa-solid fa-check text-amber-600"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -463,6 +521,39 @@
 
         </div>
     </form>
+
+    <div x-show="resetCartModalOpen" x-cloak
+         class="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950/60 p-3 sm:p-4 backdrop-blur-xs"
+         role="dialog" aria-modal="true" aria-labelledby="reset-cart-modal-title">
+        <div x-show="resetCartModalOpen" x-transition
+             @click.outside="resetCartModalOpen = false"
+             class="w-full max-w-md overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+            <div class="flex items-start gap-3.5 border-b border-slate-100 px-5 py-4 sm:px-6 sm:py-5">
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-rose-200/80 bg-rose-50 text-rose-600">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                </div>
+                <div class="min-w-0 flex-1 pr-2">
+                    <h2 id="reset-cart-modal-title" class="font-serif text-base font-bold leading-snug text-charcoal-950 sm:text-lg">Kosongkan Keranjang?</h2>
+                    <p class="mt-0.5 text-xs text-slate-500">Konfirmasi tindakan operasional restoran.</p>
+                </div>
+                <button type="button" @click="resetCartModalOpen = false" class="rounded-lg p-1 text-slate-400 transition hover:text-slate-600" aria-label="Tutup modal">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                </button>
+            </div>
+            <div class="px-5 py-4 sm:px-6 sm:py-5">
+                <p class="text-xs leading-relaxed text-slate-600 sm:text-sm">Semua menu yang sudah dimasukkan ke keranjang kasir akan dihapus.</p>
+            </div>
+            <div class="flex flex-col-reverse gap-2.5 border-t border-slate-100 bg-slate-50/80 px-5 py-3.5 sm:flex-row sm:justify-end sm:gap-3 sm:px-6 sm:py-4">
+                <button type="button" @click="resetCartModalOpen = false" class="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-600 shadow-2xs transition hover:bg-slate-100 hover:text-charcoal-900 sm:w-auto sm:text-sm">
+                    Batal
+                </button>
+                <button type="button" @click="confirmResetCart()" class="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-5 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-rose-700 active:scale-95 sm:w-auto sm:text-sm">
+                    <span>Kosongkan</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -488,6 +579,10 @@
                 statusPesanan: 'Dimasak',
                 cart: [],
                 ongkir: 15000,
+                resetCartModalOpen: false,
+                feedbackModalOpen: false,
+                feedbackTitle: '',
+                feedbackMessage: '',
 
                 init() {
                     if (typeof window.stopKaryawanAutoRefresh === 'function') {
@@ -567,7 +662,7 @@
                         if (this.cart[existingIndex].qty < menu.stok) {
                             this.cart[existingIndex].qty++;
                         } else {
-                            alert(`Stok ${menu.nama_menu} tidak mencukupi (tersisa ${menu.stok} porsi).`);
+                            this.openFeedbackModal('Stok Tidak Mencukupi', `Stok ${menu.nama_menu} yang tersedia hanya ${menu.stok} porsi.`);
                         }
                     } else {
                         if (menu.stok > 0) {
@@ -580,7 +675,7 @@
                                 image: this.getMenuImage(menu)
                             });
                         } else {
-                            alert(`Stok ${menu.nama_menu} habis.`);
+                            this.openFeedbackModal('Menu Habis', `Stok ${menu.nama_menu} sedang habis.`);
                         }
                     }
                 },
@@ -589,7 +684,7 @@
                     if (this.cart[index] && this.cart[index].qty < this.cart[index].maxStok) {
                         this.cart[index].qty++;
                     } else {
-                        alert(`Stok maksimal tercapai (${this.cart[index]?.maxStok || 0} porsi).`);
+                        this.openFeedbackModal('Stok Maksimal Tercapai', `Jumlah maksimal menu ini adalah ${this.cart[index]?.maxStok || 0} porsi.`);
                     }
                 },
 
@@ -605,10 +700,19 @@
                     this.cart.splice(index, 1);
                 },
 
-                resetCart() {
-                    if (confirm('Yakin ingin mengosongkan semua menu di keranjang kasir?')) {
-                        this.cart = [];
-                    }
+                openResetCartModal() {
+                    this.resetCartModalOpen = true;
+                },
+
+                confirmResetCart() {
+                    this.cart = [];
+                    this.resetCartModalOpen = false;
+                },
+
+                openFeedbackModal(title, message) {
+                    this.feedbackTitle = title;
+                    this.feedbackMessage = message;
+                    this.feedbackModalOpen = true;
                 },
 
                 subtotal() {
@@ -638,7 +742,7 @@
                 handleSubmit(e) {
                     if (this.cart.length === 0) {
                         e.preventDefault();
-                        alert('Keranjang kasir masih kosong. Pilih minimal 1 hidangan!');
+                        this.openFeedbackModal('Keranjang Masih Kosong', 'Pilih minimal satu hidangan sebelum memproses transaksi.');
                         return false;
                     }
                 }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -48,7 +49,10 @@ class TransaksiController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'pengguna_id' => ['nullable', 'exists:pengguna,id'],
+            'pengguna_id' => [
+                'nullable',
+                Rule::exists('pengguna', 'id')->where(fn ($query) => $query->where('role', 'pelanggan')),
+            ],
             'nama_pelanggan' => ['nullable', 'string', 'max:255'],
             'no_hp_pelanggan' => ['nullable', 'string', 'max:20'],
             'tipe_pesanan' => 'required|in:Dine-In,Takeaway,Delivery',
